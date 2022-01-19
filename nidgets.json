@@ -1,0 +1,36 @@
+{
+  "input": [
+    "./client/NidgetElement.js",
+    "./client/NidgetText.js"
+  ],
+  "records": {
+    "nidget-element": {
+      "name": "nidget-element",
+      "script": "./client/NidgetElement.js",
+      "view": "",
+      "style": "",
+      "package": "@thaerious/nidget-renderer",
+      "dependents": [],
+      "parents": [
+        {
+          "name": "nidget-text",
+          "package": "@thaerious/nidget-renderer"
+        }
+      ]
+    },
+    "nidget-text": {
+      "name": "nidget-text",
+      "script": "./client/NidgetText.js",
+      "view": "",
+      "style": "",
+      "package": "@thaerious/nidget-renderer",
+      "dependents": [
+        {
+          "name": "nidget-element",
+          "package": "@thaerious/nidget-renderer"
+        }
+      ],
+      "parents": []
+    }
+  }
+}
