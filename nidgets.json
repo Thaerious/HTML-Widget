@@ -9,12 +9,13 @@
       "script": "./client/NidgetElement.js",
       "view": "",
       "style": "",
-      "package": "@thaerious/nidget-renderer",
+      "type": "nidget",
+      "package": "@thaerious/nidget",
       "dependents": [],
       "parents": [
         {
           "name": "nidget-text",
-          "package": "@thaerious/nidget-renderer"
+          "package": "@thaerious/nidget"
         }
       ]
     },
@@ -23,11 +24,12 @@
       "script": "./client/NidgetText.js",
       "view": "",
       "style": "",
-      "package": "@thaerious/nidget-renderer",
+      "type": "nidget",
+      "package": "@thaerious/nidget",
       "dependents": [
         {
           "name": "nidget-element",
-          "package": "@thaerious/nidget-renderer"
+          "package": "@thaerious/nidget"
         }
       ],
       "parents": []

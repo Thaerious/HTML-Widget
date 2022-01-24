@@ -1,0 +1,28 @@
+NAME
+    nidget - manage nidget based projects
+
+SYNOPSIS
+    nidget [OPTION]... [COMMAND]
+
+OPTIONS
+    -n, --name
+        Set the name of the nidget when relevent
+
+    -v, -vv
+        Display verbose information, or very-verbose information
+
+    --dist
+        Set the 'distribution' directory for the package command
+
+    --output
+        Set location for local output files
+
+COMMANDS
+    readme:  print the readme file which contains an example setup
+    init:    create a new nidget project in the this directory
+    create:  create a new nidget with specified name (-n)
+    view:    create a new view with specified name (-n)
+    render:  create module, run babel & sass placing files in the --dist directory, add records to nidget.json
+    pack:    create deployable, run browserify & ejs then move files in the --output directory
+    records: show all records
+    clean:   remove --dist and --output directories and remove records from nidget.json file

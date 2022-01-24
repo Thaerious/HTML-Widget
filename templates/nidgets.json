@@ -1,0 +1,10 @@
+{
+  "output": "output",
+  "package-dir": "dist",
+  "nidget-src": "./src/nidgets/",
+  "view-src": "./src/view/",
+  "input": [
+    "./src/nidgets/**",
+    "./src/view/**"
+  ]
+}

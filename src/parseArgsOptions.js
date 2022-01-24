@@ -19,5 +19,8 @@ export default {
         long: `name`,
         short: `n`,
         type: `string`
+    },{
+        long: `dist`,
+        type: `string`
     }]
 };

@@ -3,10 +3,15 @@ import Path from "path";
 import Logger from "@thaerious/logger";
 import { Parser } from "acorn";
 import { bfsAll } from "./bfsObject.js";
-import FS, { lstat, lstatSync } from "fs";
+import FS, { lstatSync } from "fs";
 import Glob from "glob";
-import constants from "./constants.js";
+import CONSTANTS from "./constants.js";
 import collectImports from "./collectImports.js";
+import {convertToDash} from "./names.js";
+import babel from "@babel/core";
+import renderSCSS from "./RenderSCSS.js";
+import renderEJS from "./RenderEJS.js";
+import renderJS from "./RenderJS.js";
 
 class Warn {
     constructor() {
@@ -21,9 +26,6 @@ class Warn {
 }
 const warner = new Warn();
 const logger = Logger.getLogger();
-// Logger.getLogger().channel("nidget_preprocessor").prefix = (f, l, c) => {
-//     return `${f}:${l}\n`;
-// };
 
 /**
  * A record object for a single Nidget or root file.
@@ -31,19 +33,19 @@ const logger = Logger.getLogger();
  * All nidgets that this nidget refrences are considered dependencies.
  */
 class DependencyRecord {
-    constructor(nidgetName, nidgetPackage = "") {
+    constructor(nidgetName, nidgetPackage = ``) {
         this._name = nidgetName;
-        this._script = "";
-        this._view = "";
-        this._style = "";
+        this._script = ``;
+        this._view = ``;
+        this._style = ``;
         this._package = nidgetPackage;
-        this._dependents = new Set();
+        this._includes = new Set();
         this._parents = new Set();
-        this._type = `nidget`;
+        this._type = ``;
     }
 
     addDependency(record) {
-        this._dependents.add(record);
+        this._includes.add(record);
         record._parents.add(this);
     }
 
@@ -64,7 +66,7 @@ class DependencyRecord {
     }
 
     /* return a non-reflective set of dependency records */
-    get dependents() {
+    get includes() {
         const set = new Set();
         const stack = [this];
 
@@ -72,7 +74,7 @@ class DependencyRecord {
             const current = stack.shift();
             if (!set.has(current)) {
                 set.add(current);
-                for (const dep of current._dependents) {
+                for (const dep of current._includes) {
                     stack.push(dep);
                 }
             }
@@ -139,8 +141,8 @@ class DependencyRecord {
             `\tstyle : ${this.style}\n` +
             `\ttype : ${this.type}\n` +
             `\tpackage : ${this.package}\n` +
-            `\tdependents : Set(${this.dependents.size}){\n` +
-            [...this.dependents].reduce((p, c) => `${p}\t\t${c.name}\n`, ``) +
+            `\tincludes : Set(${this.includes.size}){\n` +
+            [...this.includes].reduce((p, c) => `${p}\t\t${c.name}\n`, ``) +
             `\t}\n` +
             `\tparents : Set(${this.parents.size}){\n` +
             [...this.parents].reduce((p, c) => `${p}\t\t${c.name}\n`, ``) +
@@ -154,13 +156,14 @@ class DependencyRecord {
             script: this.script,
             view: this.view,
             style: this.style,
+            type: this.type,
             package: this.package,
-            dependents: [],
+            includes: [],
             parents: []
         };
 
-        for (const record of this.dependents){
-            json.dependents.push({
+        for (const record of this.includes){
+            json.includes.push({
                 name : record.name,
                 package : record.package
             });
@@ -182,7 +185,7 @@ class DependencyRecord {
      * Adds any dependencies in the data-include attribute of the template (comma or space delimited).
      * Then searches for any tag-names that match any .ejs files in the nidgets subdirectory.
      */
-    seekEJSDependencies(nidgetPreprocessor) {
+    seekEJSDependencies(npp) {
         if (this.view === ``) return;
         if (!FS.existsSync(this.view)) return;
         
@@ -199,8 +202,8 @@ class DependencyRecord {
             for (const s of split) {
                 const dependencyName = s.trim();
                 if (dependencyName !== ``) {
-                    if (nidgetPreprocessor.hasRecord(dependencyName)) {
-                        const record = nidgetPreprocessor.getRecord(dependencyName);
+                    if (npp.hasRecord(dependencyName)) {
+                        const record = npp.getRecord(dependencyName);
                         this.addDependency(record);
                     } else {
                         warner.warn(this.name, s.trim());
@@ -209,8 +212,8 @@ class DependencyRecord {
             }
         }
 
-        for (const record of nidgetPreprocessor.records) {
-            if (this._dependents.has(record)) continue;
+        for (const record of npp.records) {
+            if (this._includes.has(record)) continue;
 
             if (template?.content.querySelector(record.name) || dom.window.document.querySelector(record.name)) {
                 this.addDependency(record);
@@ -241,7 +244,7 @@ class NidgetPreprocessor {
         this.resetRecords();
         this.input_paths = [];
         this.exclude_paths = [];
-        this._package = "";
+        this._package = ``;
     }
 
     set package(value) {
@@ -252,30 +255,43 @@ class NidgetPreprocessor {
         return this._package;
     }
 
-    addModules(path){
+    applySettings(settings){
+        this.settings = {...settings};
+
+        if (settings.package)     this.package = settings.package;
+        if (settings.input)       for (const path of settings.input) this.addPath(path);
+        if (settings.exclude)     for (const path of settings.exclude) this.addExclude(path);  
+        
+        return this;
+    }
+
+    addModules(path = CONSTANTS.NODE_MODULES_PATH){
+        Logger.getLogger().channel(`very-verbose`).log(`\\_ addModules:${path}`);
         const contents = FS.readdirSync(path, { withFileTypes: true });
 
-        for (let entry of contents){
-            let fullpath = Path.join(path, entry.name);
+        for (let dirEntry of contents){
+            let fullpath = Path.join(path, dirEntry.name);
 
-            if (entry.isSymbolicLink()){
-                const realpath = FS.realpathSync(Path.join(path, entry.name));
+            if (dirEntry.isSymbolicLink()){
+                const realpath = FS.realpathSync(Path.join(path, dirEntry.name));
                 const stat = lstatSync(realpath);
                 if (!stat.isDirectory()) continue;
             } else {
-                if (!entry.isDirectory()) continue;
+                if (!dirEntry.isDirectory()) continue;
             }
 
-            if (entry.name.startsWith("@")){
+            if (dirEntry.name.startsWith("@")){
                 this.addModules(fullpath);
             }
             else {
-                const nidgetPropPath = Path.join(fullpath, constants.NIDGET_PROPERTY_FILE);
+                const nidgetPropPath = Path.join(fullpath, CONSTANTS.NIDGET_PROPERTY_FILE);
                 if (FS.existsSync(nidgetPropPath)){
                     this.addRecordsFromFile(nidgetPropPath);
                 }
             }
         }
+
+        return this;
     }
 
     addRecordsFromFile(filepath){
@@ -283,12 +299,17 @@ class NidgetPreprocessor {
         const obj = JSON.parse(text);
 
         if (!obj.records) return;
-        for (const name in obj.records){
+
+        Logger.getLogger().channel(`very-verbose`).log(`  \\_ ${filepath}`);
+
+        for (const name in obj.records){            
             const record = obj.records[name];
+            Logger.getLogger().channel(`very-verbose`).log(`    \\_ ${record.package}:${record.name}`);
             this.nidgetRecords[name] = new DependencyRecord(record.name, record.package);
             this.nidgetRecords[name].view = record.view;
             this.nidgetRecords[name].script = record.script;
             this.nidgetRecords[name].style = record.style;
+            this.nidgetRecords[name].type = record.type;
         }
     }
 
@@ -297,10 +318,14 @@ class NidgetPreprocessor {
             .channel(`verbose`)
             .log(`adding filepath ` + filepaths);
         this.input_paths = [...this.input_paths, ...filepaths];
+
+        return this;
     }
 
     addExclude(...filepaths) {
         this.exclude_paths = [...this.exclude_paths, ...filepaths];
+
+        return this;
     }
 
     getFiles() {
@@ -310,11 +335,13 @@ class NidgetPreprocessor {
         let globFiles = [];
 
         for (const inputPath of this.input_paths) {
+            logger.channel("debug").log(`Input Path: ${inputPath}`);
             const files = new Glob.sync(inputPath, { ignore: this.exclude_paths });
             globFiles = [...globFiles, ...files];
         }
 
         for (const filepath of globFiles) {
+            logger.channel("debug").log(`Glob Path: ${filepath}`);
             if (filepath.endsWith(`.ejs`)) ejsFiles.push(filepath);
             if (filepath.endsWith(`.js`)) jsFiles.push(filepath);
             if (filepath.endsWith(`.scss`)) scssFiles.push(filepath);
@@ -324,39 +351,41 @@ class NidgetPreprocessor {
     }
 
     resetRecords() {
-        const record = new DependencyRecord("nidget-element", "@thaerious/nidget-renderer");
-        record.script = "node_modules/@thaerious/nidget-renderer/dist/NidgetElement.js";
-
-        this.nidgetRecords = {
-            "nidget-element": record,
-        };
+        this.nidgetRecords = {};
     }
 
-    process() {
-        Logger.getLogger().channel(`debug`).log(`# NPP process`);
+    buildRecords() {
+        Logger.getLogger().channel(`verbose`).log(`# build records`);
 
-        this.resetRecords();
         const { jsFiles, ejsFiles, scssFiles } = this.getFiles();
+        Logger.getLogger().channel(`debug`).log(jsFiles);
+        Logger.getLogger().channel(`debug`).log(ejsFiles);
+        Logger.getLogger().channel(`debug`).log(scssFiles);
 
         try {
             for (const filepath of jsFiles) {
+                Logger.getLogger().channel(`debug`).log(`  \\_ ${filepath}`);
+                const isNidget = this.isNidgetScript(filepath);
+
                 if (this.hasRecord(filepath)) {
                     this.getRecord(filepath).script = filepath;
-                    if (this.isNidgetScript(filepath)) this.getRecord.type = `nidget`;
+                    if (isNidget) this.getRecord.type = `nidget`;
                 }
 
-                if (this.isNidgetScript(filepath)) this.addNidget(filepath);
+                if (isNidget) this.addNidget(filepath);
                 else this.addInclude(filepath);
             }
         } catch (err) {
-            console.log(`*** JS Parsing Error:`);
-            console.log(`\t${err.message}`);
+            logger.channel("standard").log(`*** JS Parsing Error:`);
+            logger.channel("standard").log(`\t${err.message}`);
         }
 
         for (const filepath of ejsFiles) {
             if (this.hasRecord(filepath)) {
                 this.getRecord(filepath).view = filepath;
-                if (this.getRecord(filepath).type === `include`) this.getRecord(filepath).type = `view`;
+                if (this.getRecord(filepath).type === `include`){
+                    this.getRecord(filepath).type = `view`;
+                }
             } else {
                 this.addView(filepath);
             }
@@ -380,21 +409,13 @@ class NidgetPreprocessor {
 
     getRecord(name) {
         if (this.nidgetRecords[name]) return this.nidgetRecords[name];
-        return this.nidgetRecords[NidgetPreprocessor.convertToDash(name)];
+        return this.nidgetRecords[convertToDash(name)];
     }
 
     hasRecord(name) {
         if (this.nidgetRecords[name]) return true;
-        if (this.nidgetRecords[NidgetPreprocessor.convertToDash(name)]) return true;
+        if (this.nidgetRecords[convertToDash(name)]) return true;
         return false;
-    }
-
-    get dictionary() {
-        const dictionary = {};
-        for (const name in this.nidgetRecords) {
-            dictionary[name] = this.nidgetRecords[name];
-        }
-        return dictionary;
     }
 
     get records() {
@@ -413,14 +434,14 @@ class NidgetPreprocessor {
         const returnSet = new Set();
 
         if (this.getRecord(nidgetName).type === `nidget`) {
-            nidgetName = NidgetPreprocessor.convertToDash(nidgetName);
+            nidgetName = convertToDash(nidgetName);
         }
 
         returnSet.add(this.getRecord(nidgetName));
 
         for (const parentName in this.nidgetRecords) {
             const parent = this.nidgetRecords[parentName];
-            for (const child of parent.dependencies) {
+            for (const child of parent.includes) {
                 if (child.name === nidgetName) returnSet.add(parent);
             }
         }
@@ -429,7 +450,7 @@ class NidgetPreprocessor {
     }
 
     addStyle(filepath) {
-        const name = NidgetPreprocessor.convertToDash(Path.parse(filepath).name);
+        const name = convertToDash(Path.parse(filepath).name);
         if (!this.nidgetRecords[name]) {
             this.nidgetRecords[name] = new DependencyRecord(name, this.package);
             this.nidgetRecords[name].type = `include`;
@@ -439,7 +460,7 @@ class NidgetPreprocessor {
     }
 
     addInclude(filepath) {
-        const name = NidgetPreprocessor.convertToDash(Path.parse(filepath).name);
+        const name = convertToDash(Path.parse(filepath).name);
         if (!this.nidgetRecords[name]) {
             this.nidgetRecords[name] = new DependencyRecord(name, this.package);
             this.nidgetRecords[name].type = `include`;
@@ -449,7 +470,7 @@ class NidgetPreprocessor {
     }
 
     addView(filepath) {
-        const name = NidgetPreprocessor.convertToDash(Path.parse(filepath).name);
+        const name = convertToDash(Path.parse(filepath).name);
         if (!this.nidgetRecords[name]) {
             this.nidgetRecords[name] = new DependencyRecord(name, this.package);
             this.nidgetRecords[name].type = `view`;
@@ -462,6 +483,7 @@ class NidgetPreprocessor {
         const name = this.validateNidgetName(Path.parse(filepath).name);
         if (!this.nidgetRecords[name]) this.nidgetRecords[name] = new DependencyRecord(name, this.package);
         this.nidgetRecords[name].script = filepath;
+        this.nidgetRecords[name].type = `nidget`;
         return this.nidgetRecords[name];
     }
 
@@ -473,48 +495,14 @@ class NidgetPreprocessor {
      * @param nidgetName
      */
     validateNidgetName(nidgetName) {
-        const ctdNidgetName = NidgetPreprocessor.convertToDash(nidgetName);
+        const ctdNidgetName = convertToDash(nidgetName);
         if (ctdNidgetName.indexOf(`-`) === -1) {
             throw new Error(`Invalid nidget name: ` + nidgetName);
         }
         return ctdNidgetName;
     }
 
-    /**
-     * Converts string to dash delimited.
-     * @param string
-     */
-    static convertToDash(string) {
-        string = Path.parse(string).name;
-        string = string.charAt(0).toLocaleLowerCase() + string.substr(1); // leading lower case
-        string = string.replace(/_+/g, `-`); // replace underscore with dash
-        string = string.replace(/ +/g, `-`); // replace space with dash
-        string = string.replace(/-([A-Z]+)/g, `$1`); // normalize dash-capital to capital
-        return string.replace(/([A-Z]+)/g, `-$1`).toLowerCase(); // change all upper to lower and add a dash
-    }
-
-    // /**
-    //  * Given a template (.ejs) file retrieve all nidgets it depends on.
-    //  * Searches the template for for any instance of a nidget element.
-    //  * @param filePath
-    //  * @returns {Set<DependencyRecord>}
-    //  */
-    // getDependencies (filePath) {
-    //     const fileString = FS.readFileSync(filePath);
-    //     const dom = new JSDOM(fileString);
-
-    //     const includes = new Set();
-    //     for (const nidget in this.nidgetRecords) {
-    //         if (dom.window.document.querySelector(nidget)) {
-    //             for (const dependent of this.nidgetRecords[nidget].dependencies) {
-    //                 includes.add(dependent);
-    //             }
-    //         }
-    //     }
-    //     return includes;
-    // }
-
-    isNidgetScript(filepath) {
+    isNidgetScript(filepath) {        
         const code = FS.readFileSync(filepath);
         let ast = null;
 
@@ -525,20 +513,160 @@ class NidgetPreprocessor {
         }
 
         ast = bfsAll(ast, `type`, `ClassDeclaration`);
-        const name = NidgetPreprocessor.convertToDash(filepath);
+        const name = convertToDash(filepath);
 
         for (const node of ast) {
             const className = node.id.name;
-            if (className === `NidgetElement`) return true;
+            if (className === `NidgetElement`){
+                logger.channel("debug").log(`is nidget script: ${filepath} true`);
+                return true;
+            }
             if (node?.superClass?.name) {
                 const superName = node.superClass.name;
-                if (name !== NidgetPreprocessor.convertToDash(className)) continue;
+                if (name !== convertToDash(className)) continue;
                 if (this.getRecord(superName)?.type === `nidget`) return true;
             }
         }
 
+        logger.channel("debug").log(`is nidget script: ${filepath} false`);
         return false;
+    }   
+
+    babelify(destination = CONSTANTS.NODE_DIST_PATH){
+        logger.channel("very-verbose").log("  \\_ babelify");
+        if (!FS.existsSync(destination)) FS.mkdirSync(destination, {recursive : true});
+
+        for (const record of this.records){
+            if (!record.script) continue;
+            if (record.package !== this.package) continue;
+
+            logger.channel("very-verbose").log(`    \\_ ${record.script}`);
+            
+            if (!FS.existsSync(record.script)){
+                logger.channel(`standard`).log(`script file not found: ${record.script}`);
+                logger.channel(`very-verbose`).log(record.toString());
+                continue;
+            }
+    
+            const result = babel.transformFileSync(record.script, {});
+            if (result){
+                const path = Path.join(CONSTANTS.NODE_DIST_PATH, record.name + ".js");
+                FS.writeFileSync(path, result.code);
+                record.script = path;
+                logger.channel("very-verbose").log(`    \\_ ${path}`);
+            }        
+        }
+
+        return this;
     }
+
+    sass () {
+        logger.channel(`verbose`).log(`  \\_ sass`);
+
+        for (const record of this.records) {
+            try {
+                if (record.style && (record.type === `view` || record.type === `nidget`)) {
+                    logger.channel(`very-verbose`).log(`    \\_ ${record.package}:${record.style}`);   
+                    const outname = record.name + `.css`;
+                    const outpath = Path.join(this.settings['package-dir'], outname);
+                    renderSCSS(record, outpath, this.package);
+                    record.style = outpath;
+                    logger.channel(`verbose`).log(`    \\_ ${outpath}`);
+                }
+            } catch (err) {
+                logger.channel("standard").log(`Error in #renderAllRecords`);
+                logger.channel("standard").log(err);
+            }
+        }
+        return this;
+    }
+
+    async ejs () {
+        logger.channel(`verbose`).log(`# ejs`);
+
+        for (const record of this.records) {
+            try {
+                if (record.style && (record.type === `view`)) {  
+                    await renderEJS(record, this.settings['output'], this.package);
+                }
+            } catch (err) {
+                logger.channel("standard").log(`Error in #renderAllRecords`);
+                logger.channel("standard").log(err);
+            }
+        }
+        return this;
+    }  
+    
+    async browserify () {
+        logger.channel(`verbose`).log(`# browserify`);
+
+        for (const record of this.records) {
+            try {
+                if (record.type === `view` && record.script) {  
+                    try {
+                        const outputPath = Path.join(this.settings[`outputPath`], Path.parse(record.script).name + `.js`);            
+                        await renderJS(record, outputPath, this.package);
+                    } catch (error) {
+                        logger.channel("standard").log(error.toString());
+                        logger.channel("standard").log(error.code);
+                        logger.channel("standard").log(record.script);
+                        process.exit();
+                    }
+                }
+            } catch (err) {
+                logger.channel("standard").log(`Error in #renderAllRecords`);
+                logger.channel("standard").log(err);
+            }
+        }
+        return this;
+    }       
+
+    writePackageFile(){
+        let nidgetJSON = {};
+
+        if (FS.existsSync(CONSTANTS.NIDGET_PROPERTY_FILE)) {
+            nidgetJSON = JSON.parse(FS.readFileSync(CONSTANTS.NIDGET_PROPERTY_FILE, "utf-8"));
+        }
+    
+        nidgetJSON.records = {};
+    
+        for (const record of this.records) {
+            if (record.package === this.package){
+                nidgetJSON.records[record.name] = record; 
+            }
+        }
+    
+        FS.writeFileSync(CONSTANTS.NIDGET_PROPERTY_FILE, JSON.stringify(nidgetJSON, null, 2));   
+        
+        return this;
+    }
+
+    copyCSS(){
+        logger.channel(`verbose`).log(`# copy`);
+
+        if (!FS.existsSync(this.settings[`outputPath`])){
+            FS.mkdirSync(this.settings[`outputPath`], {recursive : true});
+        }
+
+        for (const rec of this.records){
+            if ((rec.type === "nidget" || rec.type === "view") && rec.style !== ``){
+                if (rec.package === this.package){
+                    const from = Path.join(this.settings[`package-dir`], rec.name + ".css");
+                    const to = Path.join(this.settings[`outputPath`], rec.name + ".css");
+                    FS.copyFileSync(from, to);      
+                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
+                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
+                } else {
+                    const from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, rec.style);
+                    const to = Path.join(this.settings[`outputPath`], rec.name + ".css");
+                    FS.copyFileSync(from, to);
+                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
+                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
+                }
+            }
+        }
+    }
+
 }
 
 export default NidgetPreprocessor;

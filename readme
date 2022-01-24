@@ -1,1 +1,0 @@
-npx babel client/lib.js --out-file dist/lib.js

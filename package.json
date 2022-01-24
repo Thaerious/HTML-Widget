@@ -1,10 +1,10 @@
 {
-    "name": "@thaerious/nidget-renderer",
+    "name": "@nidget/core",
     "version": "0.1.0",
     "main": "dist/NidgetElement.js",
     "bin": {
         "render": "src/watcher.js",
-        "create_nidget": "src/createNidget.js"
+        "nidget": "src/nidgetCLi.js"
     },
     "author": "Ed Armstrong",
     "license": "MIT",

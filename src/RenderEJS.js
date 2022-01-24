@@ -2,36 +2,50 @@ import ejs from "ejs";
 import Path from "path";
 import FS from "fs";
 import Logger from "@thaerious/logger";
+import CONSTANTS from "./constants.js";
 const logger = Logger.getLogger();
 
-function renderEJS (sourceFullpath, nidgetDependencies, outputDirectory) {
-    const basename = Path.basename(sourceFullpath.slice(0, -4));
-    logger.channel(`very-verbose`).log(`  \\_ ${sourceFullpath}`);
+function renderEJS (record, outputDirectory, localPkg) {
+    const basename = Path.basename(record.view.slice(0, -4));
+    logger.channel(`very-verbose`).log(`  \\_ source ${record.package}:${record.view}`); 
 
     const viewPaths = [];
-    for (let nidget_record in nidgetDependencies.records){
-        if(nidget_record.view){
-            viewPaths.push(Path.join(process.cwd, nidget_record.view));
+    for (let include of record.includes){
+        if(include.view){
+            if (include.package === localPkg){
+                const path = Path.join(process.cwd(), include.view);
+                viewPaths.push(path);
+                logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${path}`);                 
+            } else {
+                const path = Path.join(process.cwd(), CONSTANTS.NODE_MODULES_PATH, include.package, include.view);
+                viewPaths.push(path);
+                logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${path}`); 
+            }
         }
     }
 
-    ejs.renderFile(
-        sourceFullpath,
-        {
-            filename: basename,
-            viewPaths: viewPaths
-        },
-        (err, str) => {
-            if (err) {
-                console.log(err);
-            } else {
-                if (!FS.existsSync(outputDirectory)) {
-                    FS.mkdirSync(outputDirectory, { recursive: true });
+    return new Promise((resolve, reject)=>{
+        ejs.renderFile(
+            record.view,
+            {
+                filename: basename,
+                viewPaths: viewPaths
+            },
+            (err, str) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    if (!FS.existsSync(outputDirectory)) {
+                        FS.mkdirSync(outputDirectory, { recursive: true });
+                    }
+                    const outpath = Path.join(outputDirectory, basename + `.html`);
+                    FS.writeFileSync(outpath, str);
+                    logger.channel(`very-verbose`).log(`    \\_ destination ${outpath}`);
+                    resolve();
                 }
-                FS.writeFileSync(Path.join(outputDirectory, basename + `.html`), str);
             }
-        }
-    );
+        );
+    })
 }
 
 export default renderEJS;

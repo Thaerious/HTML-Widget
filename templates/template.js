@@ -1,11 +1,11 @@
-import NidgetElement from "@thaerious/nidget/NidgetElement.js";
+import NidgetElement from "@nidget/core";
 
-class name_pascalcase extends NidgetElement {
+class ${name_pascal} extends NidgetElement {
 
     constructor() {
         super("${name_dash}-template");
     }
 }
 
-window.customElements.define('${name_dash}', ${name_pascalcase});
-export default name_pascalcase;
+window.customElements.define('${name_dash}', ${name_pascal});
+export default ${name_pascal};
