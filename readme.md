@@ -8,16 +8,16 @@ npm i @babel/preset-env
 npx nidget init
 npx nidget create -n nidget-name
 npx nidget view -n index
-npx nidget render
 
-npx babel client/lib.js --out-file dist/lib.js
-
+npx nidget sass babel pack ejs # use to create non-module babel file
+npx nidget sass ejs # use for module only
 
 Nidget Record
 =============
 
 - name: the normalized name of the nidget, view, or include
-- script: location of the .js file (dist or output) might be babelified
+- es6: location of the source module file get's babelified to the 'script' location
+- script: location of the babelified .js file
 - view: location of the .ejs file, not processed until the pack step
 - style: location of the .scss file, processed during render step
 - type: {view, nidget, include}

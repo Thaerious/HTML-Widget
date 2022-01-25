@@ -13,7 +13,7 @@ function renderEJS (record, outputDirectory, localPkg) {
     for (let include of record.includes){
         if(include.view){
             if (include.package === localPkg){
-                const path = Path.join(process.cwd(), include.view);
+                const path = Path.join(process.cwd(), include.view);                
                 viewPaths.push(path);
                 logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${path}`);                 
             } else {
@@ -24,13 +24,21 @@ function renderEJS (record, outputDirectory, localPkg) {
         }
     }
 
+    const dataobj = {
+        viewPaths: viewPaths,
+        modname: "",
+        scriptname: "",
+        stylename: ""
+    };
+    
+    if (record.es6 !== "") dataobj.modname = record.name;
+    if (record.script !== "") dataobj.scriptname = record.name;
+    if (record.style !== "") dataobj.stylename = record.name;
+
     return new Promise((resolve, reject)=>{
         ejs.renderFile(
             record.view,
-            {
-                filename: basename,
-                viewPaths: viewPaths
-            },
+            dataobj,
             (err, str) => {
                 if (err) {
                     reject(err)

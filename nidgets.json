@@ -6,30 +6,32 @@
   "records": {
     "nidget-element": {
       "name": "nidget-element",
-      "script": "./client/NidgetElement.js",
+      "es6": "dist/NidgetElement.mjs",
+      "script": "dist/NidgetElement.js",
       "view": "",
       "style": "",
       "type": "nidget",
-      "package": "@thaerious/nidget",
+      "package": "@nidget/core",
       "dependents": [],
       "parents": [
         {
           "name": "nidget-text",
-          "package": "@thaerious/nidget"
+          "package": "@nidget/core"
         }
       ]
     },
     "nidget-text": {
       "name": "nidget-text",
-      "script": "./client/NidgetText.js",
+      "es6": "dist/NidgetText.mjs",
+      "script": "dist/NidgetText.js",
       "view": "",
       "style": "",
       "type": "nidget",
-      "package": "@thaerious/nidget",
+      "package": "@nidget/core",
       "dependents": [
         {
           "name": "nidget-element",
-          "package": "@thaerious/nidget"
+          "package": "@nidget/core"
         }
       ],
       "parents": []

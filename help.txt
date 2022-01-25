@@ -22,7 +22,13 @@ COMMANDS
     init:    create a new nidget project in the this directory
     create:  create a new nidget with specified name (-n)
     view:    create a new view with specified name (-n)
-    render:  create module, run babel & sass placing files in the --dist directory, add records to nidget.json
-    pack:    create deployable, run browserify & ejs then move files in the --output directory
     records: show all records
     clean:   remove --dist and --output directories and remove records from nidget.json file
+
+    babel:   translate .mjs files into .js placing them in the --dist directory, adds/updates records in nidget.json
+    sass:    render .css files placing them in the --dist directory, adds/updates records in nidget.json
+    pack:    browserify .js files for all the views, place in --output directory
+    ejs:     render .ejs files to .html, place in --output directory [1]
+
+NOTES
+    [1] the ejs command will copy .css files from --dist to --output

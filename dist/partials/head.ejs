@@ -1,6 +1,8 @@
-<meta charset="UTF-8">
-<link rel="stylesheet" href="<%= filename %>.css"/>
-<script type="text/javascript" src="<%= filename %>.js" defer></script>
-<% if (process.env.NODE_ENV === 'test'){%>
-    <script type="text/javascript" src="scripts/static/coverage_report.js" defer></script>
-<% } %>
+<meta charset="UTF-8"><% if (stylename !== ""){%>
+    <link rel="stylesheet" href="<%= stylename %>.css"/><% }
+if (modname !== ""){%>
+    <script type="module" src="<%= modname %>.mjs"></script><% } 
+if (scriptname !== ""){%>
+    <script nomodule src="<%= scriptname %>.js" defer></script><% }
+if (process.env.NODE_ENV === 'test'){%>
+    <script type="text/javascript" src="scripts/static/coverage_report.js" defer></script><% } %>

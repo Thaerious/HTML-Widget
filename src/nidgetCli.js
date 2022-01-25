@@ -39,12 +39,11 @@ if (args.count(`verbose`) >= 2) logger.channel(`very-verbose`).enabled = true;
 if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
 (async () => {
+    if (args.args.length <= 2) help();
+
     for (const arg of args.args) {
         logger.channel(`very-verbose`).log(`arg: ${arg}`);
         switch (arg) {
-            case "args":
-                console.log(args);
-                break;
             case "init":
                 init();
                 break;
@@ -62,9 +61,12 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
                     view(args.flags["name"]);
                 }                
                 break;
-            case "render":
-                await render();
+            case "sass":
+                await sass();
                 break;
+            case "babel":
+                await babel();
+                break;                
             case "records":
                 await printRecords();
                 break;
@@ -73,6 +75,9 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
                 break;
             case "pack":
                 await pack();
+                break;
+            case "ejs":
+                await ejs();
                 break;
             case "clean":
                 clean();
@@ -86,14 +91,33 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
     logger.channel("very-verbose").log(`uptime ${process.uptime()} s`);
 })();
 
-async function render(){
+async function ejs(){
     const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
     const npp = new NidgetPreprocessor();
     npp.applySettings(extractSettings());
     npp.addModules();
     npp.buildRecords();
-    npp.babelify();
+    npp.ejs();
+    npp.copyCSS();
+}
+
+async function sass(){
+    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
+    const npp = new NidgetPreprocessor();
+    npp.applySettings(extractSettings());
+    npp.addModules();
+    npp.buildRecords();
     npp.sass();
+    npp.writePackageFile();
+}
+
+async function babel(){
+    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
+    const npp = new NidgetPreprocessor();
+    npp.applySettings(extractSettings());
+    npp.addModules();
+    npp.buildRecords();
+    await npp.babelify();
     npp.writePackageFile();
 }
 
@@ -104,8 +128,6 @@ async function pack(){
     npp.addModules();
     npp.buildRecords();
     await npp.browserify();
-    await npp.ejs();
-    npp.copyCSS();
 }
 
 function clean() {
