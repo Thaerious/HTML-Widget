@@ -417,7 +417,7 @@ class NidgetPreprocessor {
     }
 
     copyCSS(){
-        logger.channel(`verbose`).log(`# copy`);
+        logger.channel(`verbose`).log(`# copy css`);
 
         if (!FS.existsSync(this.settings[`outputPath`])){
             FS.mkdirSync(this.settings[`outputPath`], {recursive : true});
@@ -434,6 +434,33 @@ class NidgetPreprocessor {
                 } else {
                     const from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, rec.style);
                     const to = Path.join(this.settings[`outputPath`], rec.name + ".css");
+                    FS.copyFileSync(from, to);
+                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
+                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
+                }
+            }
+        }
+    }
+
+    copyMJS(){
+        logger.channel(`verbose`).log(`# copy mjs`);
+
+        if (!FS.existsSync(this.settings[`outputPath`])){
+            FS.mkdirSync(this.settings[`outputPath`], {recursive : true});
+        }
+
+        for (const rec of this.records){
+            if ((rec.type === "nidget" || rec.type === "view") && rec.style !== ``){
+                const filename = Path.parse(rec.es6).base;
+                if (rec.package === this.settings.package){
+                    const from = Path.join(rec.es6);
+                    const to = Path.join(this.settings[`outputPath`], filename);
+                    FS.copyFileSync(from, to);
+                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
+                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
+                } else {
+                    const from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, rec.es6);
+                    const to = Path.join(this.settings[`outputPath`], filename);
                     FS.copyFileSync(from, to);
                     logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
                     logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              

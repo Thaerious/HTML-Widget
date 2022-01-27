@@ -99,6 +99,7 @@ async function ejs(){
     npp.buildRecords();
     npp.ejs();
     npp.copyCSS();
+    npp.copyMJS();
 }
 
 async function sass(){
@@ -188,8 +189,8 @@ function view(name) {
     replaceInFile(viewPath + `/${name}.ejs`, "${head}", relativePath + "/head");
     replaceInFile(viewPath + `/${name}.ejs`, "${templates}", relativePath + "/nidget-templates");
 
-    if (!FS.existsSync(templateName + ".js")) {
-        FS.writeFileSync(templateName + ".js", "");
+    if (!FS.existsSync(templateName + ".mjs")) {
+        FS.writeFileSync(templateName + ".mjs", "");
     }
 
     if (!FS.existsSync(templateName + ".scss")) {
@@ -210,12 +211,12 @@ function create(name) {
     const templateName = Path.join(path, convertDelimited(name, "_"));
 
     FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.ejs"), templateName + ".ejs");
-    FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.js"), templateName + ".js");
+    FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.mjs"), templateName + ".mjs");
     FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.scss"), templateName + ".scss");
     replaceInFile(templateName + ".ejs", "${name_dash}", convertToDash(name));
     replaceInFile(templateName + ".ejs", "${name_underscore}", convertDelimited(name, "_"));
-    replaceInFile(templateName + ".js", "${name_dash}", convertToDash(name));
-    replaceInFile(templateName + ".js", "${name_pascal}", convertToPascal(name));
+    replaceInFile(templateName + ".mjs", "${name_dash}", convertToDash(name));
+    replaceInFile(templateName + ".mjs", "${name_pascal}", convertToPascal(name));
     replaceInFile(templateName + ".scss", "${name_dash}", convertToDash(name));
 }
 

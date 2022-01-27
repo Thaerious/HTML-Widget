@@ -31,4 +31,4 @@ COMMANDS
     ejs:     render .ejs files to .html, place in --output directory [1]
 
 NOTES
-    [1] the ejs command will copy .css files from --dist to --output
+    [1] the ejs command will copy .css & .mjs to --output
