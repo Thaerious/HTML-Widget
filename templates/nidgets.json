@@ -1,5 +1,5 @@
 {
-  "output": "output",
+  "output-dir": "output",
   "package-dir": "dist",
   "nidget-src": "./src/nidgets/",
   "view-src": "./src/view/",

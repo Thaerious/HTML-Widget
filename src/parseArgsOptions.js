@@ -22,5 +22,9 @@ export default {
     },{
         long: `dist`,
         type: `string`
-    }]
+    },{
+        long: `output`,
+        short: `o`
+    }
+]
 };

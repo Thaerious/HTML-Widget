@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 import ParseArgs from "@thaerious/parseargs";
-import FS from "fs";
+import FS, { lstatSync } from "fs";
 import CONSTANTS from "./constants.js";
 import Logger from "@thaerious/logger";
 import Path from "path";
 import { convertToDash, convertToPascal, convertDelimited } from "./names.js";
 import extractSettings from "./extractSettings.js";
+import Lib from "./lib.js";
 // import Watcher from "./Watcher.js"
 
 const parseArgsOptions = {
@@ -43,30 +44,35 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
     for (const arg of args.args) {
         logger.channel(`very-verbose`).log(`arg: ${arg}`);
-        switch (arg) {
+        switch (arg.toLowerCase()) {
+            case "settings":
+                console.log(extractSettings());
+                break;
             case "init":
                 init();
                 break;
             case "create":
-                if (!args.flags["name"]){
+                if (!args.flags["name"]) {
                     logger.channel(`standard`).log(`missing -n, --name parameter`);
                 } else {
                     create(args.flags["name"]);
                 }
                 break;
             case "view":
-                if (!args.flags["name"]){
+                if (!args.flags["name"]) {
                     logger.channel(`standard`).log(`missing -n, --name parameter`);
                 } else {
                     view(args.flags["name"]);
-                }                
+                }
                 break;
+            case "scss":
+            case "css":    
             case "sass":
                 await sass();
                 break;
             case "babel":
                 await babel();
-                break;                
+                break;
             case "records":
                 await printRecords();
                 break;
@@ -78,6 +84,19 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
                 break;
             case "ejs":
                 await ejs();
+                break;
+            case "es6":
+            case "mjs":
+                await es6();
+                break;
+            case "lib":
+                new Lib().go();
+                break;
+            case "deploy":
+                await deploy();
+                break;
+            case "dist":
+                await dist();
                 break;
             case "clean":
                 clean();
@@ -91,28 +110,58 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
     logger.channel("very-verbose").log(`uptime ${process.uptime()} s`);
 })();
 
-async function ejs(){
+async function dist(){
+    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
+    const npp = new NidgetPreprocessor();
+    const settings = extractSettings();
+    settings['output-dir'] = settings['package-dir'];
+    npp.applySettings(settings);
+    npp.addModules();
+    npp.buildRecords();
+    npp.copyMJS();
+    npp.sass();
+    npp.writePackageFile();
+}
+
+async function deploy(){
+    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
+    new Lib().go();
+    const npp = new NidgetPreprocessor();
+    npp.applySettings(extractSettings());
+    npp.addModules();
+    npp.buildRecords();
+    npp.ejs();
+    npp.sass();
+    npp.copyMJS();
+}
+
+async function ejs() {
     const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
     const npp = new NidgetPreprocessor();
     npp.applySettings(extractSettings());
     npp.addModules();
     npp.buildRecords();
     npp.ejs();
-    npp.copyCSS();
+}
+
+async function es6() {
+    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
+    const npp = new NidgetPreprocessor();
+    npp.applySettings(extractSettings());
+    npp.buildRecords();
     npp.copyMJS();
 }
 
-async function sass(){
+async function sass() {
     const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
     const npp = new NidgetPreprocessor();
     npp.applySettings(extractSettings());
     npp.addModules();
     npp.buildRecords();
     npp.sass();
-    npp.writePackageFile();
 }
 
-async function babel(){
+async function babel() {
     const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
     const npp = new NidgetPreprocessor();
     npp.applySettings(extractSettings());
@@ -122,7 +171,7 @@ async function babel(){
     npp.writePackageFile();
 }
 
-async function pack(){
+async function pack() {
     const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
     const npp = new NidgetPreprocessor();
     npp.applySettings(extractSettings());
@@ -134,8 +183,14 @@ async function pack(){
 function clean() {
     const settings = extractSettings();
 
-    if (FS.existsSync(settings["package-dir"])) FS.rmSync(settings["package-dir"], { recursive: true });
-    if (FS.existsSync(settings["outputPath"])) FS.rmSync(settings["outputPath"], { recursive: true });
+    if (FS.existsSync(settings["package-dir"])){
+        logger.channel(`verbose`).log(`clean ${settings["package-dir"]}`);
+        FS.rmSync(settings["package-dir"], { recursive: true });
+    }
+    if (FS.existsSync(settings["output-dir"])){
+        logger.channel(`verbose`).log(`clean ${settings["output-dir"]}`);
+        FS.rmSync(settings["output-dir"], { recursive: true });
+    }
 
     if (!FS.existsSync(CONSTANTS.NIDGET_PROPERTY_FILE)) return;
     const nidgetJSON = JSON.parse(FS.readFileSync(CONSTANTS.NIDGET_PROPERTY_FILE, "utf-8"));
@@ -146,7 +201,7 @@ function clean() {
 async function printRecords() {
     const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
     const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());    
+    npp.applySettings(extractSettings());
     npp.addModules();
     npp.addRecordsFromFile(CONSTANTS.NIDGET_PROPERTY_FILE);
     npp.buildRecords();
@@ -157,12 +212,12 @@ async function printRecords() {
 }
 
 function init() {
-    if (!FS.existsSync("nidgets.json")){
+    if (!FS.existsSync("nidgets.json")) {
         logger.channel(`verbose`).log("create nidget.json file");
         FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/nidgets.json"), "nidgets.json");
     }
 
-    if (!FS.existsSync(".babelrc")){
+    if (!FS.existsSync(".babelrc")) {
         logger.channel(`verbose`).log("create .babelrc file");
         FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/.babelrc"), ".babelrc");
     }
@@ -174,19 +229,24 @@ function init() {
 }
 
 function view(name) {
-    const settings = loadSettings();
-    const viewPath = Path.join(settings["view-src"], name);
+    const settings = extractSettings();
+    const viewPath = Path.join(settings["view-src"], name); // src/nidget-name
     const templateName = Path.join(viewPath, convertDelimited(name, "_"));
-    const templatePath = Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates", "view.template.ejs");
-    const partialsPath = Path.join("node_modules", CONSTANTS.MODULE_NAME, "dist", "partials");
 
-    if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath);
+    if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath, {recursive : true});
 
-    FS.copyFileSync(templatePath, templateName + ".ejs");
+    FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, templateName + ".ejs");
 
-    const relativePath = Path.relative(viewPath, partialsPath);
+    const relativePath = Path.relative(viewPath, CONSTANTS.PARTIALS_DIR);
 
-    replaceInFile(viewPath + `/${name}.ejs`, "${head}", relativePath + "/head");
+    const importMapPath = 
+        Path.relative(
+            viewPath,
+            Path.join(settings[`output-dir`], CONSTANTS.LIVE_LIB_PATH, Path.parse(CONSTANTS.LIB_FILE).name)
+        );
+
+    replaceInFile(viewPath + `/${name}.ejs`, "${import_map}", importMapPath);
+    replaceInFile(viewPath + `/${name}.ejs`, "${modules}", relativePath + "/modules");
     replaceInFile(viewPath + `/${name}.ejs`, "${templates}", relativePath + "/nidget-templates");
 
     if (!FS.existsSync(templateName + ".mjs")) {
@@ -204,9 +264,9 @@ function create(name) {
         process.exit();
     }
 
-    const settings = loadSettings();
+    const settings = extractSettings();
     const path = Path.join(settings["nidget-src"], name);
-    if (!FS.existsSync(path)) FS.mkdirSync(path);
+    if (!FS.existsSync(path)) FS.mkdirSync(path, {recursive: true});
 
     const templateName = Path.join(path, convertDelimited(name, "_"));
 
@@ -218,11 +278,6 @@ function create(name) {
     replaceInFile(templateName + ".mjs", "${name_dash}", convertToDash(name));
     replaceInFile(templateName + ".mjs", "${name_pascal}", convertToPascal(name));
     replaceInFile(templateName + ".scss", "${name_dash}", convertToDash(name));
-}
-
-function loadSettings() {
-    const text = FS.readFileSync(CONSTANTS.NIDGET_PROPERTY_FILE, "utf-8");
-    return JSON.parse(text);
 }
 
 function replaceInFile(filename, search, replace) {

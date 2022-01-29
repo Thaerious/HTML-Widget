@@ -5,7 +5,7 @@ import { bfsAll } from "./bfsObject.js";
 import FS, { lstatSync } from "fs";
 import Glob from "glob";
 import CONSTANTS from "./constants.js";
-import {convertToDash} from "./names.js";
+import {convertToDash, convertDelimited} from "./names.js";
 import renderSCSS from "./RenderSCSS.js";
 import renderEJS from "./RenderEJS.js";
 import renderJS from "./RenderJS.js";
@@ -21,11 +21,10 @@ class NidgetPreprocessor {
         this.resetRecords();
         this.input_paths = [];
         this.exclude_paths = [];
-        this._package = ``;
     }
 
     get package(){
-        return this._package;
+        return this?.settings?.package;
     }
 
     applySettings(settings){
@@ -171,7 +170,7 @@ class NidgetPreprocessor {
             const record = this.nidgetRecords[name];
             if (record.package === this.settings.package){
                 record.seekEJSDependencies(this);
-                record.seekJSDependencies(this);
+                // record.seekJSDependencies(this);
             }
         }
 
@@ -195,29 +194,6 @@ class NidgetPreprocessor {
             array.push(this.nidgetRecords[name]);
         }
         return array;
-    }
-
-    /**
-     * Retrieve a non-reflective set nidgets that depend on a nidget
-     */
-    reverseLookup(nidgetName) {
-        if (!this.getRecord(nidgetName)) throw new Error(`Unknown Nidget: ${nidgetName}`);
-        const returnSet = new Set();
-
-        if (this.getRecord(nidgetName).type === `nidget`) {
-            nidgetName = convertToDash(nidgetName);
-        }
-
-        returnSet.add(this.getRecord(nidgetName));
-
-        for (const parentName in this.nidgetRecords) {
-            const parent = this.nidgetRecords[parentName];
-            for (const child of parent.includes) {
-                if (child.name === nidgetName) returnSet.add(parent);
-            }
-        }
-
-        return returnSet;
     }
 
     addStyle(filepath) {
@@ -303,7 +279,7 @@ class NidgetPreprocessor {
         return false;
     }   
 
-    async babelify(destination = CONSTANTS.NODE_DIST_PATH){
+    async babelify(destination = CONSTANTS.NIDGET_PACKAGE_DIR){
         const { default: babel } = await import(`@babel/core`);
 
         logger.channel("very-verbose").log("  \\_ babelify");
@@ -323,7 +299,7 @@ class NidgetPreprocessor {
     
             const result = babel.transformFileSync(record.es6, {});
             if (result){
-                const path = Path.join(CONSTANTS.NODE_DIST_PATH, record.name + ".js");
+                const path = Path.join(CONSTANTS.NIDGET_PACKAGE_DIR, record.name + ".js");
                 FS.writeFileSync(path, result.code);
                 record.script = path;
                 logger.channel("very-verbose").log(`    \\_ ${path}`);
@@ -333,17 +309,16 @@ class NidgetPreprocessor {
         return this;
     }
 
-    sass (destination = CONSTANTS.NODE_DIST_PATH) {
-        if (!FS.existsSync(destination)) FS.mkdirSync(destination, {recursive : true});
-
+    sass () {
         logger.channel(`verbose`).log(`  \\_ sass`);
 
         for (const record of this.records) {
+            if (record.package !== this.package) continue;
             try {
                 if (record.style && (record.type === `view` || record.type === `nidget`)) {
                     logger.channel(`very-verbose`).log(`    \\_ ${record.package}:${record.style}`);   
-                    const outname = record.name + `.css`;
-                    const outpath = Path.join(this.settings['package-dir'], outname);
+                    const outname = convertDelimited(record.name, `_`) + `.css`;
+                    const outpath = Path.join(this.settings['output-dir'], outname);
                     renderSCSS(record, outpath, this.settings.package);
                     record.style = outpath;
                     logger.channel(`verbose`).log(`    \\_ ${outpath}`);
@@ -362,10 +337,10 @@ class NidgetPreprocessor {
         for (const record of this.records) {
             try {
                 if (record.style && (record.type === `view`)) {  
-                    await renderEJS(record, this.settings['output'], this.settings.package);
+                    await renderEJS(record, this.settings);
                 }
             } catch (err) {
-                logger.channel("standard").log(`Error in #renderAllRecords`);
+                logger.channel("standard").log(`Error in #ejs`);
                 logger.channel("standard").log(err);
             }
         }
@@ -379,7 +354,7 @@ class NidgetPreprocessor {
             try {
                 if (record.type === `view` && record.script) {
                     try {
-                        const outputPath = Path.join(this.settings[`outputPath`], Path.parse(record.script).name + `.js`);            
+                        const outputPath = Path.join(this.settings[`output-dir`], Path.parse(record.script).name + `.js`);            
                         await renderJS(record, outputPath, this.settings.package);
                     } catch (error) {
                         logger.channel("standard").log(error.toString());
@@ -416,37 +391,11 @@ class NidgetPreprocessor {
         return this;
     }
 
-    copyCSS(){
-        logger.channel(`verbose`).log(`# copy css`);
-
-        if (!FS.existsSync(this.settings[`outputPath`])){
-            FS.mkdirSync(this.settings[`outputPath`], {recursive : true});
-        }
-
-        for (const rec of this.records){
-            if ((rec.type === "nidget" || rec.type === "view") && rec.style !== ``){
-                if (rec.package === this.settings.package){
-                    const from = Path.join(this.settings[`package-dir`], rec.name + ".css");
-                    const to = Path.join(this.settings[`outputPath`], rec.name + ".css");
-                    FS.copyFileSync(from, to);      
-                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
-                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
-                } else {
-                    const from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, rec.style);
-                    const to = Path.join(this.settings[`outputPath`], rec.name + ".css");
-                    FS.copyFileSync(from, to);
-                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
-                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
-                }
-            }
-        }
-    }
-
     copyMJS(){
         logger.channel(`verbose`).log(`# copy mjs`);
 
-        if (!FS.existsSync(this.settings[`outputPath`])){
-            FS.mkdirSync(this.settings[`outputPath`], {recursive : true});
+        if (!FS.existsSync(this.settings[`output-dir`])){
+            FS.mkdirSync(this.settings[`output-dir`], {recursive : true});
         }
 
         for (const rec of this.records){
@@ -454,13 +403,15 @@ class NidgetPreprocessor {
                 const filename = Path.parse(rec.es6).base;
                 if (rec.package === this.settings.package){
                     const from = Path.join(rec.es6);
-                    const to = Path.join(this.settings[`outputPath`], filename);
+                    const to = Path.join(this.settings[`output-dir`], filename);
+                    rec.es6 = to;
                     FS.copyFileSync(from, to);
                     logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
                     logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
                 } else {
                     const from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, rec.es6);
-                    const to = Path.join(this.settings[`outputPath`], filename);
+                    const to = Path.join(this.settings[`output-dir`], filename);
+                    rec.es6 = to;
                     FS.copyFileSync(from, to);
                     logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
                     logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              

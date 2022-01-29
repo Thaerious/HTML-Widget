@@ -8,7 +8,7 @@ const logger = Logger.getLogger();
 function renderJS (record, outputPath, localPkg) {
     const srcPath
         = record.package === localPkg
-        ? Path.join(CONSTANTS.NODE_DIST_PATH, record.name + ".js")
+        ? Path.join(CONSTANTS.NIDGET_PACKAGE_DIR, record.name + ".js")
         : Path.join(CONSTANTS.NODE_MODULES_PATH, record.package, record.script);
 
     logger.channel(`very-verbose`).log(`  \\_ source ${record.package}:${srcPath}`);
@@ -21,7 +21,7 @@ function renderJS (record, outputPath, localPkg) {
             if (include.script) {
                 const includePath 
                     = include.package === localPkg
-                    ? Path.join(CONSTANTS.NODE_DIST_PATH, include.name + ".js")
+                    ? Path.join(CONSTANTS.NIDGET_PACKAGE_DIR, include.name + ".js")
                     : Path.join(CONSTANTS.NODE_MODULES_PATH, include.package, include.script)
 
                 logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${includePath}`);                

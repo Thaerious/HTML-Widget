@@ -2,7 +2,7 @@ NAME
     nidget - manage nidget based projects
 
 SYNOPSIS
-    nidget [OPTION]... [COMMAND]
+    nidget [OPTION]... [COMMANDS]...
 
 OPTIONS
     -n, --name
@@ -12,10 +12,10 @@ OPTIONS
         Display verbose information, or very-verbose information
 
     --dist
-        Set the 'distribution' directory for the package command
+        Set the 'distribution' directory for the dist command
 
-    --output
-        Set location for local output files
+    -o, --output
+        Set location for locally deployed files (web server will look in this directory)
 
 COMMANDS
     readme:  print the readme file which contains an example setup
@@ -26,9 +26,18 @@ COMMANDS
     clean:   remove --dist and --output directories and remove records from nidget.json file
 
     babel:   translate .mjs files into .js placing them in the --dist directory, adds/updates records in nidget.json
-    sass:    render .css files placing them in the --dist directory, adds/updates records in nidget.json
+    lib:     copy all 'dist' directories from modules to --output directory tree
+    sass:    render .css files placing them in the --output directory
     pack:    browserify .js files for all the views, place in --output directory
-    ejs:     render .ejs files to .html, place in --output directory [1]
+    es6:     copy .mps files from source to --output [2]
+    ejs:     render .ejs files to .html, place in --output directory
+
+    dist  :  move .mjs and render .css files into the --dist directory for use as a module [3][4]
+    deploy:  create deployable in --output directory for use by the web server [5]
 
 NOTES
-    [1] the ejs command will copy .css & .mjs to --output
+    [1] command alias' are 'scss' or 'css'
+    [2] command alias 'mjs'
+    [3] same as 'nidget sass ejs -o dist'
+    [4] updates nidget.json file
+    [5] same as 'nidget lib ejs sass es6'

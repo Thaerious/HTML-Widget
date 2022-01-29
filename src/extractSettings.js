@@ -19,13 +19,9 @@ function extractSettings(filename = CONSTANTS.NIDGET_PROPERTY_FILE) {
         settings = JSON.parse(settingsText);
     }
 
-    settings.outputPath = settings.outputPath ?? CONSTANTS.DEFAULT_OUTPUT;
-    if (args.flags.output) settings.outputPath = args.flags.output;
+    settings['output-dir'] = settings['output-dir'] ?? CONSTANTS.DEFAULT_OUTPUT;
+    if (args.flags.output) settings['output-dir'] = args.flags.output;
     if (args.flags.dist) settings['package-dir'] = args.flags.dist;
-
-    if (!FS.existsSync(settings.outputPath)) {
-        FS.mkdirSync(settings.outputPath, { recursive: true });
-    }
     
     if (FS.existsSync(CONSTANTS.NODE_PACKAGE_FILE)){
         const nodePkg = JSON.parse(FS.readFileSync(CONSTANTS.NODE_PACKAGE_FILE, "utf-8"));

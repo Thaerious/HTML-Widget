@@ -12,7 +12,10 @@ function renderSCSS (record, outputPath, localPkg) {
         : Path.join(CONSTANTS.NODE_MODULES_PATH, record.package, record.style)
     )
 
-    if (result) FS.writeFileSync(outputPath, result.css); 
+    if (result){
+        if (!FS.existsSync(outputPath)) FS.mkdirSync(Path.parse(outputPath).dir, { recursive: true });
+        FS.writeFileSync(outputPath, result.css); 
+    }
 }
 
 export default renderSCSS;

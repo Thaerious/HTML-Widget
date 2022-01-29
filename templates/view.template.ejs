@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%- include('${head}'); %>
+    <script type="importmap">
+        <%- include('${import_map}'); %>
+    </script>
+    <%- include('${modules}');    %>
 </head>
 <body>
-    <%- include('${templates}'); %>
+    <%- include('${templates}');  %>
 </body>
 </html>
 
