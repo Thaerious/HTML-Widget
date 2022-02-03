@@ -24,7 +24,7 @@ function renderEJS (record, settings) {
                 logger.channel(`very-verbose`).log(`    \\_ local style ${include.package}:${style}`);                 
             } else {
                 const view = Path.join(process.cwd(), CONSTANTS.NODE_MODULES_PATH, include.package, include.view);
-                const style = Path.join(CONSTANTS.LIVE_LIB_PATH, include.package, include.style);
+                const style = Path.join(CONSTANTS.IMPORT_MAP_FILE_PATH, include.package, include.style);
                 viewPaths.push({view: view, style: style});
                 logger.channel(`very-verbose`).log(`    \\_ lib view ${include.package}:${view}`);                 
                 logger.channel(`very-verbose`).log(`    \\_ lib style ${include.package}:${style}`);  
@@ -66,6 +66,7 @@ function renderEJS (record, settings) {
                 } else {
                     const outpath = Path.join(settings[`output-dir`], basename + `.html`);
                     const outdir = Path.parse(outpath).dir;
+                    record.html = outpath;
                     if (!FS.existsSync(outdir)) FS.mkdirSync(outdir, { recursive: true });
 
                     FS.writeFileSync(outpath, str);

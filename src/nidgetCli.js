@@ -118,7 +118,7 @@ async function dist(){
     npp.applySettings(settings);
     npp.addModules();
     npp.buildRecords();
-    npp.copyMJS();
+    npp.copyMJS(args.flags["link"]);
     npp.sass();
     npp.writePackageFile();
 }
@@ -132,7 +132,7 @@ async function deploy(){
     npp.buildRecords();
     npp.ejs();
     npp.sass();
-    npp.copyMJS();
+    npp.copyMJS(args.flags["link"]);
 }
 
 async function ejs() {
@@ -149,7 +149,7 @@ async function es6() {
     const npp = new NidgetPreprocessor();
     npp.applySettings(extractSettings());
     npp.buildRecords();
-    npp.copyMJS();
+    npp.copyMJS(args.flags["link"]);
 }
 
 async function sass() {
@@ -242,7 +242,7 @@ function view(name) {
     const importMapPath = 
         Path.relative(
             viewPath,
-            Path.join(settings[`output-dir`], CONSTANTS.LIVE_LIB_PATH, Path.parse(CONSTANTS.LIB_FILE).name)
+            Path.join(settings[`output-dir`], CONSTANTS.IMPORT_MAP_FILE_PATH, Path.parse(CONSTANTS.LIB_FILE).name)
         );
 
     replaceInFile(viewPath + `/${name}.ejs`, "${import_map}", importMapPath);

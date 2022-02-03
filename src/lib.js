@@ -37,7 +37,7 @@ class Lib {
                 }
             }
         }
-        const importFileDir = Path.join(this.settings[`output-dir`], CONSTANTS.LIVE_LIB_PATH);
+        const importFileDir = Path.join(this.settings[`output-dir`], CONSTANTS.IMPORT_MAP_FILE_PATH);
         if (!FS.existsSync(importFileDir)) FS.mkdirSync(importFileDir, {recursive : true});
         const importFilePath = Path.join(importFileDir, CONSTANTS.LIB_FILE);
         FS.writeFileSync(importFilePath, JSON.stringify(this.importMap, null, 2));
@@ -47,15 +47,16 @@ class Lib {
         const libProperties = JSON.parse(FS.readFileSync(path)); // nidget.json
         const packageJSONText = FS.readFileSync(Path.join(Path.parse(path).dir, CONSTANTS.NODE_PACKAGE_FILE));
         const packageJSON = JSON.parse(packageJSONText); // package.json
-        if (!packageJSON.main) return;
+        const entryPoint = packageJSON.module ?? packageJSON.main;        
+        if (!entryPoint) return;
 
         const packageSubDir = Path.parse(path).dir.substring(CONSTANTS.NODE_MODULES_PATH.length + 1);
 
         const pkgDir = libProperties[`package-dir`] ?? Path.join(CONSTANTS.NIDGET_PACKAGE_DIR);
         const from = Path.join(Path.parse(path).dir, pkgDir);
-        const to = Path.join(this.settings[`output-dir`], CONSTANTS.LIVE_LIB_PATH, packageSubDir, pkgDir);
+        const to = Path.join(this.settings[`output-dir`], CONSTANTS.IMPORT_MAP_FILE_PATH, packageSubDir, pkgDir);
 
-        const mapPath = Path.join(CONSTANTS.LIVE_LIB_PATH, packageSubDir, packageJSON.main);
+        const mapPath = Path.join(CONSTANTS.IMPORT_MAP_FILE_PATH, packageSubDir, entryPoint);
         this.importMap.imports[packageJSON.name] = "/" + mapPath;
 
         this._copyLib(from, to);

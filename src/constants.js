@@ -4,7 +4,7 @@ const CONSTANTS =  {
     NIDGET_PROPERTY_FILE: `nidgets.json`,
     NODE_PACKAGE_FILE: `package.json`,
     NODE_MODULES_PATH: `node_modules`,
-    LIVE_LIB_PATH: `lib`,
+    IMPORT_MAP_FILE_PATH: `lib`,
     LIB_FILE: `import_map.ejs`,
     NIDGET_PACKAGE_DIR: `dist`,
     DEFAULT_OUTPUT: `output`,

@@ -33,6 +33,7 @@ const logger = Logger.getLogger();
         this._includes = new Set();
         this._parents = new Set();
         this._type = ``;
+        this._html = ``;
     }
 
     addDependency(record) {
@@ -96,6 +97,14 @@ const logger = Logger.getLogger();
         this._script = value;
     }
 
+    set html(value){
+        this._html = value;
+    }
+
+    get html(){
+        return this._html;
+    }
+
     get view() {
         return this._view;
     }
@@ -139,6 +148,7 @@ const logger = Logger.getLogger();
             `\tes6: ${this.es6}\n` +
             `\tscript : ${this.script}\n` +
             `\tview : ${this.view}\n` +
+            `\thtml : ${this.html}\n` +
             `\tstyle : ${this.style}\n` +
             `\ttype : ${this.type}\n` +
             `\tpackage : ${this.package}\n` +
@@ -157,6 +167,7 @@ const logger = Logger.getLogger();
             es6 : this.es6,
             script: this.script,
             view: this.view,
+            html: this.html,
             style: this.style,
             type: this.type,
             package: this.package,

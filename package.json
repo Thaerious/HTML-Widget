@@ -1,7 +1,8 @@
 {
     "name": "@nidget/core",
     "version": "0.1.0",
-    "main": "dist/NidgetElement.mjs",
+    "main": "src/packageFile.js",
+    "module": "dist/NidgetElement.mjs",
     "bin": {
         "render": "src/watcher.js",
         "nidget": "src/nidgetCLi.js"

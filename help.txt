@@ -17,6 +17,9 @@ OPTIONS
     -o, --output
         Set location for locally deployed files (web server will look in this directory)
 
+    -l, --link
+        Create filesystem links instead of copying files
+
 COMMANDS
     readme:  print the readme file which contains an example setup
     init:    create a new nidget project in the this directory

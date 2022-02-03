@@ -391,8 +391,8 @@ class NidgetPreprocessor {
         return this;
     }
 
-    copyMJS(){
-        logger.channel(`verbose`).log(`# copy mjs`);
+    copyMJS(link = false){
+        logger.channel(`verbose`).log(`# ${link ? "link" : "copy"} mjs`);
 
         if (!FS.existsSync(this.settings[`output-dir`])){
             FS.mkdirSync(this.settings[`output-dir`], {recursive : true});
@@ -401,25 +401,22 @@ class NidgetPreprocessor {
         for (const rec of this.records){
             if ((rec.type === "nidget" || rec.type === "view") && rec.style !== ``){
                 const filename = Path.parse(rec.es6).base;
-                if (rec.package === this.settings.package){
-                    const from = Path.join(rec.es6);
-                    const to = Path.join(this.settings[`output-dir`], filename);
-                    rec.es6 = to;
-                    FS.copyFileSync(from, to);
-                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
-                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
-                } else {
-                    const from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, rec.es6);
-                    const to = Path.join(this.settings[`output-dir`], filename);
-                    rec.es6 = to;
-                    FS.copyFileSync(from, to);
-                    logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
-                    logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
+                let from = Path.join(rec.es6);
+                const to = Path.join(this.settings[`output-dir`], filename);
+
+                if (rec.package !== this.settings.package){
+                    from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, rec.es6);
                 }
+
+                rec.es6 = to;
+                if (!link) FS.copyFileSync(from, to);    
+                else if (!FS.existsSync(to)) FS.linkSync(from, to);
+
+                logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);              
+                logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);              
             }
         }
     }
-
 }
 
 export default NidgetPreprocessor;
