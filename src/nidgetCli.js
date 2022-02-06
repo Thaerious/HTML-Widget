@@ -7,8 +7,8 @@ import Logger from "@thaerious/logger";
 import Path from "path";
 import { convertToDash, convertToPascal, convertDelimited } from "./names.js";
 import extractSettings from "./extractSettings.js";
-import Lib from "./lib.js";
-// import Watcher from "./Watcher.js"
+
+let npp = undefined;
 
 const parseArgsOptions = {
     flags: [
@@ -51,14 +51,14 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
             case "init":
                 init();
                 break;
-            case "create":
+            case "create":                
                 if (!args.flags["name"]) {
                     logger.channel(`standard`).log(`missing -n, --name parameter`);
                 } else {
                     create(args.flags["name"]);
                 }
                 break;
-            case "view":
+            case "createview":
                 if (!args.flags["name"]) {
                     logger.channel(`standard`).log(`missing -n, --name parameter`);
                 } else {
@@ -68,6 +68,7 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
             case "scss":
             case "css":    
             case "sass":
+            case "style":
                 await sass();
                 break;
             case "babel":
@@ -82,21 +83,28 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
             case "pack":
                 await pack();
                 break;
+            case "html":                
             case "ejs":
+            case "view":
                 await ejs();
                 break;
             case "es6":
             case "mjs":
+            case "script":
                 await es6();
                 break;
             case "lib":
-                new Lib().go();
+                await lib();
                 break;
             case "deploy":
                 await deploy();
                 break;
             case "dist":
                 await dist();
+                break;
+            case "disc":
+            case "discover":
+                await discover();
                 break;
             case "clean":
                 clean();
@@ -110,73 +118,56 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
     logger.channel("very-verbose").log(`uptime ${process.uptime()} s`);
 })();
 
-async function dist(){
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    const npp = new NidgetPreprocessor();
-    const settings = extractSettings();
-    settings['output-dir'] = settings['package-dir'];
-    npp.applySettings(settings);
-    npp.addModules();
-    npp.buildRecords();
-    npp.copyMJS(args.flags["link"]);
-    npp.sass();
-    npp.writePackageFile();
+async function loadNPP(){
+    if (!npp){
+        const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
+        npp = new NidgetPreprocessor();
+        npp.applySettings(extractSettings());
+    }
 }
 
+async function discover(){
+    await loadNPP()
+    npp.discover();
+}
+
+
 async function deploy(){
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    new Lib().go();
-    const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());
-    npp.addModules();
-    npp.buildRecords();
+    await loadNPP()
+    npp.loadLibs();
     npp.ejs();
     npp.sass();
     npp.copyMJS(args.flags["link"]);
 }
 
+async function lib(){
+    await loadNPP();
+    npp.loadLibs();
+}
+
 async function ejs() {
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());
-    npp.addModules();
-    npp.buildRecords();
+    await loadNPP()
     npp.ejs();
 }
 
 async function es6() {
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());
-    npp.buildRecords();
+    await loadNPP()
     npp.copyMJS(args.flags["link"]);
 }
 
 async function sass() {
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());
-    npp.addModules();
-    npp.buildRecords();
+    await loadNPP()
     npp.sass();
 }
 
 async function babel() {
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());
-    npp.addModules();
-    npp.buildRecords();
+    await loadNPP()
     await npp.babelify();
     npp.writePackageFile();
 }
 
 async function pack() {
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());
-    npp.addModules();
-    npp.buildRecords();
+    await loadNPP()
     await npp.browserify();
 }
 
@@ -199,12 +190,7 @@ function clean() {
 }
 
 async function printRecords() {
-    const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
-    const npp = new NidgetPreprocessor();
-    npp.applySettings(extractSettings());
-    npp.addModules();
-    npp.addRecordsFromFile(CONSTANTS.NIDGET_PROPERTY_FILE);
-    npp.buildRecords();
+    await loadNPP()
 
     for (const record of npp.records) {
         logger.channel(`standard`).log(record.toString());
@@ -242,7 +228,7 @@ function view(name) {
     const importMapPath = 
         Path.relative(
             viewPath,
-            Path.join(settings[`output-dir`], CONSTANTS.IMPORT_MAP_FILE_PATH, Path.parse(CONSTANTS.LIB_FILE).name)
+            Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name)
         );
 
     replaceInFile(viewPath + `/${name}.ejs`, "${import_map}", importMapPath);

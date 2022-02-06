@@ -1,13 +1,10 @@
 {
-  "input": [
-    "./client/NidgetElement.js",
-    "./client/NidgetText.js"
-  ],
+  "package-dir": "dist",
   "records": {
     "nidget-element": {
       "name": "nidget-element",
-      "es6": "dist/NidgetElement.mjs",
-      "script": "dist/NidgetElement.js",
+      "es6": "NidgetElement.mjs",
+      "script": "NidgetElement.js",
       "view": "",
       "style": "",
       "type": "nidget",
@@ -22,8 +19,8 @@
     },
     "nidget-text": {
       "name": "nidget-text",
-      "es6": "dist/NidgetText.mjs",
-      "script": "dist/NidgetText.js",
+      "es6": "NidgetText.mjs",
+      "script": "NidgetText.js",
       "view": "",
       "style": "",
       "type": "nidget",

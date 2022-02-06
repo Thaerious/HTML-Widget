@@ -4,43 +4,31 @@ import FS from "fs";
 import Logger from "@thaerious/logger";
 import CONSTANTS from "./constants.js";
 const logger = Logger.getLogger();
-import {convertDelimited} from "./names.js";
+import mkdirIf from "./mkdirIf.js";
+import { convertDelimited } from "./names.js";
 
-function renderEJS (record, settings) {
-    const basename = Path.basename(record.view.slice(0, -4));
-    logger.channel(`very-verbose`).log(`  \\_ source ${record.package}:${record.view}`); 
+function renderEJS(record, settings) {
+    record.html = record.view.slice(0, -4) + ".html";
+    logger.channel(`very-verbose`).log(`  \\_ source ${record.package}:${record.view}`);
 
     const viewPaths = [];
     const modPaths = [];
     const scriptPaths = [];
 
-    for (let include of record.includes){
-        if(include.view){
-            if (include.package === settings[`package`]){
-                const view = Path.join(process.cwd(), include.view);                
-                const style = Path.join(convertDelimited(include.name, '_') + ".css");
-                viewPaths.push({view: view, style: style});
-                logger.channel(`very-verbose`).log(`    \\_ local view ${include.package}:${view}`);                 
-                logger.channel(`very-verbose`).log(`    \\_ local style ${include.package}:${style}`);                 
-            } else {
-                const view = Path.join(process.cwd(), CONSTANTS.NODE_MODULES_PATH, include.package, include.view);
-                const style = Path.join(CONSTANTS.IMPORT_MAP_FILE_PATH, include.package, include.style);
-                viewPaths.push({view: view, style: style});
-                logger.channel(`very-verbose`).log(`    \\_ lib view ${include.package}:${view}`);                 
-                logger.channel(`very-verbose`).log(`    \\_ lib style ${include.package}:${style}`);  
-            }
+    for (let include of record.includes) {
+        if (include.view) {
+            const view = Path.join(process.cwd(), include.package, include.view);
+            const style = Path.join(include.package, include.style);
         }
-        if(include.es6){
-            const filename = Path.parse(include.es6).base;
-            const path = Path.join(filename);                
-            modPaths.push(path);
-            logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${path}`);                 
+        if (include.es6) {
+            const script = Path.join(include.package, include.es6);
+            modPaths.push(script);
+            logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${script}`);
         }
-        if(include.script){
-            const filename = Path.parse(include.script).base;
-            const path = Path.join(filename);                
-            scriptPaths.push(path);
-            logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${path}`);                 
+        if (include.script) {
+            const script = Path.join(include.package, include.script);
+            scriptPaths.push(script);
+            logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${script}`);
         }
     }
 
@@ -49,33 +37,28 @@ function renderEJS (record, settings) {
         modPaths: modPaths,
         scriptPaths: scriptPaths,
         scriptname: "",
-        stylename: ""
+        stylename: "",
     };
-    
-    if (record.es6 !== "") modPaths.push(Path.parse(record.es6).base);
-    if (record.script !== "") scriptPaths.push(Path.parse(record.script).base);
-    if (record.style !== "") dataobj.stylename = record.name;
 
-    return new Promise((resolve, reject)=>{
-        ejs.renderFile(
-            record.view,
-            dataobj,
-            (err, str) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    const outpath = Path.join(settings[`output-dir`], basename + `.html`);
-                    const outdir = Path.parse(outpath).dir;
-                    record.html = outpath;
-                    if (!FS.existsSync(outdir)) FS.mkdirSync(outdir, { recursive: true });
+    if (record.es6 !== "") modPaths.push(Path.join(record.package, record.es6));
+    if (record.script !== "") scriptPaths.push(Path.join(record.package, record.script));
+    if (record.style !== "") dataobj.stylename = Path.join(record.package, record.style);
 
-                    FS.writeFileSync(outpath, str);
-                    logger.channel(`very-verbose`).log(`    \\_ destination ${outpath}`);
-                    resolve();
-                }
+    return new Promise((resolve, reject) => {
+        const inputPath = Path.join(settings['input'], record.view);
+        ejs.renderFile(inputPath, dataobj, (err, str) => {
+            if (err) {
+                reject(err);
+            } else {
+                const outpath = Path.join(settings[`output-dir`], record.package, record.html);
+                mkdirIf(outpath);
+
+                FS.writeFileSync(outpath, str);
+                logger.channel(`very-verbose`).log(`    \\_ destination ${outpath}`);
+                resolve();
             }
-        );
-    })
+        });
+    });
 }
 
 export default renderEJS;

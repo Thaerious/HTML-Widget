@@ -89,8 +89,8 @@ class NidgetElement extends HTMLElement {
     async ready() {}
 
     get visible() {
-        const v = this.classList.contains("visible") === true;
-        const h = this.classList.contains("hidden") === true;
+        const v = this.classList.contains(NidgetElement.VISIBLE_CLASS) === true;
+        const h = this.classList.contains(NidgetElement.HIDDEN_CLASS) === true;
 
         if (v && !h) return true;
         if (h && !v) return false;
@@ -106,16 +106,16 @@ class NidgetElement extends HTMLElement {
      * Remove 'hidden' class.
      */
     show() {
-        this.classList.remove("hidden");
-        this.classList.add("visible");
+        this.classList.remove(NidgetElement.HIDDEN_CLASS);
+        this.classList.add(NidgetElement.VISIBLE_CLASS);
     }
 
     /**
      * Add 'hidden' class.
      */
     hide() {
-        this.classList.remove("visible");
-        this.classList.add("hidden");
+        this.classList.remove(NidgetElement.VISIBLE_CLASS);
+        this.classList.add(NidgetElement.HIDDEN_CLASS);
     }
 
     /**
@@ -239,6 +239,8 @@ function toCamelCase(input) {
 }
 
 NidgetElement.DISABLED_ATTRIBUTE = "nidget-disabled";
+NidgetElement.HIDDEN_CLASS = "hidden";
+NidgetElement.VISIBLE_CLASS = "visible";
 
 if (!window.customElements.get("nidget-element")) {
     window.customElements.define("nidget-element", NidgetElement);

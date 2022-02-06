@@ -25,6 +25,7 @@ const logger = Logger.getLogger();
  class DependencyRecord {
     constructor(nidgetName, nidgetPackage = ``) {
         this._name = nidgetName;
+        this._root = ``;
         this._es6 = ``;
         this._script = ``;
         this._view = ``;
@@ -73,6 +74,15 @@ const logger = Logger.getLogger();
         }
         set.delete(this);
         return set;
+    }
+
+    get root(){
+        return this._root;
+    }
+
+    set root(value){
+        if (typeof value !== `string`) throw new Error(`expected string found ${typeof value}`);
+        this._root = value;
     }
 
     get es6(){
@@ -145,6 +155,7 @@ const logger = Logger.getLogger();
         return (
             `NidgetRecord {\n` +
             `\tname : ${this.name}\n` +
+            `\troot : ${this.root}\n` +
             `\tes6: ${this.es6}\n` +
             `\tscript : ${this.script}\n` +
             `\tview : ${this.view}\n` +
@@ -164,6 +175,7 @@ const logger = Logger.getLogger();
     toJSON() {
         const json = {
             name: this.name,
+            root: this.root,
             es6 : this.es6,
             script: this.script,
             view: this.view,
