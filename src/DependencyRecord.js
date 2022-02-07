@@ -2,6 +2,7 @@ import Logger from "@thaerious/logger";
 import FS from "fs";
 import { parseHTML } from "linkedom";
 import collectImports from "./collectImports.js";
+import Path from "path";
 
 class Warn {
     constructor() {
@@ -212,9 +213,10 @@ const logger = Logger.getLogger();
      */
     seekEJSDependencies(npp) {
         if (this.view === ``) return;
-        if (!FS.existsSync(this.view)) return;
+        const viewPath = Path.join(npp.settings['input'], this.view);
+        if (!FS.existsSync(viewPath)) return;
         
-        const fileString = FS.readFileSync(this.view);
+        const fileString = FS.readFileSync(viewPath);
         const htmlString = `<html><body>${fileString}</body></html>`;
         const dom = parseHTML(htmlString);
 

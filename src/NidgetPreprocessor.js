@@ -12,6 +12,7 @@ import renderEJS from "./RenderEJS.js";
 import renderJS from "./RenderJS.js";
 import DependencyRecord from "./DependencyRecord.js";
 import mkdirIf from "./mkdirIf.js";
+import loadJSON from "./loadJSON.js";
 
 const logger = Logger.getLogger();
 
@@ -31,15 +32,16 @@ class NidgetPreprocessor {
 
     applySettings(settings) {
         this.settings = { ...settings };
-        if (settings.input) for (const path of settings.input) this.addPath(path);
+        if (settings.input){
+            if (typeof settings.input === "string") this.addPath(settings.input);
+            else for (const path of settings.input) this.addPath(path);
+        }
         if (settings.exclude) for (const path of settings.exclude) this.addExclude(path);
         return this;
     }
 
     addPath(...filepaths) {
-        Logger.getLogger()
-            .channel(`verbose`)
-            .log(`adding filepath ` + filepaths);
+        Logger.getLogger().channel(`verbose`).log(`adding filepath ` + filepaths);
         this.input_paths = [...this.input_paths, ...filepaths];
         return this;
     }
@@ -124,103 +126,16 @@ class NidgetPreprocessor {
     }
 
     processPackage(packagePath){
-        const nidgetJSONPath = Path.join(packagePath, CONSTANTS.NIDGET_PROPERTY_FILE);
-        const nidgetJSON = JSON.parse(FS.readFileSync(nidgetJSONPath)); // nidget.json
-
-        const packageJSONPath = Path.join(packagePath, CONSTANTS.NODE_PACKAGE_FILE);
-        const packageJSON = JSON.parse(FS.readFileSync(packageJSONPath)); // package.json
+        const nidgetJSON = loadJSON(packagePath, CONSTANTS.NIDGET_PROPERTY_FILE);
+        const packageJSON = loadJSON(packagePath, CONSTANTS.NODE_PACKAGE_FILE);       
 
         const from = Path.join(packagePath, nidgetJSON['package-dir']);
         const to = Path.join(this.settings['output-dir'], packageJSON.name, nidgetJSON['package-dir']);
+
         FSX.copy(from, to);
+
         const importPath = "/" + Path.join(packageJSON.name, packageJSON.module ?? packageJSON.main);
         this.importMap.imports[packageJSON.name] = importPath;
-    }
-
-    // processPackageEntry(from){
-    // }
-
-    //     for (let dirEntry of contents) {
-    //         if (dirEntry.isFile()) {
-    //             const fromPath = Path.join(from, dirEntry.name);
-    //             const toPath = Path.join(to, dirEntry.name);
-    //             FS.copyFileSync(fromPath, toPath);
-    //         } else {
-                
-    //         }
-
-    //         if (dirEntry.isFile()) {
-    //             Logger.getLogger().channel(`very-verbose`).log(`      \\_ file:${dirEntry.name}`);
-    //             FS.copyFileSync(fromPath, toPath);
-
-    //             if (Path.resolve(fromPath) === modulePath) newModulePath = toPath;
-    //         } else if (dirEntry.isDirectory()) {
-    //             return this._copyLib(fromPath, toPath, modulePath);
-    //         }
-    //     }        
-    // }
-
-    // copyLib(pathToJSON) {
-    //     Logger.getLogger().channel(`debug`).log(`copyLib(${pathToJSON})`);
-
-    //     const nidgetJSON = JSON.parse(FS.readFileSync(pathToJSON)); // nidget.json
-    //     const _packageJSON = FS.readFileSync(Path.join(Path.parse(pathToJSON).dir, CONSTANTS.NODE_PACKAGE_FILE));
-    //     const packageJSON = JSON.parse(_packageJSON); // package.json
-    //     const entryPoint = packageJSON.module ?? packageJSON.main;
-    //     if (!entryPoint) return;
-
-    //     const distDir = nidgetJSON[`package-dir`] ?? Path.join(CONSTANTS.NIDGET_PACKAGE_DIR); // default to dist
-    //     const from = Path.join(Path.parse(pathToJSON).dir, distDir);
-    //     const to = Path.join(this.settings[`output-dir`], packageJSON.name);
-    //     const modulepath = Path.resolve(Path.join(Path.parse(pathToJSON).dir, packageJSON.module));
-
-    //     this.doctorRecords(nidgetJSON, to);
-    //     const newModulePath = this._copyLib(from, to, modulepath);
-
-    //     if (newModulePath) {
-    //         this.importMap.imports[packageJSON.name] = "/" + newModulePath;
-    //     }
-    // }
-
-    _copyLib(from, to, modulePath) {
-        Logger.getLogger().channel(`very-verbose`).log(`    \\_ from:${from}`);
-        Logger.getLogger().channel(`very-verbose`).log(`    \\_ to:${to}`);
-        let newModulePath = false;
-
-        FS.mkdirSync(to, { recursive: true });
-        const contents = FS.readdirSync(from, { withFileTypes: true });
-
-        for (let dirEntry of contents) {
-            const fromPath = Path.join(from, dirEntry.name);
-            const toPath = Path.join(to, dirEntry.name);
-
-            if (dirEntry.isFile()) {
-                Logger.getLogger().channel(`very-verbose`).log(`      \\_ file:${dirEntry.name}`);
-                FS.copyFileSync(fromPath, toPath);
-
-                if (Path.resolve(fromPath) === modulePath) newModulePath = toPath;
-            } else if (dirEntry.isDirectory()) {
-                return this._copyLib(fromPath, toPath, modulePath);
-            }
-        }
-
-        return newModulePath;
-    }
-
-    doctorRecords(nidgetJSON, to) {
-        if (!nidgetJSON.records) return;
-
-        for (const name in nidgetJSON.records) {
-            const record = nidgetJSON.records[name];
-            Logger.getLogger().channel(`very-verbose`).log(`    \\_ ${record.package}:${record.name}`);
-
-            this.nidgetRecords[name] = new DependencyRecord(record.name, record.package);
-            this.nidgetRecords[name].view = record.view !== "" ? Path.join(to, record.view) : "";
-            this.nidgetRecords[name].es6 = record.es6 !== "" ? Path.join(to, record.es6) : "";
-            this.nidgetRecords[name].script = record.script !== "" ? Path.join(to, record.script) : "";
-            this.nidgetRecords[name].style = record.style !== "" ? Path.join(to, record.style) : "";
-            this.nidgetRecords[name].type = record.type;
-        }
     }
 
     discover() {

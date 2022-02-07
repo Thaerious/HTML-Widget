@@ -17,17 +17,19 @@ function renderEJS(record, settings) {
 
     for (let include of record.includes) {
         if (include.view) {
-            const view = Path.join(process.cwd(), include.package, include.view);
-            const style = Path.join(include.package, include.style);
+            const view = Path.join(process.cwd(), settings['input'], include.view);
+            const style = include.style ? Path.join(include.package, include.style) : "";
+            console.log(style);
+            viewPaths.push({view: view, style: "/" + style});
         }
         if (include.es6) {
             const script = Path.join(include.package, include.es6);
-            modPaths.push(script);
+            modPaths.push("/" + script);
             logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${script}`);
         }
         if (include.script) {
             const script = Path.join(include.package, include.script);
-            scriptPaths.push(script);
+            scriptPaths.push("/" + script);
             logger.channel(`very-verbose`).log(`    \\_ include ${include.package}:${script}`);
         }
     }
@@ -40,9 +42,9 @@ function renderEJS(record, settings) {
         stylename: "",
     };
 
-    if (record.es6 !== "") modPaths.push(Path.join(record.package, record.es6));
-    if (record.script !== "") scriptPaths.push(Path.join(record.package, record.script));
-    if (record.style !== "") dataobj.stylename = Path.join(record.package, record.style);
+    if (record.es6 !== "") modPaths.push("/" + Path.join(record.package, record.es6));
+    if (record.script !== "") scriptPaths.push("/" + Path.join(record.package, record.script));
+    if (record.style !== "") dataobj.stylename = "/" + Path.join(record.package, record.style);
 
     return new Promise((resolve, reject) => {
         const inputPath = Path.join(settings['input'], record.view);
