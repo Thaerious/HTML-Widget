@@ -13,11 +13,13 @@ function nppMiddleware(req, res){
     npp.loadLibs();
     npp.sass();
     npp.copyMJS(true);
+    npp.ejs();
     
     renderEJS(npp.getRecord(url.name), npp.settings);
     
     const record = npp.getRecord(url.name);
-    const html = FS.readFileSync(record.html);
+    const path = npp.settings['output-dir'] + "/" + record.package + "/" + record.html;
+    const html = FS.readFileSync(path);
 
     res.set('Content-Type', 'text/html');
     res.send(html);

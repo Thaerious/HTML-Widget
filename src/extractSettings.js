@@ -10,13 +10,16 @@ const args = new ParseArgs().loadOptions(parseArgsOptions).run();
  **/
 function extractSettings(filename = CONSTANTS.NIDGET_PROPERTY_FILE) {
     let settings = {
-        package : ""
+        package : "",
+        "nidget-src" : "./src",
+        "view-src" : "./src",
+        "src" : ["./src"]
     };
 
     let fileSettings = {};
     if (FS.existsSync(filename)) {
         const settingsText = FS.readFileSync(filename);
-        settings = JSON.parse(settingsText);
+        settings = {...settings, ...JSON.parse(settingsText)};
     }
 
     settings['output-dir'] = settings['output-dir'] ?? CONSTANTS.DEFAULT_OUTPUT;

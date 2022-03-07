@@ -1,7 +1,7 @@
 {
-  "name": "nidget-mock",
+  "name": "mock-lib",
   "version": "1.0.0",
-  "description": "",
+  "description": "This directory is only used to test imports into the mock directory.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@nidget/core": "file:../..",
-    "mock-lib": "file:../mock-lib"
-  },
-  "type": "module"
+    "@nidget/core": "file:../.."
+  }
 }

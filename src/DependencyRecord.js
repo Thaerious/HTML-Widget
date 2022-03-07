@@ -183,25 +183,8 @@ const logger = Logger.getLogger();
             html: this.html,
             style: this.style,
             type: this.type,
-            package: this.package,
-            includes: [],
-            parents: []
+            package: this.package
         };
-
-        for (const record of this.includes){
-            json.includes.push({
-                name : record.name,
-                package : record.package
-            });
-        }
-
-        for (const record of this.parents){
-            json.parents.push({
-                name : record.name,
-                package : record.package
-            });
-        }
-
         return json;
     }
 
@@ -213,10 +196,9 @@ const logger = Logger.getLogger();
      */
     seekEJSDependencies(npp) {
         if (this.view === ``) return;
-        const viewPath = Path.join(npp.settings['input'], this.view);
-        if (!FS.existsSync(viewPath)) return;
+        if (!FS.existsSync(this.view)) return;
         
-        const fileString = FS.readFileSync(viewPath);
+        const fileString = FS.readFileSync(this.view);
         const htmlString = `<html><body>${fileString}</body></html>`;
         const dom = parseHTML(htmlString);
 

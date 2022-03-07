@@ -1,7 +1,10 @@
 /**
- * Return the first object in a breadth-first-search of child objects that
- * for a matching key:value pair.
- * Returns root if it has a matching key:value pair.
+ * Search the root object and all subsequent child objects for an object with
+ * and attribute named 'key' with the value 'value'.  If value is omitted 
+ * returns any object with attribute named 'key'.
+ * 
+ * Returns the first object in a breadth-first-search that matches the criteria.
+ * Returns root if it meets the criteria.
  * Returns undefined when no match is found.
  * The 'test' function accepts the value of key when it is found on an object.
  * It defaults to simple equivalency.

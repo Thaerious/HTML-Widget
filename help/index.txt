@@ -1,0 +1,43 @@
+NAME
+    nidget - manage nidget based projects
+
+SYNOPSIS
+    nidget [OPTION]... [COMMANDS]...
+
+OPTIONS
+    -n, --name
+        Set the name of the nidget when relevent
+
+    -v, -vv
+        Display verbose information, or very-verbose information
+
+    --dist
+        Set the 'distribution' directory for the dist command
+
+    -o, --output
+        Set location for locally deployed files (web server will look in this directory)
+
+    -l, --link
+        Create file links instead of copying files
+
+COMMANDS
+    readme:  print the readme file which contains an example setup
+    init:    create a new nidget project in the this directory
+    create [nidget, view] name:  create a new nidget or view with specified name (-n)
+    records: show all records
+    clean:   remove --dist and --output directories and remove records from nidget.json file
+    settings: print out settings
+
+    disc:    search input directory for valid nidget files and record them as records
+    link:     search node_modules for valid nidget modules
+    
+    style:   render .css files placing them in the --output directory
+    script:  copy .mps files from source to --output [1]
+    view:    render .ejs files to .html, place in --output directory
+
+    deploy:  create deployable in --output directory for use by the web server [2]
+
+NOTES
+    [1]  Use --link to link instead of copy
+    [2]  Equivelent to 'disc lib script style view'
+

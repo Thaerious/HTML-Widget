@@ -1,3 +1,6 @@
+This tool manages custom html components that are shared accross multiple views.
+
+
 The objective is to inject 'view' files with nidget templates.
 SASS files need to be compiled at the same time.
 ES6 files need to be copied/linked/babel'd.
@@ -83,3 +86,7 @@ Copy or link all es6 files found in the records.
 Updates the records to match the destination file.
 Only operates on records from this package.
   
+Notes
+=====
+
+nidget source and view source will default to "./src"

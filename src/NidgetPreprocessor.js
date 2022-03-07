@@ -13,6 +13,7 @@ import renderJS from "./RenderJS.js";
 import DependencyRecord from "./DependencyRecord.js";
 import mkdirIf from "./mkdirIf.js";
 import loadJSON from "./loadJSON.js";
+import getFiles from "./getFiles.js";
 
 const logger = Logger.getLogger();
 
@@ -52,24 +53,11 @@ class NidgetPreprocessor {
     }
 
     /**
-     * Retrieve matching files from the include directories
+     * Recrusively retrieve matching files from the include directories
+     * If a directory has a .nigetrc file then use the src and/or records from it.
      */
     getFiles(...extensions) {
-        const rvalue = {};
-
-        const root = this.settings.input;
-        logger.channel("debug").log(`Input Path: ${root}`);
-        const globFiles = new Glob.sync(root + "**", { ignore: this.exclude_paths });
-
-        for (const extension of extensions) {
-            rvalue[extension] = [];
-            for (const filepath of globFiles) {
-                if (filepath.endsWith(`.${extension}`)) {
-                    rvalue[extension].push(filepath.substring(root.length));
-                }
-            }
-        }
-        return rvalue;
+        return getFiles(this.settings.input, {}, extensions); 
     }
 
     resetRecords() {
@@ -93,8 +81,6 @@ class NidgetPreprocessor {
                 imports: {},
             };
         }
-
-        Logger.getLogger().channel(`very-verbose`).log(`  \\_ lib:${sourcePath}`);
 
         if (FS.existsSync(Path.join(sourcePath, CONSTANTS.NIDGET_PROPERTY_FILE))) {
             this.processPackage(sourcePath);
@@ -141,35 +127,41 @@ class NidgetPreprocessor {
     discover() {
         Logger.getLogger().channel(`verbose`).log(`#discover`);
 
-        const files = this.getFiles("mjs", "ejs", "scss");
+        const files = this.getFiles(
+            CONSTANTS.EXTENSIONS.SCRIPT_SOURCE,
+            CONSTANTS.EXTENSIONS.STYLE_SOURCE,
+            CONSTANTS.EXTENSIONS.VIEW_SOURCE
+        );
 
         try {
-            for (const filepath of files[`mjs`]) {
-                const fullpath = Path.join(this.settings.input, filepath);
-                const isNidget = this.isNidgetScript(fullpath);
+            for (const entry of files[CONSTANTS.EXTENSIONS.SCRIPT_SOURCE]) {
+                Logger.getLogger().channel(`debug`).log(entry.full);
+                const isNidget = this.isNidgetScript(entry.full);
 
-                if (isNidget) this.addNidget(filepath);
-                else this.addES6Include(filepath);
+                if (isNidget) this.addNidget(entry.full);
+                else this.addES6Include(entry.full);
             }
         } catch (err) {
             logger.channel("standard").log(`*** JS Parsing Error:`);
             logger.channel("standard").log(`\t${err.message}`);
         }
 
-        for (const filepath of files[`ejs`]) {
-            if (this.hasRecord(filepath)) {
-                this.getRecord(filepath).view = filepath;
-                if (this.getRecord(filepath).type === `include`) {
-                    this.getRecord(filepath).type = `view`;
+        for (const entry of files[CONSTANTS.EXTENSIONS.VIEW_SOURCE]) {
+            Logger.getLogger().channel(`debug`).log(entry.full);
+            if (this.hasRecord(entry.full)) {
+                this.getRecord(entry.full).view = entry.full;
+                if (this.getRecord(entry.full).type === `include`) {
+                    this.getRecord(entry.full).type = `view`;
                 }
             } else {
-                this.addView(filepath);
+                this.addView(entry.full);
             }
         }
 
-        for (const filepath of files[`scss`]) {
-            if (!this.hasRecord(filepath)) this.addStyle(filepath);
-            else this.getRecord(filepath).style = filepath;
+        for (const entry of files[CONSTANTS.EXTENSIONS.STYLE_SOURCE]) {
+            Logger.getLogger().channel(`debug`).log(entry.full);
+            if (!this.hasRecord(entry.full)) this.addStyle(entry.full);
+            else this.getRecord(entry.full).style = entry.full;
         }
 
         for (const name in this.nidgetRecords) {
@@ -195,8 +187,11 @@ class NidgetPreprocessor {
 
     get records() {
         const array = [];
-        for (const name in this.nidgetRecords) {
-            array.push(this.nidgetRecords[name]);
+        for (const name in this.nidgetRecords) {        
+            const nidget = this.nidgetRecords[name];
+            if (nidget.type == "view" || nidget.type == "nidget"){
+                array.push(nidget);
+            }
         }
         return array;
     }

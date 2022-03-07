@@ -1,0 +1,10 @@
+COMMAND
+    link - search the node modules directory for components
+
+SYNOPSIS
+    npx nidget link
+
+DESCRIPTION
+    Will examine all projects in the node modules directory for a .nidgetrc file.
+    Uses the records field in this .nidgetrc file to add known components.
+    This field is built by the nidget pack command.

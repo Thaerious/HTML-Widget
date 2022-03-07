@@ -1,0 +1,15 @@
+COMMAND
+    disc, discover - manage nidget based projects
+
+SYNOPSIS
+    npx nidget discover
+
+DESCRIPTION
+    Search all input directories for nidget or view files.  All related files must
+    share the same name (ex: myNidget.mjs, myNidget.ejs, myNidget.scss). The standard
+    pattern in to include all the files in directory with the nidget/view name.
+
+    A set of files is a NIDGET if the module source (.mjs) contains a class that
+    extends the NidgetElement class.  They are considered a view if there is an .ejs
+    file that doesn't have a correstponding .mjs file that marks it as a nidget.
+

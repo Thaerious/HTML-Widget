@@ -7,6 +7,7 @@ import Logger from "@thaerious/logger";
 import Path from "path";
 import { convertToDash, convertToPascal, convertDelimited } from "./names.js";
 import extractSettings from "./extractSettings.js";
+import loadJSON from "./loadJSON.js";
 
 let npp = undefined;
 
@@ -40,145 +41,202 @@ if (args.count(`verbose`) >= 2) logger.channel(`very-verbose`).enabled = true;
 if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
 (async () => {
-    if (args.args.length <= 2) help();
+    await nidgetCli(args.args);
+})();
 
-    for (const arg of args.args) {
-        logger.channel(`very-verbose`).log(`arg: ${arg}`);
-        switch (arg.toLowerCase()) {
+async function nidgetCli(commands) {
+    let rvalue = null;
+
+    function nextCommand() {
+        if (commands.length === 0) {
+            logger.channel(`standard`).log("command parse error");
+            process.exit(1);
+        }
+        return commands.shift();
+    }
+
+    const iterator = {
+        index: 0,
+        next: function () {},
+    };
+
+    while (commands.length > 0) {
+        switch (nextCommand().toLowerCase()) {
             case "settings":
                 console.log(extractSettings());
                 break;
+            case "i":
             case "init":
                 init();
                 break;
-            case "create":                
-                if (!args.flags["name"]) {
-                    logger.channel(`standard`).log(`missing -n, --name parameter`);
-                } else {
-                    create(args.flags["name"]);
+            case "create":
+                switch (nextCommand().toLowerCase()) {
+                    case "nidget":
+                        createNidget(nextCommand());
+                        break;
+                    case "view":
+                        createView(nextCommand());
+                        break;
                 }
+            case "records":
+                await printRecords();
                 break;
-            case "createview":
-                if (!args.flags["name"]) {
-                    logger.channel(`standard`).log(`missing -n, --name parameter`);
-                } else {
-                    view(args.flags["name"]);
-                }
+            case "pack":
+                await pack();
                 break;
-            case "scss":
-            case "css":    
-            case "sass":
+            case "disc":
+            case "discover":
+                rvalue = await discover();
+                break;
+            case "link":
+                rvalue = await link();
+                break;
+
             case "style":
                 await sass();
                 break;
             case "babel":
                 await babel();
                 break;
-            case "records":
-                await printRecords();
-                break;
             case "readme":
                 readme();
                 break;
-            case "pack":
-                await pack();
-                break;
-            case "html":                
-            case "ejs":
             case "view":
                 await ejs();
                 break;
-            case "es6":
-            case "mjs":
             case "script":
                 await es6();
                 break;
-            case "lib":
-                await lib();
-                break;
             case "deploy":
                 await deploy();
-                break;
-            case "dist":
-                await dist();
-                break;
-            case "disc":
-            case "discover":
-                await discover();
                 break;
             case "clean":
                 clean();
                 break;
             case "help":
-                help();
+                help(commands);
+                break;
+            case "settings":
+                settings();
                 break;
         }
     }
 
     logger.channel("very-verbose").log(`uptime ${process.uptime()} s`);
-})();
+    return rvalue;
+}
 
-async function loadNPP(){
-    if (!npp){
+async function pack(){
+    const rvalue = {};
+
+    await loadNPP();
+    npp.discover();
+
+    for (const record of npp.records) {
+        const padding = 8 - record.type.length;
+        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.name}`);
+        
+        if (record.type === "nidget"){
+            rvalue[record.name] = record.toJSON();
+        }
+    }
+
+    if (FS.existsSync(CONSTANTS.NIDGET_PROPERTY_FILE)) {
+        const settings = loadJSON(CONSTANTS.NIDGET_PROPERTY_FILE);       
+        
+        settings.records = rvalue;
+        FS.writeFileSync(
+            CONSTANTS.NIDGET_PROPERTY_FILE,
+            JSON.stringify(settings, null, 2),
+            "utf-8"
+        );
+    }
+
+}
+
+async function loadNPP() {
+    if (!npp) {
         const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
         npp = new NidgetPreprocessor();
         npp.applySettings(extractSettings());
     }
 }
 
-async function discover(){
-    await loadNPP()
-    npp.discover();
+function settings() {
+    const settings = extractSettings();
+    for (const key of Object.keys(settings)) {
+        logger.channel("standard").log(`${key} : ${settings[key]}`);
+    }
 }
 
+async function discover() {
+    const rvalue = {};
 
-async function deploy(){
-    await loadNPP()
+    await loadNPP();
+    npp.discover();
+
+    for (const record of npp.records) {
+        const padding = 8 - record.type.length;
+        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.name}`);
+        rvalue[record.name] = record.type;
+    }
+
+    return rvalue;
+}
+
+async function link() {
+    const rvalue = {};
+
+    await loadNPP();
+    npp.loadLibs();
+
+    for (const record of npp.records) {
+        const padding = 8 - record.type.length;
+        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.name}`);
+        rvalue[record.name] = record.type;
+    }
+
+    return rvalue;
+}
+
+async function deploy() {
+    await loadNPP();
+    npp.discover();
     npp.loadLibs();
     npp.ejs();
     npp.sass();
     npp.copyMJS(args.flags["link"]);
 }
 
-async function lib(){
-    await loadNPP();
-    npp.loadLibs();
-}
-
 async function ejs() {
-    await loadNPP()
+    await loadNPP();
     npp.ejs();
 }
 
 async function es6() {
-    await loadNPP()
+    await loadNPP();
     npp.copyMJS(args.flags["link"]);
 }
 
 async function sass() {
-    await loadNPP()
+    await loadNPP();
     npp.sass();
 }
 
 async function babel() {
-    await loadNPP()
+    await loadNPP();
     await npp.babelify();
     npp.writePackageFile();
-}
-
-async function pack() {
-    await loadNPP()
-    await npp.browserify();
 }
 
 function clean() {
     const settings = extractSettings();
 
-    if (FS.existsSync(settings["package-dir"])){
+    if (FS.existsSync(settings["package-dir"])) {
         logger.channel(`verbose`).log(`clean ${settings["package-dir"]}`);
         FS.rmSync(settings["package-dir"], { recursive: true });
     }
-    if (FS.existsSync(settings["output-dir"])){
+    if (FS.existsSync(settings["output-dir"])) {
         logger.channel(`verbose`).log(`clean ${settings["output-dir"]}`);
         FS.rmSync(settings["output-dir"], { recursive: true });
     }
@@ -190,46 +248,36 @@ function clean() {
 }
 
 async function printRecords() {
-    await loadNPP()
-
+    await loadNPP();
     for (const record of npp.records) {
         logger.channel(`standard`).log(record.toString());
     }
 }
 
 function init() {
-    if (!FS.existsSync("nidgets.json")) {
+    if (!FS.existsSync(CONSTANTS.NIDGET_PROPERTY_FILE)) {
         logger.channel(`verbose`).log("create nidget.json file");
-        FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/nidgets.json"), "nidgets.json");
+        FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates", CONSTANTS.NIDGET_PROPERTY_FILE), CONSTANTS.NIDGET_PROPERTY_FILE);
     }
 
     if (!FS.existsSync(".babelrc")) {
         logger.channel(`verbose`).log("create .babelrc file");
         FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/.babelrc"), ".babelrc");
     }
-
-    if (!FS.existsSync("output")) FS.mkdirSync("output");
-    if (!FS.existsSync("src")) FS.mkdirSync("src");
-    if (!FS.existsSync("src/nidgets")) FS.mkdirSync("src/nidgets");
-    if (!FS.existsSync("src/view")) FS.mkdirSync("src/view");
 }
 
-function view(name) {
+function createView(name) {
     const settings = extractSettings();
-    const viewPath = Path.join(settings["view-src"], name); // src/nidget-name
+    const viewPath = Path.join(settings["view-src"], name);
     const templateName = Path.join(viewPath, convertDelimited(name, "_"));
 
-    if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath, {recursive : true});
+    if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath, { recursive: true });
 
-    FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, templateName + ".ejs");
+    FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(viewPath, name + ".ejs"));
 
     const relativePath = Path.relative(viewPath, CONSTANTS.PARTIALS_DIR);
 
-    const importMapPath = 
-        Path.relative(
-            viewPath,
-            Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name)
-        );
+    const importMapPath = Path.relative(viewPath, Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name));
 
     replaceInFile(viewPath + `/${name}.ejs`, "${import_map}", importMapPath);
     replaceInFile(viewPath + `/${name}.ejs`, "${modules}", relativePath + "/modules");
@@ -244,7 +292,7 @@ function view(name) {
     }
 }
 
-function create(name) {
+function createNidget(name) {
     if (convertToDash(name).split("-").length < 2) {
         logger.channel(`standard`).log(`error: name must consist of two or more words`);
         process.exit();
@@ -252,7 +300,7 @@ function create(name) {
 
     const settings = extractSettings();
     const path = Path.join(settings["nidget-src"], name);
-    if (!FS.existsSync(path)) FS.mkdirSync(path, {recursive: true});
+    if (!FS.existsSync(path)) FS.mkdirSync(path, { recursive: true });
 
     const templateName = Path.join(path, convertDelimited(name, "_"));
 
@@ -278,8 +326,16 @@ function readme() {
     logger.channel("standard").log(text);
 }
 
-function help() {
-    const path = Path.join("node_modules", CONSTANTS.MODULE_NAME, "help.txt");
-    const text = FS.readFileSync(path, "utf-8");
-    logger.channel("standard").log(text);
+function help(commands) {
+    const helpContext = commands?.shift() || "index";
+    const path = Path.join(CONSTANTS.NODE_MODULES_PATH, CONSTANTS.MODULE_NAME, `help/${helpContext}.txt`);
+    console.log(path);
+    if (!FS.existsSync(path)) {
+        logger.channel("standard").log(`Help for command '${helpContext}' not found.`);
+    } else {
+        const text = FS.readFileSync(path, "utf-8");
+        logger.channel("standard").log(text);
+    }
 }
+
+export default nidgetCli;

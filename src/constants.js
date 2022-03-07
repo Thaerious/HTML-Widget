@@ -1,7 +1,7 @@
 import Path from "path";
 
 const CONSTANTS =  {
-    NIDGET_PROPERTY_FILE: `.nidgets.json`,
+    NIDGET_PROPERTY_FILE: `.nidgetrc`,
     NODE_PACKAGE_FILE: `package.json`,
     NODE_MODULES_PATH: `node_modules`,
     LIB_FILE: `import_map.ejs`,
@@ -16,6 +16,11 @@ const CONSTANTS =  {
         SCSS: `template.scss`,
         EJS: `template.ejs`,
         VIEW: `view.template.ejs`
+    },
+    EXTENSIONS: {
+        SCRIPT_SOURCE: `.mjs`,
+        STYLE_SOURCE: `.scss`,
+        VIEW_SOURCE: `.ejs`,
     }
 };
 
