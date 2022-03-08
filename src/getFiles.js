@@ -30,9 +30,11 @@ function processDirectory(root, result, extensions) {
     }
 
     for (const input of inputs) {
+        console.log(input);
         const localPath = Path.join(root, input);
         const contents = FS.readdirSync(localPath, { withFileTypes: true });
         for (const dirEntry of contents) {
+            console.log(dirEntry);
             processEntry(dirEntry, localPath, result, extensions);
         }
     }

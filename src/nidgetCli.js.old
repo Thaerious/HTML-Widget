@@ -52,11 +52,7 @@ async function nidgetCli(commands) {
             logger.channel(`standard`).log("command parse error");
             process.exit(1);
         }
-        return commands.shift().toLowerCase();
-    }
-
-    function peekCommand() {
-        return commands[0].toLowerCase();
+        return commands.shift();
     }
 
     const iterator = {
@@ -65,7 +61,7 @@ async function nidgetCli(commands) {
     };
 
     while (commands.length > 0) {
-        switch (nextCommand()) {
+        switch (nextCommand().toLowerCase()) {
             case "settings":
                 console.log(extractSettings());
                 break;
@@ -74,17 +70,12 @@ async function nidgetCli(commands) {
                 init();
                 break;
             case "create":
-                switch (peekCommand()) {
+                switch (nextCommand().toLowerCase()) {
                     case "nidget":
-                        nextCommand();
                         createNidget(nextCommand());
                         break;
                     case "view":
-                        nextCommand();
                         createView(nextCommand());
-                        break;
-                    default:
-                        createNidget(nextCommand());
                         break;
                 }
             case "records":
@@ -100,8 +91,12 @@ async function nidgetCli(commands) {
             case "link":
                 rvalue = await link();
                 break;
-            case "sass":
+
+            case "style":
                 await sass();
+                break;
+            case "babel":
+                await babel();
                 break;
             case "readme":
                 readme();
@@ -131,7 +126,7 @@ async function nidgetCli(commands) {
     return rvalue;
 }
 
-async function pack() {
+async function pack(){
     const rvalue = {};
 
     await loadNPP();
@@ -140,18 +135,23 @@ async function pack() {
     for (const record of npp.records) {
         const padding = 8 - record.type.length;
         logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.name}`);
-
-        if (record.type === "nidget") {
+        
+        if (record.type === "nidget"){
             rvalue[record.name] = record.toJSON();
         }
     }
 
     if (FS.existsSync(CONSTANTS.NIDGET_PROPERTY_FILE)) {
-        const settings = loadJSON(CONSTANTS.NIDGET_PROPERTY_FILE);
-
+        const settings = loadJSON(CONSTANTS.NIDGET_PROPERTY_FILE);       
+        
         settings.records = rvalue;
-        FS.writeFileSync(CONSTANTS.NIDGET_PROPERTY_FILE, JSON.stringify(settings, null, 2), "utf-8");
+        FS.writeFileSync(
+            CONSTANTS.NIDGET_PROPERTY_FILE,
+            JSON.stringify(settings, null, 2),
+            "utf-8"
+        );
     }
+
 }
 
 async function loadNPP() {
@@ -223,6 +223,12 @@ async function sass() {
     npp.sass();
 }
 
+async function babel() {
+    await loadNPP();
+    await npp.babelify();
+    npp.writePackageFile();
+}
+
 function clean() {
     const settings = extractSettings();
 
@@ -263,41 +269,26 @@ function init() {
 function createView(name) {
     const settings = extractSettings();
     const viewPath = Path.join(settings["view-src"], name);
+    const templateName = Path.join(viewPath, convertDelimited(name, "_"));
 
     if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath, { recursive: true });
 
+    FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(viewPath, name + ".ejs"));
+
     const relativePath = Path.relative(viewPath, CONSTANTS.PARTIALS_DIR);
+
     const importMapPath = Path.relative(viewPath, Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name));
 
-    const infoPath = Path.join(settings["view-src"], name, CONSTANTS.NIDGET_INFO_FILE);
-    if (!FS.existsSync(infoPath)) {
-        const nidgetInfo = {
-            components: [
-                {
-                    type: CONSTANTS.TYPE.VIEW,
-                    tagName: convertToDash(name),
-                    view: name + ".ejs",
-                    es6: name + ".mjs",
-                    style: name + ".scss"
-                },
-            ],
-        };
-        FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));
+    replaceInFile(viewPath + `/${name}.ejs`, "${import_map}", importMapPath);
+    replaceInFile(viewPath + `/${name}.ejs`, "${modules}", relativePath + "/modules");
+    replaceInFile(viewPath + `/${name}.ejs`, "${templates}", relativePath + "/nidget-templates");
+
+    if (!FS.existsSync(templateName + ".mjs")) {
+        FS.writeFileSync(templateName + ".mjs", "");
     }
 
-    if (!FS.existsSync(Path.join(viewPath, name + ".ejs"))) {
-        FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(viewPath, name + ".ejs"));
-        replaceInFile(viewPath + `/${name}.ejs`, "${import_map}", importMapPath);
-        replaceInFile(viewPath + `/${name}.ejs`, "${modules}", relativePath + "/modules");
-        replaceInFile(viewPath + `/${name}.ejs`, "${templates}", relativePath + "/nidget-templates");
-    }
-
-    if (!FS.existsSync(Path.join(viewPath, name + ".mjs"))) {
-        FS.writeFileSync(Path.join(viewPath, name + ".mjs"), "");
-    }
-
-    if (!FS.existsSync(Path.join(viewPath, name + ".scss"))) {
-        FS.writeFileSync(Path.join(viewPath, name + ".scss"), "");
+    if (!FS.existsSync(templateName + ".scss")) {
+        FS.writeFileSync(templateName + ".scss", "");
     }
 }
 
@@ -311,42 +302,40 @@ function createNidget(name) {
     const path = Path.join(settings["nidget-src"], name);
     if (!FS.existsSync(path)) FS.mkdirSync(path, { recursive: true });
 
-    const templateName = Path.join(path, convertDelimited(name, "_"));
+    const templateName = Path.join(path, convertDelimited(name, "_"));  
     const moduleSourceName = Path.join(path, convertToPascal(name, "_") + ".mjs");
+
     const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
 
     const infoPath = Path.join(settings["nidget-src"], name, CONSTANTS.NIDGET_INFO_FILE);
-    if (!FS.existsSync(infoPath)) {
+    if (!FS.existsSync(infoPath)){
         const nidgetInfo = {
-            components: [
-                {
-                    type: CONSTANTS.TYPE.COMPONENT,
-                    tagName: convertToDash(name),
-                    view: templateName + ".ejs",
-                    es6: moduleSourceName,
-                    style: templateName + ".scss",
-                    package: packageJSON.name,
-                },
-            ],
-        };
+            components : [{
+                tagName : convertToDash(name),
+                view : templateName + ".ejs",
+                es6 : moduleSourceName,
+                style : templateName + ".scss",
+                package : packageJSON.name
+            }]
+        }
         FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));
     }
-
-    if (!FS.existsSync(templateName + ".ejs")) {
+ 
+    if (!FS.existsSync(templateName + ".ejs")){
         FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.ejs"), templateName + ".ejs");
         replaceInFile(templateName + ".ejs", "${name_dash}", convertToDash(name));
-        replaceInFile(templateName + ".ejs", "${name_underscore}", convertDelimited(name, "_"));
+        replaceInFile(templateName + ".ejs", "${name_underscore}", convertDelimited(name, "_"));        
     }
-
-    if (!FS.existsSync(moduleSourceName)) {
+    
+    if (!FS.existsSync(moduleSourceName)){
         FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.mjs"), moduleSourceName);
         replaceInFile(moduleSourceName, "${name_dash}", convertToDash(name));
         replaceInFile(moduleSourceName, "${name_pascal}", convertToPascal(name));
     }
 
-    if (!FS.existsSync(templateName + ".scss")) {
+    if (!FS.existsSync(templateName + ".scss")){
         FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.scss"), templateName + ".scss");
-        replaceInFile(templateName + ".scss", "${name_dash}", convertToDash(name));
+        replaceInFile(templateName + ".scss", "${name_dash}", convertToDash(name));        
     }
 }
 

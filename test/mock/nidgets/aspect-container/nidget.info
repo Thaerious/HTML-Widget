@@ -1,0 +1,12 @@
+{
+    "components": [
+        {
+            "type": "component",
+            "tagName": "aspect-container",
+            "view": "nidgets/aspect-container/aspect_container.ejs",
+            "es6": "nidgets/aspect-container/AspectContainer.mjs",
+            "style": "nidgets/aspect-container/aspect_container.scss",
+            "package": "nidget-mock"
+        }
+    ]
+}

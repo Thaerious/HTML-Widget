@@ -28,12 +28,12 @@ COMMANDS
     clean:   remove --dist and --output directories and remove records from nidget.json file
     settings: print out settings
 
-    disc:    search input directory for valid nidget files and record them as records
+    disc:     search input directory for valid nidget files and record them as records
     link:     search node_modules for valid nidget modules
     
-    style:   render .css files placing them in the --output directory
-    script:  copy .mps files from source to --output [1]
-    view:    render .ejs files to .html, place in --output directory
+    sass:     render .css files placing them in the --output directory
+    script:   copy .mps files from source to --output [1]
+    view:     render .ejs files to .html, place in --output directory
 
     deploy:  create deployable in --output directory for use by the web server [2]
 

@@ -1,7 +1,6 @@
-import {NidgetElement} from "@thaerious/nidget-renderer";
+import { NidgetElement } from "@nidget/element";
 
 class AspectContainer extends NidgetElement {
-
     constructor() {
         super("aspect-container-template");
     }
@@ -14,10 +13,10 @@ class AspectContainer extends NidgetElement {
     }
 
     copyChildElements() {
-        for (let i = 0; i < this.childElementCount; i++){
+        for (let i = 0; i < this.childElementCount; i++) {
             const node = this.children[i];
-            this.shadowRoot.append(node.cloneNode(true))
-        };
+            this.shadowRoot.append(node.cloneNode(true));
+        }
         this.innerHTML = "";
     }
 
@@ -25,8 +24,8 @@ class AspectContainer extends NidgetElement {
         const pageContainer = document.querySelector("#page-container");
         const ratio = window.innerWidth / window.innerHeight;
 
-        let aspectW = getComputedStyle(this).getPropertyValue('--aspect-width');
-        let aspectH = getComputedStyle(this).getPropertyValue('--aspect-height');
+        let aspectW = getComputedStyle(this).getPropertyValue("--aspect-width");
+        let aspectH = getComputedStyle(this).getPropertyValue("--aspect-height");
         aspectW = parseInt(aspectW);
         aspectH = parseInt(aspectH);
         if (isNaN(aspectW)) aspectW = 16;
@@ -43,4 +42,4 @@ class AspectContainer extends NidgetElement {
     }
 }
 
-window.customElements.define('aspect-container', AspectContainer);
+window.customElements.define("aspect-container", AspectContainer);

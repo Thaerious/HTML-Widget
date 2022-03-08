@@ -1,0 +1,11 @@
+{
+    "components": [
+        {
+            "type": "view",
+            "tagName": "index",
+            "view": "index.ejs",
+            "es6": "index.mjs",
+            "style": "index.scss"
+        }
+    ]
+}

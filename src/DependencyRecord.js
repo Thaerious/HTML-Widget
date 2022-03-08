@@ -24,7 +24,7 @@ const logger = Logger.getLogger();
  * All nidgets that this nidget refrences are considered dependencies.
  */
  class DependencyRecord {
-    constructor(nidgetName, nidgetPackage = ``) {
+    constructor(nidgetName = ``, nidgetPackage = ``) {
         this._name = nidgetName;
         this._root = ``;
         this._es6 = ``;
@@ -77,6 +77,15 @@ const logger = Logger.getLogger();
         return set;
     }
 
+    get name(){
+        return this._name;
+    }
+
+    set name(value){
+        if (typeof value !== `string`) throw new Error(`expected string found ${typeof value}`);
+        this._name = value;
+    }
+
     get root(){
         return this._root;
     }
@@ -93,10 +102,6 @@ const logger = Logger.getLogger();
     set es6(value){
         if (typeof value !== `string`) throw new Error(`expected string found ${typeof value}`);
         this._es6 = value;
-    }
-
-    get name() {
-        return this._name;
     }
 
     get script() {

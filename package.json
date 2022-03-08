@@ -11,6 +11,7 @@
     "license": "MIT",
     "type": "module",
     "dependencies": {
+        "@nidget/element": "file:../nidget_element",
         "@thaerious/logger": "^0.1.1",
         "@thaerious/parseargs": "^0.*.*",
         "acorn": "^8.6.0",
