@@ -1,0 +1,15 @@
+{
+    "components": [
+        {
+            "type": "component",
+            "tagName": "name-view",
+            "view": "name_view.ejs",
+            "es6": "NameView.mjs",
+            "style": {
+                "src": "name_view.scss",
+                "dest": "name_view.css"
+            },
+            "package": "nidget-mock"
+        }
+    ]
+}

@@ -8,6 +8,7 @@ import Path from "path";
 import { convertToDash, convertToPascal, convertDelimited } from "./names.js";
 import extractSettings from "./extractSettings.js";
 import loadJSON from "./loadJSON.js";
+import getDependencies from "./getDependencies.js";
 
 let npp = undefined;
 
@@ -41,7 +42,8 @@ if (args.count(`verbose`) >= 2) logger.channel(`very-verbose`).enabled = true;
 if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
 (async () => {
-    await nidgetCli(args.args);
+    const rvalue = await nidgetCli(args.args);
+    if (rvalue) printResult(rvalue);
 })();
 
 async function nidgetCli(commands) {
@@ -100,6 +102,7 @@ async function nidgetCli(commands) {
             case "link":
                 rvalue = await link();
                 break;
+            case "style":
             case "sass":
                 await sass();
                 break;
@@ -124,6 +127,9 @@ async function nidgetCli(commands) {
             case "settings":
                 settings();
                 break;
+            case "dependencies":
+                rvalue = dependencies(nextCommand());
+                break;
         }
     }
 
@@ -131,18 +137,29 @@ async function nidgetCli(commands) {
     return rvalue;
 }
 
+function printResult(records){
+    for (const record of records){
+        const padding = 10 - record.type.length;
+        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.tagName}`);
+    }
+}
+
+async function dependencies(recordName){
+    await loadNPP();
+    const record = npp.getRecord(recordName);
+    const dependencies = getDependencies(record, npp);
+    return dependencies;
+}
+
 async function pack() {
-    const rvalue = {};
+    const rvalue = [];
 
     await loadNPP();
     npp.discover();
 
     for (const record of npp.records) {
-        const padding = 8 - record.type.length;
-        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.name}`);
-
         if (record.type === "nidget") {
-            rvalue[record.name] = record.toJSON();
+            rvalue[record.tagName] = record.toJSON();
         }
     }
 
@@ -170,32 +187,20 @@ function settings() {
 }
 
 async function discover() {
-    const rvalue = {};
-
     await loadNPP();
     npp.discover();
 
-    for (const record of npp.records) {
-        const padding = 8 - record.type.length;
-        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.name}`);
-        rvalue[record.name] = record.type;
-    }
-
+    const rvalue = [];
+    for (const record of npp.records) rvalue.push(record);
     return rvalue;
 }
 
 async function link() {
-    const rvalue = {};
-
     await loadNPP();
     npp.loadLibs();
 
-    for (const record of npp.records) {
-        const padding = 8 - record.type.length;
-        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.name}`);
-        rvalue[record.name] = record.type;
-    }
-
+    const rvalue = [];
+    for (const record of npp.records) rvalue.push(record);
     return rvalue;
 }
 
@@ -210,12 +215,12 @@ async function deploy() {
 
 async function ejs() {
     await loadNPP();
-    npp.ejs();
+    npp.linkEJS();
 }
 
 async function es6() {
     await loadNPP();
-    npp.copyMJS(args.flags["link"]);
+    npp.linkMJS();
 }
 
 async function sass() {
@@ -244,7 +249,7 @@ function clean() {
 async function printRecords() {
     await loadNPP();
     for (const record of npp.records) {
-        logger.channel(`standard`).log(record.toString());
+        logger.channel(`standard`).log(JSON.stringify(record, null, 2));
     }
 }
 
@@ -268,6 +273,7 @@ function createView(name) {
 
     const relativePath = Path.relative(viewPath, CONSTANTS.PARTIALS_DIR);
     const importMapPath = Path.relative(viewPath, Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name));
+    const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
 
     const infoPath = Path.join(settings["view-src"], name, CONSTANTS.NIDGET_INFO_FILE);
     if (!FS.existsSync(infoPath)) {
@@ -278,7 +284,11 @@ function createView(name) {
                     tagName: convertToDash(name),
                     view: name + ".ejs",
                     es6: name + ".mjs",
-                    style: name + ".scss"
+                    style: {
+                        src : name + ".scss",
+                        dest : name + ".css"
+                    },
+                    package: packageJSON.name
                 },
             ],
         };
@@ -307,6 +317,7 @@ function createNidget(name) {
         process.exit();
     }
 
+    name = convertDelimited(name, "_");
     const settings = extractSettings();
     const path = Path.join(settings["nidget-src"], name);
     if (!FS.existsSync(path)) FS.mkdirSync(path, { recursive: true });
@@ -322,9 +333,12 @@ function createNidget(name) {
                 {
                     type: CONSTANTS.TYPE.COMPONENT,
                     tagName: convertToDash(name),
-                    view: templateName + ".ejs",
-                    es6: moduleSourceName,
-                    style: templateName + ".scss",
+                    view: name + ".ejs",
+                    es6: convertToPascal(name) + ".mjs",
+                    style: {
+                        src : name + ".scss",
+                        dest : name + ".css"
+                    },
                     package: packageJSON.name,
                 },
             ],

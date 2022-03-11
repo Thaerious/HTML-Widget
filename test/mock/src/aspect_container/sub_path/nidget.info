@@ -1,0 +1,15 @@
+{
+    "components": [
+        {
+            "type": "component",
+            "tagName": "sub-path",
+            "view": "sub_path.ejs",
+            "es6": "SubPath.mjs",
+            "style": {
+                "src": "sub_path.scss",
+                "dest": "sub_path.css"
+            },
+            "package": "nidget-mock"
+        }
+    ]
+}

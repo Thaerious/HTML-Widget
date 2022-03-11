@@ -1,0 +1,15 @@
+{
+    "components": [
+        {
+            "type": "component",
+            "tagName": "lib-nidget",
+            "view": "lib_nidget.ejs",
+            "es6": "LibNidget.mjs",
+            "style": {
+                "src": "lib_nidget.scss",
+                "dest": "lib_nidget.css"
+            },
+            "package": "mock-lib"
+        }
+    ]
+}

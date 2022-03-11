@@ -1,22 +1,7 @@
 {
-  "output-dir": "output",
-  "package-dir": "dist",
-  "nidget-src": "./src/",
-  "view-src": "./src/",
-  "input": [
-    "./src/"
-  ],
-  "records": {
-    "lib-nidget": {
-      "name": "lib-nidget",
-      "root": "",
-      "es6": "src/lib-nidget/lib_nidget.mjs",
-      "script": "",
-      "view": "src/lib-nidget/lib_nidget.ejs",
-      "html": "",
-      "style": "src/lib-nidget/lib_nidget.scss",
-      "type": "nidget",
-      "package": "mock-lib"
-    }
-  }
+    "output-dir": "output",
+    "package-dir": "dist",
+    "nidget-src": "./src/",
+    "view-src": "./src/",
+    "input": "./src/"
 }

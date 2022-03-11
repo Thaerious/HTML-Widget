@@ -5,7 +5,11 @@
             "tagName": "index",
             "view": "index.ejs",
             "es6": "index.mjs",
-            "style": "index.scss"
+            "style": {
+                "src": "index.scss",
+                "dest": "index.css"
+            },
+            "package": "nidget-mock"
         }
     ]
 }

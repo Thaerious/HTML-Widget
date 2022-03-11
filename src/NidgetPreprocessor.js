@@ -1,15 +1,9 @@
 import Path from "path";
 import Logger from "@thaerious/logger";
-import { Parser } from "acorn";
-import { bfsAll } from "./bfsObject.js";
-import FS, { lstatSync } from "fs";
-import FSX from "fs-extra";
+import FS from "fs";
 import CONSTANTS from "./constants.js";
-import { convertToDash, convertDelimited } from "./names.js";
+import { convertToDash } from "./names.js";
 import renderSCSS from "./RenderSCSS.js";
-import renderEJS from "./RenderEJS.js";
-import renderJS from "./RenderJS.js";
-import DependencyRecord from "./DependencyRecord.js";
 import mkdirIf from "./mkdirIf.js";
 import loadJSON from "./loadJSON.js";
 import seekFiles from "./seekFiles.js";
@@ -23,6 +17,9 @@ const logger = Logger.getLogger();
 class NidgetPreprocessor {
     constructor() {
         this.nidgetRecords = {};
+        this.importMap = {
+            imports: [],
+        };
     }
 
     get package() {
@@ -42,13 +39,8 @@ class NidgetPreprocessor {
         for (const file of files) {
             const nidgetInfo = loadJSON(file.full);
             for (const component of nidgetInfo.components) {
-                const record = new DependencyRecord();
-                record.type = component.type;
-                record.name = component.tagName;
-                record.es6 = component.es6;
-                record.style = component.style;
-                record.package = component.package;
-                this.nidgetRecords[record.name] = record;
+                component.path = Path.relative(path, file.dir);
+                this.nidgetRecords[component.tagName] = component;
             }
         }
 
@@ -61,9 +53,7 @@ class NidgetPreprocessor {
     loadLibs(path = CONSTANTS.NODE_MODULES_PATH) {
         for (const propertyFile of getPropertyFiles()) {
             const properties = loadJSON(propertyFile.full);
-            for (const input of properties.input) {
-                this.discover(Path.join(propertyFile.dir, input));
-            }
+            this.discover(Path.join(propertyFile.dir, properties.input));
         }
     }
 
@@ -93,62 +83,71 @@ class NidgetPreprocessor {
         logger.channel(`verbose`).log(`  \\_ sass`);
 
         for (const record of this.records) {
-            if (record.package !== this.package) continue;
             try {
-                if (record.style && (record.type === CONSTANTS.TYPE.VIEW || record.type === CONSTANTS.TYPE.COMPONENT)) {
-                    renderSCSS(record, this.settings);
-                }
+                renderSCSS(record, this.settings);
             } catch (err) {
                 logger.channel("standard").log(`Error in #sass`);
                 logger.channel("standard").log(err);
+                logger.channel("standard").log(JSON.stringify(record, null, 2));
             }
         }
         return this;
     }
 
-    async ejs() {
-        logger.channel(`verbose`).log(`# ejs`);
-
-        for (const record of this.records) {
-            try {
-                if (record.style && record.type === `view`) {
-                    await renderEJS(record, this.settings);
-                }
-            } catch (err) {
-                logger.channel("standard").log(`Error in #ejs`);
-                logger.channel("standard").log(err);
-            }
+    linkEJS() {
+        for (const rec of this.records) {
+            if (rec.type === CONSTANTS.TYPE.VIEW) this.linkFile(rec, "view");
         }
-        return this;
+    }
+
+    linkMJS() {
+        for (const rec of this.records) {
+            this.linkFile(rec, "es6");
+        }
     }
 
     /**
-     * Copy or link all es6 files found in the input directories to the output
-     * directories, keeping the directory structure.
+     * Link the file under field for each record to the output directory.
      */
-    copyMJS(link = false) {
-        logger.channel(`verbose`).log(`# ${link ? "link" : "copy"} mjs`);
+    linkFile(rec, field) {
+        logger.channel(`verbose`).log(`# link .mjs`);
 
         if (!FS.existsSync(this.settings[`output-dir`])) {
             FS.mkdirSync(this.settings[`output-dir`], { recursive: true });
         }
 
-        for (const rec of this.records) {
-            if (rec.package !== this.package) continue;
-            if (rec.es6 === "") continue;
+        if (rec[field] === "") return;
+        if (!rec.package || rec.package == this.package) this.linkLocalFile(rec, field);
+        else this.linkModuleFile(rec, field);
+    }
 
-            if (rec.type === CONSTANTS.TYPE.COMPONENT || rec.type === CONSTANTS.TYPE.VIEW) {
-                let from = Path.join(this.settings["input"], rec.es6);
-                const to = Path.join(this.settings[`output-dir`], this.package, rec.es6);
-                mkdirIf(to);
+    linkModuleFile(rec, field) {
+        const properties = loadJSON(CONSTANTS.NODE_MODULES_PATH, rec.package, CONSTANTS.NIDGET_PROPERTY_FILE);
 
-                if (!link) FS.copyFileSync(from, to);
-                else if (!FS.existsSync(to)) FS.linkSync(from, to);
+        let from = Path.join(CONSTANTS.NODE_MODULES_PATH, rec.package, properties.input, rec.path, rec.es6);
+        const to = Path.join(this.settings[`output-dir`], rec.package, rec.path, rec[field]);
+        this.importMap.imports[rec.package] = Path.join(rec.package, rec.path, rec[field]);
 
-                logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);
-                logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);
-            }
-        }
+        if (FS.existsSync(to)) FS.rmSync(to);
+        mkdirIf(to);
+        FS.linkSync(from, to);
+
+        logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);
+        logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);
+    }
+
+    linkLocalFile(rec, field) {
+        let from = Path.join(this.settings["input"], rec.path, rec[field]);
+        const to = Path.join(this.settings[`output-dir`], rec.path, rec[field]);
+
+        if (FS.existsSync(to)) FS.rmSync(to);
+        mkdirIf(to);
+        FS.linkSync(from, to);
+
+        logger.channel(`very-verbose`).log(`  \\_ source ${rec.package}:${from}`);
+        logger.channel(`very-verbose`).log(`  \\_ destination ${rec.package}:${to}`);
+
+        return to;
     }
 }
 
