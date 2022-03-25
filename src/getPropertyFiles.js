@@ -15,7 +15,7 @@ function checkDirectory(root, result = []) {
     return result;
 }
 
-function recurseDirectory(root, result) {
+function recurseDirectory(root, result) {    
     const dirContents = FS.readdirSync(root, { withFileTypes: true });
     for (const dirEntry of dirContents) {
         if (dirEntry.isSymbolicLink()) {

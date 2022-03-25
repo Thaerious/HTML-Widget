@@ -4,10 +4,10 @@
 			"path": "."
 		},
 		{
-			"path": "..\\nidget_element"
+			"path": "..\\test_nidget"
 		},
 		{
-			"path": "..\\test_nidget"
+			"path": "..\\test_package"
 		}
 	],
 	"settings": {}

@@ -10,6 +10,7 @@ import { convertToDash, convertToPascal, convertDelimited } from "../names.js";
 const logger = Logger.getLogger();
 
 function create(records, commands, args) {
+    console.log("WTF");
     switch (commands.peekCommand()) {
         case "component":
             commands.nextCommand();
@@ -27,75 +28,74 @@ function create(records, commands, args) {
 
 function createView(name, args) {
     const settings = extractSettings();
-    const dir = args.flags.dest || settings["view-src"];
-    const viewPath = Path.join(dir, name);
+    const destPath = Path.join(settings["view-src"], name);
+    if (!FS.existsSync(destPath)) FS.mkdirSync(destPath, { recursive: true });
 
-    if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath, { recursive: true });
-
-    const relativePath = Path.relative(viewPath, CONSTANTS.PARTIALS_DIR);
-    // const importMapPath = Path.relative(viewPath, Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name));
-    const importMapPath = Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name);
-    const infoPath = Path.join(dir, name, CONSTANTS.NIDGET_INFO_FILE);
+    // load any nidget.info already in the path or make a new one
+    const infoPath = Path.join(destPath, CONSTANTS.NIDGET_INFO_FILE);
     const nidgetInfo = loadInfoFile(infoPath);
     const record = buildRecord(nidgetInfo, name, CONSTANTS.TYPE.VIEW);
-
     FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));
 
-    const viewFullPath = Path.join(viewPath, record.view);
+    const relativeMapPath = Path.relative(destPath, Path.join(Path.parse(CONSTANTS.LIB_FILE).name));
+    const viewFullPath = Path.join(destPath, record.view);
     if (!FS.existsSync(viewFullPath)) {
-        FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(viewPath, record.view));
-        replaceInFile(viewFullPath, "${import_map}", importMapPath);
-        replaceInFile(viewFullPath, "${modules}", relativePath + "/modules");
-        replaceInFile(viewFullPath, "${templates}", Path.join(record.dir.dest, CONSTANTS.FILENAME.TEMPLATES));
+        FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(destPath, record.view));
+        replaceInFile(viewFullPath, "${import_map}", relativeMapPath);
+        replaceInFile(viewFullPath, "${templates}", CONSTANTS.FILENAME.TEMPLATES);
     }
 
-    const scriptFullPath = Path.join(viewPath, record.es6);
+    const scriptFullPath = Path.join(destPath, record.es6);
     if (!FS.existsSync(scriptFullPath)) {
         FS.writeFileSync(scriptFullPath, "");
     }
 
-    const styleFullPath = Path.join(viewPath, record.style.src);
+    const styleFullPath = Path.join(destPath, record.style.src);
     if (!FS.existsSync(styleFullPath)) {
         FS.writeFileSync(styleFullPath, "");
     }
 }
 
 function createNidget(name, args) {
+    logger.channel("very-verbose").log("\__ create nidget");
+
     if (convertToDash(name).split("-").length < 2) {
         logger.channel(`standard`).log(`error: name must consist of two or more words`);
         process.exit();
     }
 
     name = convertDelimited(name, "_");
-    const settings = extractSettings();
-    const path = args.flags.dest || Path.join(settings["nidget-src"], name);
-    if (!FS.existsSync(path)) FS.mkdirSync(path, { recursive: true });
 
-    const templateName = Path.join(path, convertDelimited(name, "_"));
-    const moduleSourceName = Path.join(path, convertToPascal(name, "_") + ".mjs");
-    const infoPath = Path.join(path, CONSTANTS.NIDGET_INFO_FILE);
+    const settings = extractSettings();
+    const destPath = Path.join(settings["nidget-src"], convertToDash(name));
+    if (!FS.existsSync(destPath)) FS.mkdirSync(destPath, { recursive: true });
+
+    // load any nidget.info already in the path or make a new one
+    const infoPath = Path.join(destPath, CONSTANTS.NIDGET_INFO_FILE);
     const nidgetInfo = loadInfoFile(infoPath);
     const record = buildRecord(nidgetInfo, name, CONSTANTS.TYPE.COMPONENT);
-
     FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));
 
-    if (!args.flags["skip-templates"]) {        
-        if (!FS.existsSync(templateName + ".ejs")) {
-            FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.ejs"), templateName + ".ejs");
-            replaceInFile(templateName + ".ejs", "${name_dash}", convertToDash(name));
-            replaceInFile(templateName + ".ejs", "${name_underscore}", convertDelimited(name, "_"));
-            replaceInFile(templateName + ".ejs", "${style_path}", Path.join(record.dir.dest, record.style.dest));
+    if (!args.flags["skip-templates"]) {       
+        const viewPath = Path.join(record.dir.src,  record.view);
+        if (!FS.existsSync(viewPath)) {
+            FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.ejs"), viewPath);
+            replaceInFile(viewPath, "${name_dash}", convertToDash(name));
+            replaceInFile(viewPath, "${name_underscore}", convertDelimited(name, "_"));
+            replaceInFile(viewPath, "${style_path}", Path.join(record.dir.sub, record.style.dest));
         }
 
-        if (!FS.existsSync(moduleSourceName)) {
-            FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.mjs"), moduleSourceName);
-            replaceInFile(moduleSourceName, "${name_dash}", convertToDash(name));
-            replaceInFile(moduleSourceName, "${name_pascal}", convertToPascal(name));
+        const scriptPath = Path.join(record.dir.src, record.es6);
+        if (!FS.existsSync(scriptPath)) {
+            FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.mjs"), scriptPath);
+            replaceInFile(scriptPath, "${name_dash}", convertToDash(name));
+            replaceInFile(scriptPath, "${name_pascal}", convertToPascal(name));
         }
 
-        if (!FS.existsSync(templateName + ".scss")) {
-            FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.scss"), templateName + ".scss");
-            replaceInFile(templateName + ".scss", "${name_dash}", convertToDash(name));
+        const stylePath = Path.join(record.dir.src, record.style.src);
+        if (!FS.existsSync(stylePath)) {
+            FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.scss"), stylePath);
+            replaceInFile(stylePath, "${name_dash}", convertToDash(name));
         }
     }
 }
@@ -103,7 +103,13 @@ function createNidget(name, args) {
 /* if the record already exists retrieve it, else create new */
 function buildRecord(nidgetInfo, name, type) {
     const settings = extractSettings();
+
     const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
+
+    if (!packageJSON.name){
+        throw new Error(`no name field found in ${CONSTANTS.NODE_PACKAGE_FILE}, run npm init`);
+    }
+
     let record = bfsObject(nidgetInfo, "tagName", convertToDash(name));
     if (!record) {
         record = {
@@ -116,6 +122,7 @@ function buildRecord(nidgetInfo, name, type) {
                 dest: name + ".css",
             },
             dir : {
+                sub : Path.join(packageJSON.name, convertToDash(name)),
                 src : Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? "nidget-src" : "view-src"], convertToDash(name)),
                 dest : Path.join(settings["output-dir"], packageJSON.name, convertToDash(name))
             },

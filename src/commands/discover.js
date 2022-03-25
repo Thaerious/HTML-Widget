@@ -16,9 +16,9 @@ function discover(records, commands, args){
     _discover(records, settings.input, settings);
 
     // discover in packages
-    for (const propertyFile of getPropertyFiles()) {         
-        const properties = loadJSON(propertyFile.full);
-        _discover(records, Path.join(propertyFile.dir, properties.input), settings);
+    for (const nidgetRCFileDesc of getPropertyFiles()) {          
+        const nidgetRC = loadJSON(nidgetRCFileDesc.full);
+        _discover(records, Path.join(nidgetRCFileDesc.dir, nidgetRC.input), settings);
     }
 }
 
@@ -29,12 +29,9 @@ function _discover(records, path, settings) {
         const nidgetInfo = loadJSON(file.full);
 
         for (const component of nidgetInfo.components) {
-            component.dir = {src : file.dir};
-
-            component.dir.dest = component.package === settings.package  
-            ? Path.join(settings["output-dir"], component.package, component.tagName)
-            : Path.join(settings["output-dir"], component.package)
-
+            component.dir = component.dir || {};
+            component.dir.src = component.dir.scr || file.dir;
+            component.dir.dest = component.dir.dest || Path.join(settings["output-dir"], component.package, component.tagName);
             storeRecord(records, component);
         }
     }
@@ -46,8 +43,7 @@ function storeRecord(records, component){
     }
 
     records[component.tagName] = component;
-    logger.channel("verbose").log(` \\__ ${component.package}:${component.tagName}`);
-    logger.channel("debug").log(JSON.stringify(component, null, 2));    
+    logger.channel("verbose").log(` \\__ ${component.package}:${component.tagName}`); 
 }
 
 export default discover;

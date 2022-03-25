@@ -1,6 +1,10 @@
 import FS from "fs";
 import Path from "path";
 
+/**
+ * Search root and all subdirectories for files that pass 'test'.
+ * Test is passed a fileEntry from FS, with the full path appended.
+ */
 function seekFiles(roots, test, result = []) {
     for (const root of [roots].flat())
         processDirectory(root, test, result);

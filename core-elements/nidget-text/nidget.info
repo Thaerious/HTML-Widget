@@ -1,0 +1,14 @@
+{
+    "components": [
+        {
+            "type": "component",
+            "tagName": "nidget-text",
+            "es6": "NidgetText.mjs",
+            "dir": {
+                "sub": "nidget_core/nidget-text",
+                "src": "core-elements/nidget-text"
+            },
+            "package": "@nidget/core"
+        }
+    ]
+}
