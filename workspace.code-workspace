@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\nidget_element"
+		},
+		{
+			"path": "..\\test_nidget"
+		}
+	],
+	"settings": {}
+}

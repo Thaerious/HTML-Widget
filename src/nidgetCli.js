@@ -1,16 +1,41 @@
 #!/usr/bin/env node
 
 import ParseArgs from "@thaerious/parseargs";
-import FS, { lstatSync } from "fs";
+import FS from "fs";
 import CONSTANTS from "./constants.js";
 import Logger from "@thaerious/logger";
 import Path from "path";
-import { convertToDash, convertToPascal, convertDelimited } from "./names.js";
 import extractSettings from "./extractSettings.js";
 import loadJSON from "./loadJSON.js";
 import getDependencies from "./getDependencies.js";
 
-let npp = undefined;
+class Commands{        
+    /**
+     * @param commandStack An array to use for the command stack.
+     */
+    constructor(commandStack){
+        this.commandStack = commandStack;
+        this._prev = [];
+    }
+
+    nextCommand() {
+        if (this.commandStack.length === 0) throw("command parse error: empty command stack");
+        this._prev.unshift(this.commandStack.shift().toLowerCase());
+        return this._prev[0]
+    }
+
+    hasNext(){
+        return this.commandStack.length > 0;
+    }
+
+    peekCommand() {
+        return this.commandStack[0].toLowerCase();
+    }
+
+    get prev(){
+        return this._prev[0];
+    }
+}
 
 const parseArgsOptions = {
     flags: [
@@ -24,6 +49,21 @@ const parseArgsOptions = {
             short: `n`,
             type: `string`,
         },
+        {
+            long: `output`,
+            short: `o`,
+            type: `string`,
+        },
+        {
+            long: `input`,
+            short: `i`,
+            type: `string`,
+        }, 
+        {
+            long: `dest`,
+            short: `d`,
+            type: `string`,
+        },         
     ],
 };
 
@@ -32,120 +72,130 @@ logger.channel(`standard`).enabled = true;
 logger.channel(`verbose`).enabled = false;
 logger.channel(`very-verbose`).enabled = false;
 logger.channel(`debug`).enabled = false;
+logger.channel(`warning`).enabled = true;
+
+logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
 
 // logger.channel(`very-verbose`).prefix = (f, l, o)=>`${f} ${l} `;
 
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.count(`silent`) > 0) logger.channel(`standard`).enabled = false;
+if (args.count(`silent`) > 0) logger.channel(`warning`).enabled = false;
 if (args.count(`verbose`) >= 1) logger.channel(`verbose`).enabled = true;
 if (args.count(`verbose`) >= 2) logger.channel(`very-verbose`).enabled = true;
 if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
+let commands;
+
 (async () => {
-    const rvalue = await nidgetCli(args.args);
-    if (rvalue) printResult(rvalue);
+    try{
+        const rvalue = await nidgetCli(args.args);
+    } catch (err) {
+        if (err.code === "ERR_MODULE_NOT_FOUND"){
+            logger.channel(`standard`).log(`unknown command : ${commands.prev}`);
+            logger.channel(`verbose`).log(err);
+        } else {
+            console.log("ERROR");
+            console.log(err);
+        }
+    }
 })();
 
-async function nidgetCli(commands) {
-    let rvalue = null;
+async function nidgetCli(commandStack) {
+    let started = false; // so that we can burn through the node part of the command line
+    let npp, rvalue;
+    let records = {};
+    commands = new Commands(commandStack);
 
-    function nextCommand() {
-        if (commands.length === 0) {
-            logger.channel(`standard`).log("command parse error");
-            process.exit(1);
+    while (commandStack.length > 0) {
+        npp = nppLoadIf(npp);
+        const module = `./commands/${commands.nextCommand()}.js`;
+        if (module.endsWith("nidget.js")){
+             started = true;
+             continue;
         }
-        return commands.shift().toLowerCase();
+
+        if (!started) continue;
+
+        const { default: command } = await import(module);
+        logger.channel(`verbose`).log(`# ${commands.prev}`);
+        rvalue = await command(records, commands, args);
+        logger.channel("very-verbose").log(`uptime ${process.uptime()} s`);                 
     }
 
-    function peekCommand() {
-        return commands[0].toLowerCase();
-    }
-
-    const iterator = {
-        index: 0,
-        next: function () {},
-    };
-
-    while (commands.length > 0) {
-        switch (nextCommand()) {
-            case "settings":
-                console.log(extractSettings());
-                break;
-            case "i":
-            case "init":
-                init();
-                break;
-            case "create":
-                switch (peekCommand()) {
-                    case "nidget":
-                        nextCommand();
-                        createNidget(nextCommand());
-                        break;
-                    case "view":
-                        nextCommand();
-                        createView(nextCommand());
-                        break;
-                    default:
-                        createNidget(nextCommand());
-                        break;
-                }
-            case "records":
-                await printRecords();
-                break;
-            case "pack":
-                await pack();
-                break;
-            case "disc":
-            case "discover":
-                rvalue = await discover();
-                break;
-            case "link":
-                rvalue = await link();
-                break;
-            case "style":
-            case "sass":
-                await sass();
-                break;
-            case "readme":
-                readme();
-                break;
-            case "view":
-                await ejs();
-                break;
-            case "script":
-                await es6();
-                break;
-            case "deploy":
-                await deploy();
-                break;
-            case "clean":
-                clean();
-                break;
-            case "help":
-                help(commands);
-                break;
-            case "settings":
-                settings();
-                break;
-            case "dependencies":
-                rvalue = dependencies(nextCommand());
-                break;
-        }
-    }
-
-    logger.channel("very-verbose").log(`uptime ${process.uptime()} s`);
-    return rvalue;
+    return rvalue;  
 }
 
-function printResult(records){
-    for (const record of records){
-        const padding = 10 - record.type.length;
-        logger.channel(`standard`).log(`${record.type} ${"-".repeat(padding)} ${record.tagName}`);
-    }
-}
+        // switch (nextCommand()) {
+        //     case "settings":
+        //         console.log(extractSettings());
+        //         break;
+        //     case "i":
+        //     case "init":
+        //         loadNPP();
+        //         const command = await import(`./commands/${cmd}.js`);
+        //         break;
+        //     case "create":
+        //         switch (peekCommand()) {
+        //             case "nidget":
+        //                 nextCommand();
+        //                 createNidget(nextCommand());
+        //                 break;
+        //             case "view":
+        //                 nextCommand();
+        //                 createView(nextCommand());
+        //                 break;
+        //             default:
+        //                 createNidget(nextCommand());
+        //                 break;
+        //         }
+        //     case "records":
+        //         await printRecords();
+        //         break;
+        //     case "pack":
+        //         await pack();
+        //         break;
+        //     case "disc":
+        //     case "discover":
+        //         rvalue = await discover();
+        //         break;
+        //     case "link":
+        //         rvalue = await link();
+        //         break;
+        //     case "style":
+        //     case "sass":
+        //         await sass();
+        //         break;
+        //     case "readme":
+        //         readme();
+        //         break;
+        //     case "view":
+        //         await ejs();
+        //         break;
+        //     case "script":
+        //         await es6();
+        //         break;
+        //     case "deploy":
+        //         await deploy();
+        //         break;
+        //     case "clean":
+        //         clean();
+        //         break;
+        //     case "help":
+        //         help(commands);
+        //         break;
+        //     case "settings":
+        //         settings();
+        //         break;
+        //     case "dependencies":
+        //         rvalue = dependencies(nextCommand());
+        //         break;
+        // }
+    // }
+// }
 
 async function dependencies(recordName){
-    await loadNPP();
+    await nppLoadIf();
     const record = npp.getRecord(recordName);
     const dependencies = getDependencies(record, npp);
     return dependencies;
@@ -154,7 +204,7 @@ async function dependencies(recordName){
 async function pack() {
     const rvalue = [];
 
-    await loadNPP();
+    await nppLoadIf();
     npp.discover();
 
     for (const record of npp.records) {
@@ -171,12 +221,13 @@ async function pack() {
     }
 }
 
-async function loadNPP() {
+async function nppLoadIf(npp) {
     if (!npp) {
         const { default: NidgetPreprocessor } = await import(`./NidgetPreprocessor.js`);
         npp = new NidgetPreprocessor();
         npp.applySettings(extractSettings());
     }
+    return npp;
 }
 
 function settings() {
@@ -187,7 +238,7 @@ function settings() {
 }
 
 async function discover() {
-    await loadNPP();
+    await nppLoadIf();
     npp.discover();
 
     const rvalue = [];
@@ -196,7 +247,7 @@ async function discover() {
 }
 
 async function link() {
-    await loadNPP();
+    await nppLoadIf();
     npp.loadLibs();
 
     const rvalue = [];
@@ -205,7 +256,7 @@ async function link() {
 }
 
 async function deploy() {
-    await loadNPP();
+    await nppLoadIf();
     npp.discover();
     npp.loadLibs();
     npp.ejs();
@@ -214,17 +265,17 @@ async function deploy() {
 }
 
 async function ejs() {
-    await loadNPP();
+    await nppLoadIf();
     npp.linkEJS();
 }
 
 async function es6() {
-    await loadNPP();
+    await nppLoadIf();
     npp.linkMJS();
 }
 
 async function sass() {
-    await loadNPP();
+    await nppLoadIf();
     npp.sass();
 }
 
@@ -247,127 +298,10 @@ function clean() {
 }
 
 async function printRecords() {
-    await loadNPP();
+    await nppLoadIf();
     for (const record of npp.records) {
         logger.channel(`standard`).log(JSON.stringify(record, null, 2));
     }
-}
-
-function init() {
-    if (!FS.existsSync(CONSTANTS.NIDGET_PROPERTY_FILE)) {
-        logger.channel(`verbose`).log("create nidget.json file");
-        FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates", CONSTANTS.NIDGET_PROPERTY_FILE), CONSTANTS.NIDGET_PROPERTY_FILE);
-    }
-
-    if (!FS.existsSync(".babelrc")) {
-        logger.channel(`verbose`).log("create .babelrc file");
-        FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/.babelrc"), ".babelrc");
-    }
-}
-
-function createView(name) {
-    const settings = extractSettings();
-    const viewPath = Path.join(settings["view-src"], name);
-
-    if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath, { recursive: true });
-
-    const relativePath = Path.relative(viewPath, CONSTANTS.PARTIALS_DIR);
-    const importMapPath = Path.relative(viewPath, Path.join(settings[`output-dir`], Path.parse(CONSTANTS.LIB_FILE).name));
-    const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
-
-    const infoPath = Path.join(settings["view-src"], name, CONSTANTS.NIDGET_INFO_FILE);
-    if (!FS.existsSync(infoPath)) {
-        const nidgetInfo = {
-            components: [
-                {
-                    type: CONSTANTS.TYPE.VIEW,
-                    tagName: convertToDash(name),
-                    view: name + ".ejs",
-                    es6: name + ".mjs",
-                    style: {
-                        src : name + ".scss",
-                        dest : name + ".css"
-                    },
-                    package: packageJSON.name
-                },
-            ],
-        };
-        FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));
-    }
-
-    if (!FS.existsSync(Path.join(viewPath, name + ".ejs"))) {
-        FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(viewPath, name + ".ejs"));
-        replaceInFile(viewPath + `/${name}.ejs`, "${import_map}", importMapPath);
-        replaceInFile(viewPath + `/${name}.ejs`, "${modules}", relativePath + "/modules");
-        replaceInFile(viewPath + `/${name}.ejs`, "${templates}", relativePath + "/nidget-templates");
-    }
-
-    if (!FS.existsSync(Path.join(viewPath, name + ".mjs"))) {
-        FS.writeFileSync(Path.join(viewPath, name + ".mjs"), "");
-    }
-
-    if (!FS.existsSync(Path.join(viewPath, name + ".scss"))) {
-        FS.writeFileSync(Path.join(viewPath, name + ".scss"), "");
-    }
-}
-
-function createNidget(name) {
-    if (convertToDash(name).split("-").length < 2) {
-        logger.channel(`standard`).log(`error: name must consist of two or more words`);
-        process.exit();
-    }
-
-    name = convertDelimited(name, "_");
-    const settings = extractSettings();
-    const path = Path.join(settings["nidget-src"], name);
-    if (!FS.existsSync(path)) FS.mkdirSync(path, { recursive: true });
-
-    const templateName = Path.join(path, convertDelimited(name, "_"));
-    const moduleSourceName = Path.join(path, convertToPascal(name, "_") + ".mjs");
-    const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
-
-    const infoPath = Path.join(settings["nidget-src"], name, CONSTANTS.NIDGET_INFO_FILE);
-    if (!FS.existsSync(infoPath)) {
-        const nidgetInfo = {
-            components: [
-                {
-                    type: CONSTANTS.TYPE.COMPONENT,
-                    tagName: convertToDash(name),
-                    view: name + ".ejs",
-                    es6: convertToPascal(name) + ".mjs",
-                    style: {
-                        src : name + ".scss",
-                        dest : name + ".css"
-                    },
-                    package: packageJSON.name,
-                },
-            ],
-        };
-        FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));
-    }
-
-    if (!FS.existsSync(templateName + ".ejs")) {
-        FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.ejs"), templateName + ".ejs");
-        replaceInFile(templateName + ".ejs", "${name_dash}", convertToDash(name));
-        replaceInFile(templateName + ".ejs", "${name_underscore}", convertDelimited(name, "_"));
-    }
-
-    if (!FS.existsSync(moduleSourceName)) {
-        FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.mjs"), moduleSourceName);
-        replaceInFile(moduleSourceName, "${name_dash}", convertToDash(name));
-        replaceInFile(moduleSourceName, "${name_pascal}", convertToPascal(name));
-    }
-
-    if (!FS.existsSync(templateName + ".scss")) {
-        FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/template.scss"), templateName + ".scss");
-        replaceInFile(templateName + ".scss", "${name_dash}", convertToDash(name));
-    }
-}
-
-function replaceInFile(filename, search, replace) {
-    const text = FS.readFileSync(filename, "utf-8");
-    const newText = text.replaceAll(search, replace);
-    FS.writeFileSync(filename, newText);
 }
 
 function readme() {

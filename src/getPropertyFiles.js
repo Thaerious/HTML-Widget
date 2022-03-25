@@ -3,32 +3,37 @@ import Path from "path";
 import CONSTANTS from "./constants.js";
 
 function getPropertyFiles(root = CONSTANTS.NODE_MODULES_PATH) {
-    return processDirectory(root, [], 1);
+    return checkDirectory(root);
 }
 
-function processDirectory(root, result, depth) {
-    if (depth > 2) return result;
+function checkDirectory(root, result = []) {
+    if (FS.existsSync(Path.join(root, CONSTANTS.NODE_PACKAGE_FILE))) {
+        processDirectory(root, result);
+    } else {
+        recurseDirectory(root, result);
+    }
+    return result;
+}
 
-    const contents = FS.readdirSync(root, { withFileTypes: true });
-
-    for (const dirEntry of contents) {
+function recurseDirectory(root, result) {
+    const dirContents = FS.readdirSync(root, { withFileTypes: true });
+    for (const dirEntry of dirContents) {
         if (dirEntry.isSymbolicLink()) {
             const realpath = FS.realpathSync(Path.join(root, dirEntry.name));
-            const stat = FS.lstatSync(realpath);
-            if (stat.isDirectory()) {
-                processDirectory(realpath, result, depth + 1);
-            }
-        } else if (dirEntry.isDirectory()) {
-            processDirectory(Path.join(root, dirEntry.name), result, depth + 1);
-        } else {
-            const path = Path.join(root, dirEntry.name);
-            const fileEntry = Path.parse(path);
-            fileEntry.full = Path.join(fileEntry.dir, fileEntry.base);   
-            if (fileEntry.base === CONSTANTS.NIDGET_PROPERTY_FILE) result.push(fileEntry);
+            if (!FS.lstatSync(realpath).isDirectory()) continue
         }
-    }
+        else if (!dirEntry.isDirectory()) continue;
 
-    return result;
+        checkDirectory(Path.join(root, dirEntry.name), result);
+    }
+}
+
+function processDirectory(root, result) {
+    const propFilePath = Path.join(root, CONSTANTS.NIDGET_PROPERTY_FILE);
+    if (!FS.existsSync(propFilePath)) return;
+    const fileEntry = Path.parse(propFilePath);
+    fileEntry.full = Path.join(fileEntry.dir, fileEntry.base);
+    result.push(fileEntry);
 }
 
 export default getPropertyFiles;

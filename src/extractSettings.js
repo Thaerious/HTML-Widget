@@ -13,7 +13,7 @@ function extractSettings(filename = CONSTANTS.NIDGET_PROPERTY_FILE) {
         package : "",
         "nidget-src" : "./src",
         "view-src" : "./src",
-        "src" : ["./src"]
+        "src" : "./src"
     };
 
     let fileSettings = {};
@@ -21,6 +21,9 @@ function extractSettings(filename = CONSTANTS.NIDGET_PROPERTY_FILE) {
         const settingsText = FS.readFileSync(filename);
         settings = {...settings, ...JSON.parse(settingsText)};
     }
+
+    settings["view-src"] = settings["view-src"] || args.flags.dest;
+    settings["nidget-src"] = settings["nidget-src"] || args.flags.dest;
 
     settings['output-dir'] = settings['output-dir'] ?? CONSTANTS.DEFAULT_OUTPUT;
     if (args.flags.output) settings['output-dir'] = args.flags.output;

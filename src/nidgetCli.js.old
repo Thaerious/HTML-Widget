@@ -63,7 +63,7 @@ async function nidgetCli(commands) {
     while (commands.length > 0) {
         switch (nextCommand().toLowerCase()) {
             case "settings":
-                console.log(extractSettings());
+                logger.channel(`standard`).log(extractSettings());
                 break;
             case "i":
             case "init":
@@ -118,6 +118,9 @@ async function nidgetCli(commands) {
                 break;
             case "settings":
                 settings();
+                break;
+            default:
+                
                 break;
         }
     }
@@ -264,6 +267,8 @@ function init() {
         logger.channel(`verbose`).log("create .babelrc file");
         FS.copyFileSync(Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates/.babelrc"), ".babelrc");
     }
+
+
 }
 
 function createView(name) {

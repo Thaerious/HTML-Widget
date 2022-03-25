@@ -8,6 +8,9 @@
  * Returns undefined when no match is found.
  * The 'test' function accepts the value of key when it is found on an object.
  * It defaults to simple equivalency.
+ * 
+ * use: bfsObject(object, 'name', 'value');
+ * 
  * @param {*} root
  * @param {*} key
  * @param {*} value

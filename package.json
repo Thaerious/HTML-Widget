@@ -2,27 +2,21 @@
     "name": "@nidget/core",
     "version": "0.1.0",
     "main": "src/packageFile.js",
-    "module": "dist/NidgetElement.mjs",
     "bin": {
-        "render": "src/watcher.js",
-        "nidget": "src/nidgetCLi.js"
+        "nidget": "src/nidgetCli.js"
     },
     "author": "Ed Armstrong",
     "license": "MIT",
     "type": "module",
     "dependencies": {
-        "@nidget/element": "file:../nidget_element",
         "@thaerious/logger": "^0.1.1",
         "@thaerious/parseargs": "^0.*.*",
         "acorn": "^8.6.0",
         "ejs": "^3.1.6",
         "express": "^4.17.2",
         "fs-extra": "^10.0.0",
-        "glob": "^7.2.0",
-        "glob-fs": "^0.1.7",
         "http": "^0.0.1-security",
-        "linkedom": "^0.13.0",
-        "ws": "^8.4.0"
+        "linkedom": "^0.13.0"
     },
     "devDependencies": {
         "@babel/cli": "^7.0.0",

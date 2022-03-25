@@ -1,0 +1,10 @@
+COMMAND
+    discover - manage nidget based projects
+
+SYNOPSIS
+    npx nidget discover
+
+DESCRIPTION
+    Recrusivly search all source directories for nidget.info files and
+    collect them into a dictionary.  Part of the collect command.
+    This command appends a source path field to the returned record.

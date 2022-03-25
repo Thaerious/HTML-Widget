@@ -1,6 +1,6 @@
 import Path from "path";
 
-const CONSTANTS =  {
+const CONSTANTS =  {   
     NIDGET_PROPERTY_FILE: `.nidgetrc`,
     NIDGET_INFO_FILE: `nidget.info`,
     NODE_PACKAGE_FILE: `package.json`,
@@ -11,6 +11,9 @@ const CONSTANTS =  {
     RELOAD_WS_URL: `reload_url.ws`,
     RELOAD_SERVER_PORT: 41141,
     MODULE_NAME: Path.join(`@nidget`, `core`),
+    FILENAME : {
+        TEMPLATES : 'templates.mjs'
+    },
     TEMPLATES: {
         PATH: `templates`,
         JS: `template.js`,

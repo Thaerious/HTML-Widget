@@ -1,43 +1,29 @@
-This tool manages custom html components that are shared accross multiple views.
+This tool manages custom html components shared across multiple views.
 
+Each component is described by a nidget.info json file this allows you to define
+the view, script, and style files.  The view and script get linked to the output
+directory while the style gets compiled.
 
-The objective is to inject 'view' files with nidget templates.
-SASS files need to be compiled at the same time.
-ES6 files need to be copied/linked/babel'd.
+The 'node_modules' directory will be searched for packages that contain a 'nidget.json' 
+file.  These packages will have their 
 
-Module (.mjs) files may contain a class is a subclass of NidgetElement.
-These classes denote nidgets.  Nidgets must have a unique name, since html
-elements in a view will invoke injection based on the nidget name.  When a 
-nidget is injected the template is added to the head element, and 
-the module is imported to the head element.
-
-Any files that share a name with a nidget or a view component are considered
-associated with that component.
-
-Discover must happen before translating sass, since the records are used to 
-determine which .sass files require translating.
-
-All .mjs files get copied/linked to the output directory.
-Also, all .sass files get compiled to .css files.  Only root .sass
-files need be compiled.
-
-The output directory keeps the same structure as the input directory, this
-way all references maintain the correct path. All files get copied to 
-output_directory/package_path
-
-All external packages get recorded in import_map.ejs which in turn
-get's injected into each view file.  The map for each package is
-package_path -> package.json#module | package.json#name.
-
-External packages have a nidget.json file which will specify the 
-files for a nidget relative to the package root directory.  Local
-nidgets are discovered from the output directory.
+Use the middleware (nppMiddleware.js) during development to redeploy all files
+when a view is retrieved.  
 
 Setting up a new Nidget project
 ===============================
 
 npm init
-npm i @nidget/core
+npm i express http https
+npm i @nidget/core @nidget/element
+nx nidget init
+
+Setting up a new Nidget project
+===============================
+
+npm init
+npm i express http https
+npm i @nidget/core @nidget/element
 npm i babelify
 npm i @babel/preset-env
 npx nidget init

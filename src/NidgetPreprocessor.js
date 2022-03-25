@@ -31,22 +31,6 @@ class NidgetPreprocessor {
         return this;
     }
 
-    discover(path = this.settings.input) {
-        Logger.getLogger().channel(`verbose`).log(`#discover ${path}`);
-
-        const files = seekFiles(path, file => file.base === CONSTANTS.NIDGET_INFO_FILE);
-
-        for (const file of files) {
-            const nidgetInfo = loadJSON(file.full);
-            for (const component of nidgetInfo.components) {
-                component.path = Path.relative(path, file.dir);
-                this.nidgetRecords[component.tagName] = component;
-            }
-        }
-
-        return this;
-    }
-
     /**
      * Search node_modules for nidget libraries.
      */
