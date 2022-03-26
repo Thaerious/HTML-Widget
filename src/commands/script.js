@@ -8,6 +8,9 @@ import CONSTANTS from "../constants.js";
 
 const logger = Logger.getLogger();
 
+/**
+* Link local .mjs files into linked directory under the package name.
+*/
 function script(records, commands, args) {
     const settings = extractSettings();
 

@@ -21,7 +21,7 @@ class Commands{
     nextCommand() {
         if (this.commandStack.length === 0) throw("command parse error: empty command stack");
         this._prev.unshift(this.commandStack.shift().toLowerCase());
-        return this._prev[0]
+        return this._prev[0].replaceAll("-", "_");
     }
 
     hasNext(){
@@ -125,74 +125,6 @@ async function nidgetCli(commandStack) {
 
     return rvalue;  
 }
-
-        // switch (nextCommand()) {
-        //     case "settings":
-        //         console.log(extractSettings());
-        //         break;
-        //     case "i":
-        //     case "init":
-        //         loadNPP();
-        //         const command = await import(`./commands/${cmd}.js`);
-        //         break;
-        //     case "create":
-        //         switch (peekCommand()) {
-        //             case "nidget":
-        //                 nextCommand();
-        //                 createNidget(nextCommand());
-        //                 break;
-        //             case "view":
-        //                 nextCommand();
-        //                 createView(nextCommand());
-        //                 break;
-        //             default:
-        //                 createNidget(nextCommand());
-        //                 break;
-        //         }
-        //     case "records":
-        //         await printRecords();
-        //         break;
-        //     case "pack":
-        //         await pack();
-        //         break;
-        //     case "disc":
-        //     case "discover":
-        //         rvalue = await discover();
-        //         break;
-        //     case "link":
-        //         rvalue = await link();
-        //         break;
-        //     case "style":
-        //     case "sass":
-        //         await sass();
-        //         break;
-        //     case "readme":
-        //         readme();
-        //         break;
-        //     case "view":
-        //         await ejs();
-        //         break;
-        //     case "script":
-        //         await es6();
-        //         break;
-        //     case "deploy":
-        //         await deploy();
-        //         break;
-        //     case "clean":
-        //         clean();
-        //         break;
-        //     case "help":
-        //         help(commands);
-        //         break;
-        //     case "settings":
-        //         settings();
-        //         break;
-        //     case "dependencies":
-        //         rvalue = dependencies(nextCommand());
-        //         break;
-        // }
-    // }
-// }
 
 async function dependencies(recordName){
     await nppLoadIf();

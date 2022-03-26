@@ -5,10 +5,13 @@ import constants from "../constants.js";
 import FS from "fs";
 import Path from "path";
 import CONSTANTS from "../constants.js";
+import Logger from "@thaerious/logger";
+const logger = Logger.getLogger();
+
 
 /**
- * Build the include file for a view.
- * If the --all flag is present build for all views.
+ * Build the templates.mjs file for the views.
+ * If the --view flag is presnet, build for only the specified view
  */
 async function include(records, commands, args){
     const settings = extractSettings();
@@ -27,9 +30,12 @@ async function include(records, commands, args){
 
 async function doInclude(settings, record, records){
     if (record.type !== CONSTANTS.TYPE.VIEW) return;
+    logger.channel("verbose").log(`  \\__ ${record.tagName}`);
+    
     const dependencies = getDependencies(record, records);
     const filename = Path.join(record.dir.dest, constants.FILENAME.TEMPLATES);
-        
+    logger.channel("very-verbose").log(`  \\__ dest ${filename}`);    
+
     if (!FS.existsSync(record.dir.dest)) FS.mkdirSync(record.dir.dest, {recursive : true});
     const fp = FS.openSync(filename, "w");
 

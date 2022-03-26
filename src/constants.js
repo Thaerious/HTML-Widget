@@ -7,7 +7,6 @@ const CONSTANTS =  {
     NODE_MODULES_PATH: `node_modules`,
     LIB_FILE: `import_map.ejs`,
     NIDGET_PACKAGE_DIR: `dist`,
-    DEFAULT_OUTPUT: `output`,
     RELOAD_WS_URL: `reload_url.ws`,
     RELOAD_SERVER_PORT: 41141,
     MODULE_NAME: Path.join(`@nidget`, `core`),
@@ -29,6 +28,10 @@ const CONSTANTS =  {
     TYPE: {
         COMPONENT: "component",
         VIEW: "view"
+    },
+    LOCATIONS : {
+        LINK_DIR : Path.join("www", "linked"),
+        OUTPUT: Path.join("www", "compiled")
     }
 };
 

@@ -123,8 +123,7 @@ function buildRecord(nidgetInfo, name, type) {
             },
             dir : {
                 sub : Path.join(packageJSON.name, convertToDash(name)),
-                src : Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? "nidget-src" : "view-src"], convertToDash(name)),
-                dest : Path.join(settings["output-dir"], packageJSON.name, convertToDash(name))
+                src : Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? "nidget-src" : "view-src"], convertToDash(name))
             },
             package: packageJSON.name,
         };

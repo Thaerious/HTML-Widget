@@ -34,9 +34,9 @@ class NidgetPreprocessor {
 
     applySettings(settings) {
         this.settings = { ...settings };
-        if (settings.input) {
-            if (typeof settings.input === "string") this.addPath(settings.input);
-            else for (const path of settings.input) this.addPath(path);
+        if (settings["src"]) {
+            if (typeof settings["src"] === "string") this.addPath(settings["src"]);
+            else for (const path of settings["src"]) this.addPath(path);
         }
         if (settings.exclude) for (const path of settings.exclude) this.addExclude(path);
         return this;
@@ -60,7 +60,7 @@ class NidgetPreprocessor {
      * If a directory has a .nigetrc file then use the src and/or records from it.
      */
     getFiles(...extensions) {
-        return getFiles(this.settings.input, {}, extensions);
+        return getFiles(this.settings["src"], {}, extensions);
     }
 
     resetRecords() {
@@ -92,7 +92,7 @@ class NidgetPreprocessor {
         }
     }
 
-    discover(path = this.settings.input) {
+    discover(path = this.settings["src"]) {
         Logger.getLogger().channel(`verbose`).log(`#discover ${path}`);
 
         const files = seekFiles(path, file => file.base === CONSTANTS.NIDGET_INFO_FILE);

@@ -13,7 +13,7 @@ const logger = Logger.getLogger();
  */
 function discover(records, commands, args){
     const settings = extractSettings();
-    _discover(records, settings.input, settings);
+    _discover(records, settings["src"], settings);
 
     // discover in packages
     for (const nidgetRCFileDesc of getPropertyFiles()) {          
@@ -28,10 +28,11 @@ function _discover(records, path, settings) {
     for (const file of files) {
         const nidgetInfo = loadJSON(file.full);
 
+        if (!nidgetInfo.components) continue;
         for (const component of nidgetInfo.components) {
             component.dir = component.dir || {};
             component.dir.src = component.dir.scr || file.dir;
-            component.dir.dest = component.dir.dest || Path.join(settings["output-dir"], component.package, component.tagName);
+            component.dir.dest = Path.join(settings["output-dir"], component.package, component.tagName);
             storeRecord(records, component);
         }
     }
