@@ -10,7 +10,6 @@ import { convertToDash, convertToPascal, convertDelimited } from "../names.js";
 const logger = Logger.getLogger();
 
 function create(records, commands, args) {
-    console.log("WTF");
     switch (commands.peekCommand()) {
         case "component":
             commands.nextCommand();
@@ -41,8 +40,8 @@ function createView(name, args) {
     const viewFullPath = Path.join(destPath, record.view);
     if (!FS.existsSync(viewFullPath)) {
         FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(destPath, record.view));
-        replaceInFile(viewFullPath, "${import_map}", relativeMapPath);
-        replaceInFile(viewFullPath, "${templates}", CONSTANTS.FILENAME.TEMPLATES);
+        const templatePath = Path.join(record.package, record.tagName, CONSTANTS.FILENAME.TEMPLATES);
+        replaceInFile(viewFullPath, "${templates}", templatePath);
     }
 
     const scriptFullPath = Path.join(destPath, record.es6);

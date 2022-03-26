@@ -9,7 +9,8 @@ import CONSTANTS from "../constants.js";
 const logger = Logger.getLogger();
 
 /**
-* Link local .mjs files into linked directory under the package name.
+* 1) Link local .mjs files into linked directory under the package name.
+* 2) Build the www/compiled/input_map.ejs file
 */
 function script(records, commands, args) {
     const settings = extractSettings();

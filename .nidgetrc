@@ -3,5 +3,5 @@
   "package-dir": "dist",
   "nidget-src": "src",
   "view-src": "src",
-  "input": "core-elements"
+  "src": "core-elements"
 }

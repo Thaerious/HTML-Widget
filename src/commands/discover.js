@@ -18,7 +18,11 @@ function discover(records, commands, args){
     // discover in packages
     for (const nidgetRCFileDesc of getPropertyFiles()) {          
         const nidgetRC = loadJSON(nidgetRCFileDesc.full);
-        _discover(records, Path.join(nidgetRCFileDesc.dir, nidgetRC.input), settings);
+        logger.channel("debug").log(`   \\__ nidgetRCFileDesc.full ${nidgetRCFileDesc.full}`); 
+        logger.channel("debug").log(`   \\__ nidgetRCFileDesc.dir ${nidgetRCFileDesc.dir}`); 
+        logger.channel("debug").log(`   \\__ nidgetRC.input ${nidgetRC.input}`);
+         
+        _discover(records, Path.join(nidgetRCFileDesc.dir, nidgetRC.src), settings);
     }
 }
 

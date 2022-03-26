@@ -76,3 +76,12 @@ Notes
 =====
 
 nidget source and view source will default to "./src"
+
+Initializing a package
+======================
+
+mkdir package_name
+cd package_name
+npm init
+npm i @nidget/core
+npx nidget init

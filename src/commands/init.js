@@ -36,6 +36,8 @@ function addPackageInfo(){
     const settings = extractSettings();
     const nidgetInfo = loadJSON(settings["src"], CONSTANTS.NIDGET_INFO_FILE);
 
+    if (!FS.existsSync(settings["src"])) FS.mkdirSync(settings["src"], {recursive : true});
+
     FS.writeFileSync(
         Path.join(settings["src"], CONSTANTS.NIDGET_INFO_FILE),
         JSON.stringify({...nidgetInfo, link : settings.package}, null, 2)

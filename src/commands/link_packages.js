@@ -23,7 +23,7 @@ async function link_packages(records, commands, args){
 
     for (const nidgetRCFileDesc of getPropertyFiles()) {          
         const nidgetRC = loadJSON(nidgetRCFileDesc.full);
-        _discover(Path.join(nidgetRCFileDesc.dir, nidgetRC.input), settings);
+        _discover(Path.join(nidgetRCFileDesc.dir, nidgetRC.src), settings);
     }
 }
 
