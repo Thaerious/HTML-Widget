@@ -35,22 +35,30 @@ function createView(name, args) {
     const record = buildRecord(nidgetInfo, name, CONSTANTS.TYPE.VIEW);
     FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));
 
-    const relativeMapPath = Path.relative(destPath, Path.join(Path.parse(CONSTANTS.FILENAME.LIB_FILE).name));
     const viewFullPath = Path.join(destPath, record.view);
     if (!FS.existsSync(viewFullPath)) {
-        FS.copyFileSync(CONSTANTS.VIEW_TEMPLATE_PATH, Path.join(destPath, record.view));
+        const viewTemplatePath = Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates", CONSTANTS.TEMPLATES.VIEW);
+        FS.copyFileSync(viewTemplatePath, Path.join(destPath, record.view));
         const templatePath = Path.join(record.package, record.tagName, CONSTANTS.FILENAME.TEMPLATES);
         replaceInFile(viewFullPath, "${templates}", templatePath);
+    } else {
+        logger.channel("standard").log(`skipping existing file ${viewFullPath}`);
     }
 
     const scriptFullPath = Path.join(destPath, record.es6);
     if (!FS.existsSync(scriptFullPath)) {
         FS.writeFileSync(scriptFullPath, "");
     }
+    else {
+        logger.channel("standard").log(`skipping existing file ${scriptFullPath}`);
+    }
 
     const styleFullPath = Path.join(destPath, record.style.src);
     if (!FS.existsSync(styleFullPath)) {
         FS.writeFileSync(styleFullPath, "");
+    }
+    else {
+        logger.channel("standard").log(`skipping existing file ${styleFullPath}`);
     }
 }
 
@@ -80,6 +88,8 @@ function createNidget(name, args) {
             replaceInFile(viewPath, "${name_dash}", convertToDash(name));
             replaceInFile(viewPath, "${name_underscore}", convertDelimited(name, "_"));
             replaceInFile(viewPath, "${style_path}", Path.join(record.dir.sub, record.style.dest));
+        } else {
+            logger.channel("standard").log(`skipping existing file ${viewPath}`);
         }
 
         const scriptPath = Path.join(record.dir.src, record.es6);
@@ -87,12 +97,17 @@ function createNidget(name, args) {
             FS.copyFileSync(Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates/template.mjs"), scriptPath);
             replaceInFile(scriptPath, "${name_dash}", convertToDash(name));
             replaceInFile(scriptPath, "${name_pascal}", convertToPascal(name));
+        } else {
+            logger.channel("standard").log(`skipping existing file ${scriptPath}`);
         }
 
         const stylePath = Path.join(record.dir.src, record.style.src);
         if (!FS.existsSync(stylePath)) {
             FS.copyFileSync(Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates/template.scss"), stylePath);
             replaceInFile(stylePath, "${name_dash}", convertToDash(name));
+        }
+        else {
+            logger.channel("standard").log(`skipping existing file ${stylePath}`);
         }
     }
 }

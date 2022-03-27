@@ -24,6 +24,4 @@ const CONSTANTS =  {
     }
 };
 
-CONSTANTS.VIEW_TEMPLATE_PATH = Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates", CONSTANTS.TEMPLATES.VIEW);
-
 export default CONSTANTS;
