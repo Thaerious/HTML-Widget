@@ -1,6 +1,6 @@
-import FS from "fs";
-import Path from "path";
+import settings from "./settings.js";
+import index2 from "./index2.js";
 
-const p = Path.join("path", "to", "nowhere");
-const q = Path.parse(p);
-console.log(q);
+console.log(settings);
+settings.a = "a";
+console.log(index2);

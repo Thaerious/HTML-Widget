@@ -27,7 +27,7 @@ function create(records, commands, args) {
 
 function createView(name, args) {
     const settings = extractSettings();
-    const destPath = Path.join(settings["view-src"], name);
+    const destPath = Path.join(settings["src"], name);
     if (!FS.existsSync(destPath)) FS.mkdirSync(destPath, { recursive: true });
 
     // load any nidget.info already in the path or make a new one
@@ -66,7 +66,7 @@ function createNidget(name, args) {
     name = convertDelimited(name, "_");
 
     const settings = extractSettings();
-    const destPath = Path.join(settings["nidget-src"], convertToDash(name));
+    const destPath = Path.join(settings["src"], convertToDash(name));
     if (!FS.existsSync(destPath)) FS.mkdirSync(destPath, { recursive: true });
 
     // load any nidget.info already in the path or make a new one
@@ -122,7 +122,7 @@ function buildRecord(nidgetInfo, name, type) {
             },
             dir : {
                 sub : Path.join(packageJSON.name, convertToDash(name)),
-                src : Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? "nidget-src" : "view-src"], convertToDash(name))
+                src : Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? "src" : "src"], convertToDash(name))
             },
             package: packageJSON.name,
         };

@@ -273,7 +273,7 @@ function init() {
 
 function createView(name) {
     const settings = extractSettings();
-    const viewPath = Path.join(settings["view-src"], name);
+    const viewPath = Path.join(settings["src"], name);
     const templateName = Path.join(viewPath, convertDelimited(name, "_"));
 
     if (!FS.existsSync(viewPath)) FS.mkdirSync(viewPath, { recursive: true });
@@ -304,7 +304,7 @@ function createNidget(name) {
     }
 
     const settings = extractSettings();
-    const path = Path.join(settings["nidget-src"], name);
+    const path = Path.join(settings["src"], name);
     if (!FS.existsSync(path)) FS.mkdirSync(path, { recursive: true });
 
     const templateName = Path.join(path, convertDelimited(name, "_"));  
@@ -312,7 +312,7 @@ function createNidget(name) {
 
     const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
 
-    const infoPath = Path.join(settings["nidget-src"], name, CONSTANTS.NIDGET_INFO_FILE);
+    const infoPath = Path.join(settings["src"], name, CONSTANTS.NIDGET_INFO_FILE);
     if (!FS.existsSync(infoPath)){
         const nidgetInfo = {
             components : [{

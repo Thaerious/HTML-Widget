@@ -1,6 +1,6 @@
 import Path from "path";
 
-const CONSTANTS =  {   
+const CONSTANTS =  {
     NIDGET_PROPERTY_FILE: `.nidgetrc`,
     NIDGET_INFO_FILE: `nidget.info`,
     NODE_PACKAGE_FILE: `package.json`,
@@ -31,7 +31,8 @@ const CONSTANTS =  {
     },
     LOCATIONS : {
         LINK_DIR : Path.join("www", "linked"),
-        OUTPUT: Path.join("www", "compiled")
+        OUTPUT: Path.join("www", "compiled"),
+        DEFAULT_SRC: "client-src"
     }
 };
 

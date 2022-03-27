@@ -2,7 +2,7 @@ import FS from "fs";
 import Path from "path";
 import CONSTANTS from "../constants.js";
 import loadJSON from "../loadJSON.js";
-import extractSettings from "../extractSettings.js";
+import extractSettings from "../settings.js";
 import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
@@ -16,16 +16,13 @@ function addNidgetRC(args) {
         ...loadJSON(CONSTANTS.NIDGET_PROPERTY_FILE),
         ...{
             "output-dir": CONSTANTS.LOCATIONS.OUTPUT,
-            "nidget-src": "client-src",
-            "view-src": "client-src",
+            "link-dir": CONSTANTS.LOCATIONS.LINK_DIR,
             "src": "client-src"
         }
     }       
 
     if (args.flags["output"]) nidgetrc["output-dir"] = args.flags["output"];
     if (args.flags["src"]) nidgetrc["src"] = args.flags["src"];
-    if (args.flags["nidget-src"]) nidgetrc["nidget-src"] = args.flags["nidget-src"];
-    if (args.flags["view-src"]) nidgetrc["view-src"] = args.flags["view-src"];
 
     logger.channel(`very-verbose`).log(JSON.stringify(nidgetrc, null, 2));
 

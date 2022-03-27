@@ -3,5 +3,6 @@
   "package-dir": "dist",
   "nidget-src": "src",
   "view-src": "src",
-  "src": "core-elements"
+  "src": "core-elements",
+  "module" : "lib.mjs"
 }
