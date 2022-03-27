@@ -1,9 +1,9 @@
 {
     "name": "@nidget/core",
     "version": "0.1.0",
-    "main": "src/packageFile.js",
+    "main": "src/cli.js",
     "bin": {
-        "nidget": "src/nidgetCli.js"
+        "nidget": "src/cli.js"
     },
     "author": "Ed Armstrong",
     "license": "MIT",

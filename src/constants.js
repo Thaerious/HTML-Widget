@@ -4,26 +4,14 @@ const CONSTANTS =  {
     NIDGET_PROPERTY_FILE: `.nidgetrc`,
     NIDGET_INFO_FILE: `nidget.info`,
     NODE_PACKAGE_FILE: `package.json`,
-    NODE_MODULES_PATH: `node_modules`,
-    LIB_FILE: `import_map.ejs`,
-    NIDGET_PACKAGE_DIR: `dist`,
-    RELOAD_WS_URL: `reload_url.ws`,
-    RELOAD_SERVER_PORT: 41141,
+    NODE_MODULES_PATH: `node_modules`,    
     MODULE_NAME: Path.join(`@nidget`, `core`),
     FILENAME : {
-        TEMPLATES : 'templates.mjs'
+        TEMPLATES : 'templates.mjs',
+        LIB_FILE: `import_map.ejs`,
     },
     TEMPLATES: {
-        PATH: `templates`,
-        JS: `template.js`,
-        SCSS: `template.scss`,
-        EJS: `template.ejs`,
         VIEW: `view.template.ejs`
-    },
-    EXTENSIONS: {
-        SCRIPT_SOURCE: `.mjs`,
-        STYLE_SOURCE: `.scss`,
-        VIEW_SOURCE: `.ejs`,
     },
     TYPE: {
         COMPONENT: "component",
@@ -36,7 +24,6 @@ const CONSTANTS =  {
     }
 };
 
-CONSTANTS.PARTIALS_DIR = Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates", "partials"),
 CONSTANTS.VIEW_TEMPLATE_PATH = Path.join("node_modules", CONSTANTS.MODULE_NAME, "templates", CONSTANTS.TEMPLATES.VIEW);
 
 export default CONSTANTS;

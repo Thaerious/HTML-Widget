@@ -1,9 +1,6 @@
 import { parseHTML } from "linkedom";
 import FS from "fs";
 import Path from "path";
-import loadJSON from "./loadJSON.js";
-import CONSTANTS from "./constants.js";
-import settings from "./settings.js";
 
 /**
  * For a given view-record return all component-records that need to
@@ -12,7 +9,6 @@ import settings from "./settings.js";
 function getDependencies(rootRecord, records){
     const stack = [rootRecord];
     const visited = new Set();
-    const settings = extractSettings();
 
     while(stack.length > 0){
         const record = stack.shift();

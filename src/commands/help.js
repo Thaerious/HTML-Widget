@@ -2,6 +2,7 @@ import FS from "fs";
 import Path from "path";
 import Logger from "@thaerious/logger";
 import CONSTANTS from "../constants.js";
+
 const logger = Logger.getLogger();
 
 function help(records, commands, args) {

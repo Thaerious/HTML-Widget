@@ -1,13 +1,14 @@
 import FS from "fs";
 import Path from "path";
 import CONSTANTS from "./constants.js";
+import settings from "./settings";
 
-function getPropertyFiles(root = CONSTANTS.NODE_MODULES_PATH) {
-    return checkDirectory(root);
+function getPropertyFiles() {
+    return checkDirectory(settings["node-modules"]);
 }
 
 function checkDirectory(root, result = []) {
-    if (FS.existsSync(Path.join(root, CONSTANTS.NODE_PACKAGE_FILE))) {
+    if (FS.existsSync(Path.join(root, settings["package-json"]))) {
         processDirectory(root, result);
     } else {
         recurseDirectory(root, result);
@@ -29,7 +30,7 @@ function recurseDirectory(root, result) {
 }
 
 function processDirectory(root, result) {
-    const propFilePath = Path.join(root, CONSTANTS.NIDGET_PROPERTY_FILE);
+    const propFilePath = Path.join(root, settings["nidget-rc"]);
     if (!FS.existsSync(propFilePath)) return;
     const fileEntry = Path.parse(propFilePath);
     fileEntry.full = Path.join(fileEntry.dir, fileEntry.base);

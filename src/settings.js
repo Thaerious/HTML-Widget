@@ -1,5 +1,4 @@
 import CONSTANTS from "./constants.js";
-import FS from "fs";
 import Path from "path";
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "./parseArgsOptions.js";
@@ -11,7 +10,6 @@ const args = new ParseArgs().loadOptions(parseArgsOptions).run();
  * Overwrite with command line settings
  **/
 function extractSettings() {
-    console.log("extractSettings");
     const cwd = args.flags.cwd || ".";
     const packageJSON = loadJSON(cwd, CONSTANTS.NODE_PACKAGE_FILE);
 
@@ -25,7 +23,9 @@ function extractSettings() {
     let settings = {...defaultSettings, ...loadJSON(Path.join(cwd, CONSTANTS.NIDGET_PROPERTY_FILE))};
 
     return {
+        "node-modules" : Path.join(cwd, CONSTANTS.NODE_MODULES_PATH),
         "package-json" : Path.join(cwd, CONSTANTS.NODE_PACKAGE_FILE),
+        "nidget-rc" : Path.join(cwd, CONSTANTS.NIDGET_PROPERTY_FILE),
         "package" : settings.package,
         "output-dir" : Path.join(cwd, settings["output-dir"]),
         "link-dir" : Path.join(cwd, settings["link-dir"]),

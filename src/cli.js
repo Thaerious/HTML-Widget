@@ -2,6 +2,7 @@
 
 import ParseArgs from "@thaerious/parseargs";
 import Logger from "@thaerious/logger";
+import parseArgsOptions from "./parseArgsOptions.js";
 
 class Commands {
     /**
@@ -31,36 +32,6 @@ class Commands {
     }
 }
 
-const parseArgsOptions = {
-    flags: [
-        {
-            long: `verbose`,
-            short: `v`,
-            type: `boolean`,
-        },
-        {
-            long: `name`,
-            short: `n`,
-            type: `string`,
-        },
-        {
-            long: `output`,
-            short: `o`,
-            type: `string`,
-        },
-        {
-            long: `input`,
-            short: `i`,
-            type: `string`,
-        },
-        {
-            long: `dest`,
-            short: `d`,
-            type: `string`,
-        },
-    ],
-};
-
 const logger = Logger.getLogger();
 logger.channel(`standard`).enabled = true;
 logger.channel(`verbose`).enabled = false;
@@ -85,7 +56,7 @@ logger.channel(`verbose`).log(`Nidget command line interface`);
 
 (async () => {
     try {
-        const rvalue = await nidgetCli(args.args);
+        const rvalue = await cli(args.args);
     } catch (err) {
         if (err.code === "ERR_MODULE_NOT_FOUND") {
             logger.channel(`standard`).log(`unknown command : ${commands.prev}`);
@@ -97,7 +68,7 @@ logger.channel(`verbose`).log(`Nidget command line interface`);
     }
 })();
 
-async function nidgetCli(commandStack) {
+async function cli(commandStack) {
     let started = false; // so that we can burn through the node part of the command line
     let rvalue;
     let records = {};
@@ -106,7 +77,7 @@ async function nidgetCli(commandStack) {
     while (commandStack.length > 0) {
         const module = `./commands/${commands.nextCommand()}.js`;
         logger.channel(`debug`).log(` -- ${module}`);
-        if (module.endsWith("nidget.js") || module.endsWith("nidgetcli.js")) {
+        if (module.endsWith("nidget.js") || module.endsWith("cli.js")) {
             logger.channel(`debug`).log(` -- started`);
             started = true;
             continue;
@@ -125,4 +96,4 @@ async function nidgetCli(commandStack) {
     return rvalue;
 }
 
-export default nidgetCli;
+export default cli;
