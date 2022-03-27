@@ -2,7 +2,7 @@ import Path from "path";
 import Logger from "@thaerious/logger";
 import CONSTANTS from "../constants.js";
 import loadJSON from "../loadJSON.js";
-import extractSettings from "../extractSettings.js";
+import settings from "../settings.js";
 import seekFiles from "../seekFiles.js";
 import getPropertyFiles from "../getPropertyFiles.js";
 
@@ -12,7 +12,6 @@ const logger = Logger.getLogger();
  * Examine source directories for components and views.
  */
 function discover(records, commands, args){
-    const settings = extractSettings();
     _discover(records, settings["src"], settings);
 
     // discover in packages

@@ -1,9 +1,9 @@
 import Logger from "@thaerious/logger";
-import extractSettings from "../extractSettings.js";
+import settings from "../settings.js";
 const logger = Logger.getLogger();
 
 function settings(records, commands, args) {
-    console.log(extractSettings());
+    console.log(settings);
 }
 
 export default settings;

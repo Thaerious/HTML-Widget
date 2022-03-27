@@ -3,7 +3,7 @@ import Path from "path";
 import Logger from "@thaerious/logger";
 import CONSTANTS from "../constants.js";
 import loadJSON from "../loadJSON.js";
-import extractSettings from "../extractSettings.js";
+import settings from "../settings.js";
 import replaceInFile from "../replaceInFile.js";
 import { bfsObject } from "../bfsObject.js";
 import { convertToDash, convertToPascal, convertDelimited } from "../names.js";

@@ -1,6 +1,6 @@
 import FS from "fs";
 import Path from "path";
-import extractSettings from "../extractSettings.js";
+import settings from "../settings.js";
 import Logger from "@thaerious/logger";
 import loadJSON from "../loadJSON.js";
 import getPropertyFiles from "../getPropertyFiles.js";
@@ -13,8 +13,6 @@ const logger = Logger.getLogger();
 * Build the www/compiled/input_map.ejs file  from nidgetrc files.
 */
 function import_map(records, commands, args) {
-    const settings = extractSettings();
-
     const importMap = {
         imports : {}
     };

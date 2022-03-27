@@ -1,5 +1,5 @@
 import { bfsObject } from "../bfsObject.js";
-import extractSettings from "../extractSettings.js";
+import settings from "../settings.js";
 import getDependencies from "../getDependencies.js";
 import constants from "../constants.js";
 import FS from "fs";
@@ -14,8 +14,6 @@ const logger = Logger.getLogger();
  * If the --view flag is presnet, build for only the specified view
  */
 async function include(records, commands, args){
-    const settings = extractSettings();
-
     if (!args.flags.view){
         for (const tagName in records){
             await doInclude(settings, records[tagName], records);

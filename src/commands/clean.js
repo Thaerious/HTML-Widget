@@ -1,10 +1,4 @@
 import FS from "fs";
-import Path from "path";
-import CONSTANTS from "../constants.js";
-import loadJSON from "../loadJSON.js";
-import extractSettings from "../extractSettings.js";
-import Logger from "@thaerious/logger";
-const logger = Logger.getLogger();
 
 function clean(records, commands, args) {
     const settings = extractSettings();

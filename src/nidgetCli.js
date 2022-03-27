@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 
 import ParseArgs from "@thaerious/parseargs";
-import FS from "fs";
-import CONSTANTS from "./constants.js";
 import Logger from "@thaerious/logger";
-import Path from "path";
-import extractSettings from "./extractSettings.js";
-import loadJSON from "./loadJSON.js";
-import getDependencies from "./getDependencies.js";
 
 class Commands {
     /**

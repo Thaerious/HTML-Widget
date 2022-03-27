@@ -1,7 +1,7 @@
 import FS from "fs";
 import Path from "path";
 import CONSTANTS from "../constants.js";
-import extractSettings from "../extractSettings.js";
+import settings from "../settings.js";
 import getPropertyFiles from "../getPropertyFiles.js";
 import loadJSON from "../loadJSON.js";
 import seekFiles from "../seekFiles.js";
@@ -17,8 +17,6 @@ const logger = Logger.getLogger();
  * Will only search packages with a .nidgetrc file.
  */
 async function link_packages(records, commands, args){
-    const settings = extractSettings();
-
     _discover(settings["src"], settings);
 
     for (const nidgetRCFileDesc of getPropertyFiles()) {          

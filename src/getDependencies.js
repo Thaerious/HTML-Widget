@@ -3,7 +3,7 @@ import FS from "fs";
 import Path from "path";
 import loadJSON from "./loadJSON.js";
 import CONSTANTS from "./constants.js";
-import extractSettings from "./extractSettings.js";
+import settings from "./settings.js";
 
 /**
  * For a given view-record return all component-records that need to

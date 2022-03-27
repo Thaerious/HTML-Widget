@@ -3,7 +3,7 @@ import sass from "sass";
 import FS from "fs";
 import Logger from "@thaerious/logger";
 import mkdirIf from "../mkdirIf.js";
-import extractSettings from "../extractSettings.js";
+import settings from "../settings.js";
 const logger = Logger.getLogger();
 
 /**
@@ -11,8 +11,6 @@ const logger = Logger.getLogger();
  * the component and view output directories.
  */
 function style(records, commands, args) {
-    const settings = extractSettings();
-
     for (const name in records) {
         const record = records[name];
         logger.channel(`verbose`).log(`  \\_ ${record.package}:${name}`);   

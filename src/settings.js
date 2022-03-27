@@ -24,9 +24,13 @@ function extractSettings() {
 
     let settings = {...defaultSettings, ...loadJSON(Path.join(cwd, CONSTANTS.NIDGET_PROPERTY_FILE))};
 
-    return {...settings, ...{
-        "package-json" : Path.join(cwd, CONSTANTS.NODE_PACKAGE_FILE)
-    }};
+    return {
+        "package-json" : Path.join(cwd, CONSTANTS.NODE_PACKAGE_FILE),
+        "package" : settings.package,
+        "output-dir" : Path.join(cwd, settings["output-dir"]),
+        "link-dir" : Path.join(cwd, settings["link-dir"]),
+        "src" : Path.join(cwd, settings["src"])
+    };
 }
 
 let settings;
