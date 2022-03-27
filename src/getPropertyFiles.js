@@ -1,7 +1,6 @@
 import FS from "fs";
 import Path from "path";
-import CONSTANTS from "./constants.js";
-import settings from "./settings";
+import settings from "./settings.js";
 
 function getPropertyFiles() {
     return checkDirectory(settings["node-modules"]);
