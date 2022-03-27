@@ -66,7 +66,7 @@ function createNidget(name, args) {
     logger.channel("very-verbose").log("\__ create nidget");
 
     if (convertToDash(name).split("-").length < 2) {
-        logger.channel(`standard`).log(`error: name must consist of two or more words`);
+        logger.channel(`standard`).log(`error: name must consist of two or more words (${name})`);
         process.exit();
     }
 
