@@ -1,0 +1,10 @@
+COMMAND
+    build - Remove the linked and compiled directories from the client source directory.
+
+SYNOPSIS
+    npx clean
+
+OPTIONS    
+
+DESCRIPTION
+    

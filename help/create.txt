@@ -2,7 +2,8 @@ COMMAND
     create - create a new nidget or view
 
 SYNOPSIS
-    npx nidget create {nidget, view} [-d destination_dir] [--skip-templates]
+    npx nidget create component NAME
+    npx nidget create view NAME
 
 OPTIONS
 

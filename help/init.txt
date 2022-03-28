@@ -1,17 +1,9 @@
 COMMAND
-    init - create a new nidget project in this directory
+    init -  Create a new project in the root (current) directory.
 
 SYNOPSIS
-    npx nidget init [-o output_dir] [-i input_dir] [--view-src dir] [--nidget-src dir]
-
-OPTIONS
-    -o, --output    output directory where the server will look for files [defaut output]
-    -i, --input     source directory tree where the transpiler will look for files [default src]
-    --nidget-src    location for new components [default src] 
-    --view-src      location for new views [default src] 
+    npx nidget init
 
 DESCRIPTION
-    Creates a .nigetrc file in the root directory with the default settings.  To change the 
-    default settings run the command with one of the described flags.
-
-    To update the settings file, run this command again.
+    1) Creates a .nigetrc file in the root directory with the default settings.  
+    2) Creates the client-src directory.

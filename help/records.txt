@@ -1,0 +1,7 @@
+COMMAND
+    records - Debug command to view nidget.info files as the tool seems them.
+
+SYNOPSIS
+    npx records [NAME]
+    
+DESCRIPTION

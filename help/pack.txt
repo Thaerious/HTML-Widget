@@ -1,8 +1,0 @@
-COMMAND
-    pack - write all known components to the .ndgetrc file under the records field.
-
-SYNOPSIS
-    npx nidget pack
-
-DESCRIPTION
-    Will call the discover command first in order to build the componet records.

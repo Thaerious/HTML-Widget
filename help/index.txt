@@ -1,43 +1,31 @@
 NAME
-    nidget - manage nidget based projects
+    nidget - Manage web projects with HTML templates and JS modules.
 
 SYNOPSIS
-    nidget [OPTION]... [COMMANDS]...
+    nidget [OPTIONS]... [COMMANDS]...
 
 OPTIONS
-    -n, --name
-        Set the name of the nidget when relevent
-
     -v, -vv
         Display verbose information, or very-verbose information
 
-    --dist
-        Set the 'distribution' directory for the dist command
-
-    -o, --output
-        Set location for locally deployed files (web server will look in this directory)
-
-    -l, --link
-        Create file links instead of copying files
+    --cwd [VALUE]
+        Use the provided directory as the project root.
+        Default: current working directory.
 
 COMMANDS
-    readme:  print the readme file which contains an example setup
-    init:    create a new nidget project in the this directory
-    create [nidget, view] name:  create a new nidget or view with specified name (-n)
-    records: show all records
-    clean:   remove --dist and --output directories and remove records from nidget.json file
-    settings: print out settings
 
-    disc:     search input directory for valid nidget files and record them as records
-    link:     search node_modules for valid nidget modules
-    
-    sass:     render .css files placing them in the --output directory
-    script:   copy .mps files from source to --output [1]
-    view:     render .ejs files to .html, place in --output directory
+    init:    
+        Create a new project in the root (current) directory.
 
-    deploy:  create deployable in --output directory for use by the web server [2]
+    create (component, view) name:  
+        Create a new component or view.
+        
+    clean:    
+       Remove the linked and compiled directories from the client source directory.
 
-NOTES
-    [1]  Use --link to link instead of copy
-    [2]  Equivelent to 'disc lib script style view'
+    build:
+        Compile files and link directories.
 
+    help [COMMAND]:
+        Display help for the specified command.
+        

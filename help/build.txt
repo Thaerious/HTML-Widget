@@ -1,0 +1,12 @@
+COMMAND
+    build - Compile files and link directories.
+
+SYNOPSIS
+    npx build
+    npx discover link-packages style include import-map
+
+OPTIONS    
+
+DESCRIPTION
+    
+    

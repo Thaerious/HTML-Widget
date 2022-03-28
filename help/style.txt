@@ -1,12 +1,18 @@
 COMMAND
-    style - compile scss files to css files
+    style - Sub-command used by build to compile scss files to css files.
 
 SYNOPSIS
     npx style
 
+OPTIONS
+
 DESCRIPTION
-    Using discoverd or linked records convert all files found
-    in the style.src field into the style.dest field.  The 
-    dest will be in the same tree structure as the source.
-    The desination directory will be the output directory from
-    the settings (.nidgetrc) file.
+    Compiles all .scss files into .scss files.  Recursivly searchs the 
+    client source directory for nidget.info files. The source and
+    destination files names are specified in style field of the nidget.info
+    file.
+    
+    The target directory is 'www/compiled/package_name/dest_name'.
+    The package name is retrieved from the name field of the package.json 
+    file.
+     
