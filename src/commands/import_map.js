@@ -23,7 +23,7 @@ function import_map(records, commands, args) {
         
         if (nidgetRC.module){
             const packageJSON = loadJSON(nidgetRCFileDesc.dir, settings["package-json"]);
-            const libPath = Path.join(nidgetRCFileDesc.dir, nidgetRC.module);
+            const libPath = Path.join("/", packageJSON.name, nidgetRC.module);
             importMap.imports[packageJSON.name] = libPath;
         }
     }

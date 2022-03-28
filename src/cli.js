@@ -16,7 +16,7 @@ class Commands {
     nextCommand() {
         if (this.commandStack.length === 0) throw "command parse error: empty command stack";
         this._prev.unshift(this.commandStack.shift().toLowerCase());
-        return this._prev[0].replaceAll("-", "_");
+        return this._prev[0];
     }
 
     hasNext() {
@@ -75,7 +75,7 @@ async function cli(commandStack) {
     commands = new Commands(commandStack);
 
     while (commandStack.length > 0) {
-        const module = `./commands/${commands.nextCommand()}.js`;
+        const module = `./commands/${commands.nextCommand().replaceAll("-", "_")}.js`;
         logger.channel(`debug`).log(` -- ${module}`);
         if (module.endsWith("nidget.js") || module.endsWith("cli.js")) {
             logger.channel(`debug`).log(` -- started`);
@@ -96,4 +96,4 @@ async function cli(commandStack) {
     return rvalue;
 }
 
-export default cli;
+export {cli, Commands}

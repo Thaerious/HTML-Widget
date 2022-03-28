@@ -5,11 +5,11 @@ import include from "./include.js";
 import import_map from "./import_map.js";
 
 async function build(records, commands, args){
-    discover(records, commands, args);
-    link_packages(records, commands, args);
-    style(records, commands, args);
-    include(records, commands, args);
-    import_map(records, commands, args);
+    discover(records);
+    link_packages(records);
+    style(records);
+    include(records);
+    import_map(records);
 }
 
 export default build;

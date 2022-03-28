@@ -13,20 +13,13 @@ const logger = Logger.getLogger();
  * Build the templates.mjs file for the views.
  * If the --view flag is presnet, build for only the specified view
  */
-async function include(records, commands, args){
-    if (!args.flags.view){
-        for (const tagName in records){
-            await doInclude(settings, records[tagName], records);
-        }
-    } else {
-        const viewName = commands.nextCommand();
-        const record = bfsObject(records, "tagName", viewName);
-        if (!record) throw new Error(`Unknown view: ${viewName}`);    
-        await doInclude(settings, record, records);
+function include(records, commands, args){
+    for (const tagName in records){
+        doInclude(settings, records[tagName], records);
     }
 }
 
-async function doInclude(settings, record, records){
+function doInclude(settings, record, records){
     if (record.type !== CONSTANTS.TYPE.VIEW) return;
     logger.channel("verbose").log(`  \\__ ${record.tagName}`);
     

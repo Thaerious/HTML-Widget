@@ -1,7 +1,7 @@
 {
     "name": "@nidget/core",
     "version": "0.1.0",
-    "main": "src/cli.js",
+    "main": "src/lib.js",
     "bin": {
         "nidget": "src/cli.js"
     },

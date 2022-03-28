@@ -1,7 +1,8 @@
 
-function init(records, commands, args) {
+function records(records, commands, args) {
     if (commands.hasNext() && records[commands.peekCommand()]) {
-        console.log(records[commands.nextCommand()])
+        const name = commands.nextCommand();
+        console.log(records[name]);
     } else {
         for (const tagname in records) {
             console.log(records[tagname]);
@@ -9,4 +10,4 @@ function init(records, commands, args) {
     }
 }
 
-export default init;
+export default records;
