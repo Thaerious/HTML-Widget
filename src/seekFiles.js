@@ -1,18 +1,23 @@
 import FS from "fs";
 import Path from "path";
+import Logger from "@thaerious/logger";
+
+const logger = Logger.getLogger();
 
 /**
  * Search root and all subdirectories for files that pass 'test'.
  * Test is passed a fileEntry from FS, with the full path appended.
  */
 function seekFiles(roots, test, result = []) {
-    for (const root of [roots].flat())
+    for (const root of [roots].flat()){
         processDirectory(root, test, result);
+    }
 
     return result;
 }
 
 function processDirectory(root, test, result) {
+    logger.channel("debug").log(`  \\__ seek files ${root}`);  
     const contents = FS.readdirSync(root, { withFileTypes: true });
 
     for (const dirEntry of contents) {

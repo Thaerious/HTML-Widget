@@ -32,8 +32,16 @@ function createView(name, args) {
     if (!FS.existsSync(viewFullPath)) {
         const viewTemplatePath = Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates", CONSTANTS.TEMPLATES.VIEW);
         FS.copyFileSync(viewTemplatePath, viewFullPath);
-        const templatesMJS = Path.join(record.dir.src, CONSTANTS.FILENAME.TEMPLATES);
-        replaceInFile(viewFullPath, "${templates}", templatesMJS);
+        
+        const importMapFrom = Path.join(settings["link-dir"], record.dir.sub);
+        const importMapTo = Path.join(settings["output-dir"]);
+        const importMapRel = Path.relative(importMapFrom, importMapTo);
+        replaceInFile(viewFullPath, "${import_map}", Path.join(importMapRel, CONSTANTS.FILENAME.LIB_FILE));
+
+        const templateFrom = Path.join(settings["link-dir"], record.dir.sub);
+        const templateTo = Path.join(settings["output-dir"], record.dir.sub);
+        const templateRel = Path.relative(templateFrom, templateTo);
+        replaceInFile(viewFullPath, "${templates}", Path.join(templateRel, CONSTANTS.FILENAME.TEMPLATES));
     }else {
         logger.channel("standard").log(`skipping existing file ${viewFullPath}`);
     }

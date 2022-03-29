@@ -7,7 +7,7 @@ const CONSTANTS =  {
     NODE_MODULES_PATH: `node_modules`,    
     MODULE_NAME: Path.join(`@nidget`, `core`),
     FILENAME : {
-        TEMPLATES : 'templates.mjs',
+        TEMPLATES : 'templates.ejs',
         LIB_FILE: `import_map.ejs`,
     },
     TEMPLATES: {
