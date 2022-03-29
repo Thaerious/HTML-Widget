@@ -33,6 +33,8 @@ function createView(name, args) {
         const viewTemplatePath = Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates", CONSTANTS.TEMPLATES.VIEW);
         FS.copyFileSync(viewTemplatePath, viewFullPath);
         
+        replaceInFile(viewFullPath, "${style}", Path.join(record.dir.sub, record.style.dest));
+
         const importMapFrom = Path.join(settings["link-dir"], record.dir.sub);
         const importMapTo = Path.join(settings["output-dir"]);
         const importMapRel = Path.relative(importMapFrom, importMapTo);
