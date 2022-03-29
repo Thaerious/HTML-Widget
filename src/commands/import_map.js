@@ -1,12 +1,11 @@
 import FS from "fs";
 import Path from "path";
 import settings from "../settings.js";
-import Logger from "@thaerious/logger";
 import loadJSON from "../loadJSON.js";
 import getPropertyFiles from "../getPropertyFiles.js";
 import CONSTANTS from "../constants.js";
 import mkdirIf from "../mkdirIf.js";
-
+import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
 /**

@@ -121,7 +121,6 @@ function instantiateRecord(name, type){
         const parsed = Path.parse(name);
         name = parsed.name;
         root = parsed.dir;
-        console.log(name + ", " + root);
     }
 
     const record = {...{

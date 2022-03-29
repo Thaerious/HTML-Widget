@@ -33,7 +33,7 @@ function doInclude(settings, record, records){
     for (let dependency of dependencies) {
         const dependencyFilename = Path.join(dependency.dir.src, dependency.view);
         const scriptPath = Path.relative(settings["output-dir"], Path.join(dependency.dir.dest, dependency.es6));
-        FS.writeSync(fp, `<script type='module' src='${scriptPath}'></script>\n`);
+        FS.writeSync(fp, `<script type='module' src='/${scriptPath}'></script>\n`);
         FS.writeSync(fp, FS.readFileSync(dependencyFilename));
     };
 
