@@ -27,12 +27,10 @@ function create(records, commands, args) {
 
 function createView(name, args) {
     const record = instantiateRecord(name, CONSTANTS.TYPE.VIEW);
-
     const viewFullPath = mkdirIf(record.dir.src, record.view);
+
     if (!FS.existsSync(viewFullPath)) {
-        const viewTemplatePath = Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates", CONSTANTS.TEMPLATES.VIEW);
-        FS.copyFileSync(viewTemplatePath, viewFullPath);
-        
+        FS.copyFileSync(CONSTANTS.TEMPLATES.VIEW, viewFullPath);       
         replaceInFile(viewFullPath, "${style}", Path.join(record.dir.sub, record.style.dest));
 
         const importMapFrom = Path.join(settings["link-dir"], record.dir.sub);
@@ -44,12 +42,20 @@ function createView(name, args) {
         const templateTo = Path.join(settings["output-dir"], record.dir.sub);
         const templateRel = Path.relative(templateFrom, templateTo);
         replaceInFile(viewFullPath, "${templates}", Path.join(templateRel, CONSTANTS.FILENAME.TEMPLATES));
+
+        replaceInFile(viewFullPath, "${script}", Path.join(record.dir.sub, record.es6));
     }else {
         logger.channel("standard").log(`skipping existing file ${viewFullPath}`);
     }
 
-    FS.writeFileSync(mkdirIf(record.dir.src, record.es6), "");
-    FS.writeFileSync(mkdirIf(record.dir.src, record.style.src), "");
+    if (!FS.existsSync(Path.join(record.dir.src, record.es6)))
+        FS.writeFileSync(mkdirIf(record.dir.src, record.es6), "");
+
+    if (!FS.existsSync(Path.join(record.dir.src, record.style.src)))        
+        FS.writeFileSync(mkdirIf(record.dir.src, record.style.src), "");
+
+    if (!FS.existsSync(Path.join(record.dir.src, CONSTANTS.FILENAME.BODY_FILE)))        
+        FS.writeFileSync(mkdirIf(record.dir.src, CONSTANTS.FILENAME.BODY_FILE), "");
 }
 
 function createComponent(name, args) {
@@ -109,13 +115,7 @@ function instantiateRecord(name, type){
  * @param name component / view name
  * @param type view or componentn
  */
- function buildRecord(source, name, type) {
-    const packageJSON = loadJSON(settings["package-json"]);
-
-    if (!packageJSON.name){
-        throw new Error(`no name field found in ${settings["package-json"]}, run npm init`);
-    }
-    
+ function buildRecord(source, name, type) {   
     let root = "";
     if (name.indexOf("/") !== -1){
         const parsed = Path.parse(name);
@@ -133,10 +133,10 @@ function instantiateRecord(name, type){
             dest: Path.join(name + ".css"),
         },
         dir : {
-            sub : Path.join(packageJSON.name, root, convertToDash(name)),
-            src : Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? "src" : "src"], packageJSON.name, root, convertToDash(name))
+            sub : Path.join(settings["package"], root, convertToDash(name)),
+            src : Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? "src" : "src"], settings["package"], root, convertToDash(name))
         },
-        package: packageJSON.name,
+        package: settings["package"],
     }, ...source};   
 
     return record;

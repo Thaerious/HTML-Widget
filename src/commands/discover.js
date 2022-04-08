@@ -37,6 +37,8 @@ function _discover(records, path, settings) {
             component.dir.src = component.dir.scr || file.dir;
             component.dir.dest = Path.join(settings["output-dir"], component.package, component.tagName);
             storeRecord(records, component);
+
+            logger.channel("very-verbose").log(`    \\__ ${file.full}`); 
         }
     }
 }

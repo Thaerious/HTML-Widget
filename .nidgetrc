@@ -1,8 +1,3 @@
 {
-  "output-dir": "output",
-  "package-dir": "dist",
-  "nidget-src": "src",
-  "view-src": "src",
-  "src": "core-elements",
-  "module" : "lib.mjs"
+  "src": "core-elements"
 }

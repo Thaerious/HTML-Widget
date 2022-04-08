@@ -3,3 +3,5 @@ coverage
 mock/client-src
 mock/www
 mock/.nidgetrc
+**/temp
+workspace.code-workspace
