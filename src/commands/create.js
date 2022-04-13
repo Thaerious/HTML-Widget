@@ -66,7 +66,7 @@ function createComponent(name, args) {
         process.exit();
     }
 
-    const record = instantiateRecord(name, CONSTANTS.TYPE.VIEW);
+    const record = instantiateRecord(name, CONSTANTS.TYPE.COMPONENT);
     
     if (!args.flags["skip-templates"]) {       
         const viewPath = mkdirIf(record.dir.src,  record.view);
