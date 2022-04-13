@@ -3,12 +3,16 @@
 <head>
     <link rel="stylesheet" href="/${style}">
     <script type="importmap">
+        <% if (typeof prebuild === "undefined" || !prebuild) { %>
         <%- include('${import_map}'); %>
+        <% } %>
     </script>
 </head>
 <body>
     <script type="module" src="/${script}"></script>
+    <% if (typeof prebuild === "undefined" || !prebuild) { %>
     <%- include('${templates}');  %>
+    <% } %>
     <%- include('./body.ejs'); %>
 </body>
 </html>

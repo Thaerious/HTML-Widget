@@ -1,3 +1,4 @@
 {
-  "src": "core-elements"
+  "src": "core-elements",
+  "module" : "lib.mjs"
 }

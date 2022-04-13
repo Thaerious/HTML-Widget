@@ -5,6 +5,7 @@ import CONSTANTS from "./constants.js";
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "./parseArgsOptions.js";
 import Logger from "@thaerious/logger";
+import url from "url";
 const logger = Logger.getLogger();
 
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
@@ -21,10 +22,10 @@ class NPP {
     middleware(req, res, next) {
         this._records = {};
         discover(this._records);
-        const url = req.originalUrl.substr(1);
+        const myurl = url.parse(req.url).pathname.substr(1);
 
-        if (this._records[url]) {
-            const record = this.records[url];
+        if (this._records[myurl]) {
+            const record = this.records[myurl];
             if (record.type == CONSTANTS.TYPE.VIEW) {
                 logger.channel("standard").log(`#view ${record.tagName}`);
                 build(this._records);

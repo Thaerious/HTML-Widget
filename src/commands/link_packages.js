@@ -16,16 +16,16 @@ const logger = Logger.getLogger();
  * Link that directory under the value found.
  * Will only search packages with a .nidgetrc file.
  */
-async function link_packages(records, commands, args){
-    _discover(settings["src"], settings);
+async function link_packages(records, commands, args){    
+    discover(settings["src"], settings);
 
     for (const nidgetRCFileDesc of getPropertyFiles()) {          
         const nidgetRC = loadJSON(nidgetRCFileDesc.full);
-        _discover(Path.join(nidgetRCFileDesc.dir, nidgetRC.src), settings);
+        discover(Path.join(nidgetRCFileDesc.dir, nidgetRC.src), settings);
     }
 }
 
-function _discover(path, settings) {     
+function discover(path, settings) {     
     logger.channel("very-verbose").log(`  \\__ path ${path}`);   
     const files = seekFiles(path, file => file.base === CONSTANTS.NIDGET_INFO_FILE);
 
