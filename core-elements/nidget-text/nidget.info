@@ -2,6 +2,7 @@
     "components": [
         {
             "type": "component",
+            "fullName": "nidget-text",
             "tagName": "nidget-text",
             "es6": "NidgetText.mjs",
             "dir": {

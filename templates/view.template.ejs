@@ -4,14 +4,14 @@
     <link rel="stylesheet" href="/${style}">
     <script type="importmap">
         <% if (typeof prebuild === "undefined" || !prebuild) { %>
-        <%- include('${import_map}'); %>
+        <%- include(lib_file) %>
         <% } %>
     </script>
 </head>
 <body>
     <script type="module" src="/${script}"></script>
     <% if (typeof prebuild === "undefined" || !prebuild) { %>
-    <%- include('${templates}');  %>
+    <%- include(template_file) %>
     <% } %>
     <%- include('./body.ejs'); %>
 </body>

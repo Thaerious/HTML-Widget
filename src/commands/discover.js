@@ -35,7 +35,7 @@ function _discover(records, path, settings) {
         for (const component of nidgetInfo.components) {
             component.dir = component.dir || {};
             component.dir.src = component.dir.scr || file.dir;
-            component.dir.dest = Path.join(settings["output-dir"], component.package, component.tagName);
+            component.dir.dest = Path.join(settings["output-dir"], component.package, component.fullName);
             storeRecord(records, component);
 
             logger.channel("very-verbose").log(`    \\__ ${file.full}`); 
@@ -44,12 +44,12 @@ function _discover(records, path, settings) {
 }
 
 function storeRecord(records, component){
-    if (records[component.tagName]){
-        logger.channel("warning").log(`duplicate component: ${component.package}:${component.tagName}`);
+    if (records[component.fullName]){
+        logger.channel("warning").log(`duplicate component: ${component.package}:${component.fullName}`);
     }
 
-    records[component.tagName] = component;
-    logger.channel("verbose").log(` \\__ ${component.package}:${component.tagName}`); 
+    records[component.fullName] = component;
+    logger.channel("verbose").log(` \\__ ${component.package}:${component.fullName}`); 
 }
 
 export default discover;

@@ -2,8 +2,10 @@ import { parseHTML } from "linkedom";
 import FS from "fs";
 import Path from "path";
 import ejs from "ejs";
-
+import settings from "./settings.js";
 import Logger from "@thaerious/logger";
+import CONSTANTS from "./constants.js";
+
 const logger = Logger.getLogger();
 
 class DependencyError extends Error {
@@ -24,22 +26,22 @@ async function getDependencies(rootRecord, records) {
 
     while (stack.length > 0) {
         const record = stack.shift();
-        logger.channel("debug").log(`  \\__ considering ${record.tagName}`);
+        logger.channel("debug").log(`  \\__ considering ${record.fullName}`);
 
-        try {            
+        try {       
             if (!record.view || record.view === ``) continue;
             const path = Path.join(record.dir.src, record.view);
             if (!FS.existsSync(path)) continue;
 
-            const fileString = await render(path);      
+            const fileString = await render(path, record);      
 
             const dom = parseHTML(fileString);
             const template = dom.document.querySelector(`template`);
 
-            for (const tagName in records) {
-                logger.channel("debug").log(`    \\__ tagname ${tagName}`);
-                const record = records[tagName];
+            for (const fullName in records) {
+                const record = records[fullName];
                 if (visited.has(record)) continue;
+                if (!record.tagName) continue;
                 if (template?.content.querySelector(record.tagName) || dom.window.document.querySelector(record.tagName)) {
                     visited.add(record);
                     stack.push(record);
@@ -53,9 +55,19 @@ async function getDependencies(rootRecord, records) {
     return visited.values();
 }
 
-async function render(path){
+async function render(path, record){
     return new Promise((resolve, reject)=>{
-        ejs.renderFile(path, {prebuild : true}, {}, function(err, str){
+
+        const lib_file = Path.join(settings['output-dir'], CONSTANTS.FILENAME.LIB_FILE);
+        const template_file = Path.join(settings['output-dir'], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
+
+        const data = {
+            prebuild : false,
+            lib_file : Path.resolve(lib_file),
+            template_file : Path.resolve(template_file)
+        };
+
+        ejs.renderFile(path, data, {}, function(err, str){
             if (err) reject(err);
             resolve(str);
         });

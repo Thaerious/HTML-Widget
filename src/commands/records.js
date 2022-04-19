@@ -1,4 +1,6 @@
 import discover from "./discover.js";
+import Logger from "@thaerious/logger";
+const logger = Logger.getLogger();
 
 function records(records, commands, args) {
     if (Object.keys(records).length == 0){
@@ -7,10 +9,10 @@ function records(records, commands, args) {
 
     if (commands.hasNext() && records[commands.peekCommand()]) {
         const name = commands.nextCommand();
-        console.log(records[name]);
+        logger.channel(`records`).log(JSON.stringify(records[name], null, 2));
     } else {
         for (const tagname in records) {
-            console.log(records[tagname]);
+            logger.channel(`records`).log(JSON.stringify(records[tagname], null, 2));
         }
     }
 }

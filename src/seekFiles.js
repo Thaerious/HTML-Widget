@@ -17,7 +17,6 @@ function seekFiles(roots, test, result = []) {
 }
 
 function processDirectory(root, test, result) {
-    logger.channel("debug").log(`  \\__ seek files ${root}`);  
     const contents = FS.readdirSync(root, { withFileTypes: true });
 
     for (const dirEntry of contents) {

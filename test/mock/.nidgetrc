@@ -1,5 +1,0 @@
-{
-  "output-dir": "./output",
-  "package-dir": "dist",
-  "input": "./src"
-}

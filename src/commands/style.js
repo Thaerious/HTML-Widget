@@ -30,7 +30,7 @@ function renderSCSS(record, settings){
         return;
     }
 
-    logger.channel(`very-verbose`).log(`    \\_ ${record.package}:${record.tagName}`);   
+    logger.channel(`very-verbose`).log(`    \\_ ${record.package}:${record.fullName}`);   
 
     const src = Path.join(record.dir.src, record.style.src);
     const outpath = Path.join(record.dir.dest, record.style.dest);

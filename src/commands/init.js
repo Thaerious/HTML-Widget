@@ -4,11 +4,12 @@ import CONSTANTS from "../constants.js";
 import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
 import Logger from "@thaerious/logger";
+import mkdirIf from "../mkdirIf.js";
 const logger = Logger.getLogger();
 
 function init(records, commands, args) {
     addNidgetRC(args);
-    addPackageInfo();    
+    addPackageInfo(args);    
 }
 
 function addNidgetRC(args) {
@@ -29,14 +30,14 @@ function addNidgetRC(args) {
     FS.writeFileSync(settings["nidget-rc"], JSON.stringify(nidgetrc, null, 2));
 }
 
-function addPackageInfo(){
-    const nidgetInfo = loadJSON(settings["src"], CONSTANTS.NIDGET_INFO_FILE);
+function addPackageInfo(args){
+    const pkg = args.flags.package || settings["package"];
 
-    if (!FS.existsSync(settings["src"])) FS.mkdirSync(settings["src"], {recursive : true});
+    const nidgetInfo = loadJSON(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE);
 
     FS.writeFileSync(
-        Path.join(settings["src"], CONSTANTS.NIDGET_INFO_FILE),
-        JSON.stringify({...nidgetInfo, link : settings.package}, null, 2)
+        mkdirIf(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE),
+        JSON.stringify({...nidgetInfo, link : pkg}, null, 2)
     );
 }
 

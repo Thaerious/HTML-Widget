@@ -6,6 +6,7 @@ import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
 import replaceInFile from "../replaceInFile.js";
 import mkdirIf from "../mkdirIf.js";
+import { bfsObject } from "../bfsObject.js";
 import { convertToDash, convertToPascal, convertDelimited } from "../names.js";
 const logger = Logger.getLogger();
 
@@ -32,20 +33,8 @@ function createView(name, args) {
     if (!FS.existsSync(viewFullPath)) {
         FS.copyFileSync(CONSTANTS.TEMPLATES.VIEW, viewFullPath);       
         replaceInFile(viewFullPath, "${style}", Path.join(record.dir.sub, record.style.dest));
-
-        const importMapFrom = Path.join(settings["link-dir"], record.dir.sub);
-        const importMapTo = Path.join(settings["output-dir"]);
-        const importMapRel = Path.relative(importMapFrom, importMapTo);
-        replaceInFile(viewFullPath, "${import_map}", Path.join(importMapRel, CONSTANTS.FILENAME.LIB_FILE));
-
-        const templateFrom = Path.join(settings["link-dir"], record.dir.sub);
-        const templateTo = Path.join(settings["output-dir"], record.dir.sub);
-        const templateRel = Path.relative(templateFrom, templateTo);
-        replaceInFile(viewFullPath, "${templates}", Path.join(templateRel, CONSTANTS.FILENAME.TEMPLATES));
-
+        replaceInFile(viewFullPath, "${templates}", Path.join(record.dir.sub, CONSTANTS.FILENAME.TEMPLATES));
         replaceInFile(viewFullPath, "${script}", Path.join(record.dir.sub, record.es6));
-    }else {
-        logger.channel("standard").log(`skipping existing file ${viewFullPath}`);
     }
 
     if (!FS.existsSync(Path.join(record.dir.src, record.es6)))
@@ -75,8 +64,6 @@ function createComponent(name, args) {
             replaceInFile(viewPath, "${name_dash}", convertToDash(name));
             replaceInFile(viewPath, "${name_underscore}", convertDelimited(name, "_"));
             replaceInFile(viewPath, "${style_path}", Path.join(record.dir.sub, record.style.dest));
-        } else {
-            logger.channel("standard").log(`skipping existing file ${viewPath}`);
         }
 
         const scriptPath = Path.join(record.dir.src, record.es6);
@@ -84,17 +71,12 @@ function createComponent(name, args) {
             FS.copyFileSync(Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates/template.mjs"), scriptPath);
             replaceInFile(scriptPath, "${name_dash}", convertToDash(name));
             replaceInFile(scriptPath, "${name_pascal}", convertToPascal(name));
-        } else {
-            logger.channel("standard").log(`skipping existing file ${scriptPath}`);
         }
 
         const stylePath = Path.join(record.dir.src, record.style.src);
         if (!FS.existsSync(stylePath)) {
             FS.copyFileSync(Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates/template.scss"), stylePath);
             replaceInFile(stylePath, "${name_dash}", convertToDash(name));
-        }
-        else {
-            logger.channel("standard").log(`skipping existing file ${stylePath}`);
         }
     }
 }
@@ -104,6 +86,10 @@ function instantiateRecord(name, type){
     const infoPath = Path.join(record.dir.src, CONSTANTS.NIDGET_INFO_FILE);
     const nidgetInfo = loadInfoFile(infoPath);
     record = buildRecord(record, name, type);
+
+    const current = bfsObject(nidgetInfo, "fullName", record.fullName);
+    if (current) return current;
+
     nidgetInfo.components.push(record);
     FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));    
     return record;
@@ -125,7 +111,7 @@ function instantiateRecord(name, type){
 
     const record = {...{
         type: type,
-        tagName: Path.join(root, convertToDash(name)),
+        fullName: Path.join(root, convertToDash(name)),
         view: Path.join(name + ".ejs"),
         es6: Path.join(convertToPascal(name) + ".mjs"),
         style: {
@@ -138,6 +124,10 @@ function instantiateRecord(name, type){
         },
         package: settings["package"],
     }, ...source};   
+
+    if (type == CONSTANTS.TYPE.COMPONENT){
+        record.tagName = convertToDash(name);
+    }
 
     return record;
 }

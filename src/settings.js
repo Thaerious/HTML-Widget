@@ -10,8 +10,7 @@ const args = new ParseArgs().loadOptions(parseArgsOptions).run();
  * Overwrite with command line settings
  **/
 function extractSettings() {
-    const cwd = args.flags.cwd || ".";
-    const packageJSON = loadJSON(cwd, CONSTANTS.NODE_PACKAGE_FILE);
+    const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
 
     const defaultSettings = {
         package : packageJSON?.name || "",
@@ -20,16 +19,16 @@ function extractSettings() {
         "src" : CONSTANTS.LOCATIONS.DEFAULT_SRC
     };
 
-    let settings = {...defaultSettings, ...loadJSON(Path.join(cwd, CONSTANTS.NIDGET_PROPERTY_FILE))};
+    let settings = {...defaultSettings, ...loadJSON(Path.join(CONSTANTS.NIDGET_PROPERTY_FILE))};
 
     return {
-        "node-modules" : Path.join(cwd, CONSTANTS.NODE_MODULES_PATH),
-        "package-json" : Path.join(cwd, CONSTANTS.NODE_PACKAGE_FILE),
-        "nidget-rc" : Path.join(cwd, CONSTANTS.NIDGET_PROPERTY_FILE),
+        "node-modules" : Path.join(CONSTANTS.NODE_MODULES_PATH),
+        "package-json" : Path.join(CONSTANTS.NODE_PACKAGE_FILE),
+        "nidget-rc" : Path.join(CONSTANTS.NIDGET_PROPERTY_FILE),
         "package" : settings.package,
-        "output-dir" : Path.join(cwd, settings["output-dir"]),
-        "link-dir" : Path.join(cwd, settings["link-dir"]),
-        "src" : Path.join(cwd, settings["src"])
+        "output-dir" : Path.join(settings["output-dir"]),
+        "link-dir" : Path.join(settings["link-dir"]),
+        "src" : Path.join(settings["src"])
     };
 }
 

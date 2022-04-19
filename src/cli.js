@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 import ParseArgs from "@thaerious/parseargs";
-import Logger from "@thaerious/logger";
 import parseArgsOptions from "./parseArgsOptions.js";
+const args = new ParseArgs().loadOptions(parseArgsOptions).run();
+if (args.flags.cwd) process.chdir(args.flags.cwd);
+
+import Logger from "@thaerious/logger";
 
 class Commands {
     /**
@@ -43,7 +46,6 @@ logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
 
 // logger.channel(`very-verbose`).prefix = (f, l, o)=>`${f} ${l} `;
 
-const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.count(`silent`) > 0) logger.channel(`standard`).enabled = false;
 if (args.count(`silent`) > 0) logger.channel(`warning`).enabled = false;
 if (args.count(`verbose`) >= 1) logger.channel(`verbose`).enabled = true;
@@ -62,8 +64,8 @@ logger.channel(`verbose`).log(`Nidget command line interface`);
             logger.channel(`standard`).log(`unknown command : ${commands.prev}`);
             logger.channel(`verbose`).log(err);
         } else {
-            console.log("ERROR");
-            console.log(err);
+            logger.channel(`error`).log("ERROR");
+            logger.channel(`error`).log(err);
         }
     }
 })();
@@ -77,6 +79,7 @@ async function cli(commandStack) {
     while (commandStack.length > 0) {
         const module = `./commands/${commands.nextCommand().replaceAll("-", "_")}.js`;
         logger.channel(`debug`).log(` -- ${module}`);
+
         if (module.endsWith("nidget.js") || module.endsWith("cli.js")) {
             logger.channel(`debug`).log(` -- started`);
             started = true;

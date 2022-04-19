@@ -21,12 +21,13 @@ class NidgetElement extends HTMLElement {
 
     /**
      * Move elements from the parent element into the template element.
-     * @param {string} outerTarget query selector for elements to move.
+     * @param {string} selector query selector for elements to move.
      * @param {string} innerTarget query selector for element to move outer targets into.
      * @returns {*} all elements moved
      */
-    internalize(outerTarget, innerTarget = this.shadowRoot) {
-        const outerSelection = this.outerSelectorAll(outerTarget);
+    internalize(selector, innerTarget = this.shadowRoot) {
+        const outerSelection = this.outerSelectorAll(selector);
+
         if (typeof innerTarget === "string"){
             innerTarget = this.querySelector(innerTarget);
         }

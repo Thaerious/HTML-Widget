@@ -32,9 +32,9 @@ async function include(records, commands, args) {
         return;
     }    
 
-    for (const tagName in records) {
+    for (const fullName in records) {
         try {
-            await doInclude(settings, records[tagName], records);
+            await doInclude(settings, records[fullName], records);
         } catch (error) {
             if (error instanceof DependencyError){
                 console.error(error.source);
@@ -49,7 +49,7 @@ async function include(records, commands, args) {
 
 async function doInclude(settings, record, records) {
     if (record.type !== CONSTANTS.TYPE.VIEW) return;
-    logger.channel("verbose").log(`  \\__ ${record.tagName}`);
+    logger.channel("verbose").log(`  \\__ ${record.fullName}`);
 
     const dependencies = await getDependencies(record, records);
     const filename = Path.join(record.dir.dest, constants.FILENAME.TEMPLATES);
@@ -59,7 +59,7 @@ async function doInclude(settings, record, records) {
     const fp = FS.openSync(filename, "w");
 
     for (let dependency of dependencies) {
-        logger.channel("very-verbose").log(`  \\__ dependency ${dependency.tagName}`);
+        logger.channel("very-verbose").log(`  \\__ dependency ${dependency.fullName}`);
         if (!dependency.view || dependency.view === "") continue;
         const dependencyFilename = Path.join(dependency.dir.src, dependency.view);
         const scriptPath = Path.relative(settings["output-dir"], Path.join(dependency.dir.dest, dependency.es6));
