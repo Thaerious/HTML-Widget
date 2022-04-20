@@ -1,11 +1,11 @@
-import NidgetElement from "@nidget/core";
+import WidgetElement from "@html-widget/core";
 
-class LibNidget extends NidgetElement {
+class LibWidget extends WidgetElement {
 
     constructor() {
-        super("lib-nidget-template");
+        super("lib-widget-template");
     }
 }
 
-window.customElements.define('lib-nidget', LibNidget);
-export default LibNidget;
+window.customElements.define('lib-widget', LibWidget);
+export default LibWidget;

@@ -8,8 +8,8 @@ OPTIONS
 
 DESCRIPTION
     Compiles all .scss files into .scss files.  Recursivly searchs the 
-    client source directory for nidget.info files. The source and
-    destination files names are specified in style field of the nidget.info
+    client source directory for widget.info files. The source and
+    destination files names are specified in style field of the widget.info
     file.
     
     The target directory is 'www/compiled/package_name/dest_name'.

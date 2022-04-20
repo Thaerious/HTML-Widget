@@ -1,9 +1,9 @@
 "use strict";
 
 /**
- * Calling methods on the nidget will treat shadow contents as regular contents.
+ * Calling methods on the widget will treat shadow contents as regular contents.
  */
-class NidgetElement extends HTMLElement {
+class WidgetElement extends HTMLElement {
     constructor(templateId) {
         super();
         if (templateId) this.applyTemplate(templateId);
@@ -76,7 +76,7 @@ class NidgetElement extends HTMLElement {
                     templateId +
                     "' not found\n" +
                     "Has the .ejs directive been added to the source file?\n" +
-                    "<%- include('../partials/nidget-templates'); %>"
+                    "<%- include('../partials/widget-templates'); %>"
             );
         }
 
@@ -90,8 +90,8 @@ class NidgetElement extends HTMLElement {
     async ready() {}
 
     get visible() {
-        const v = this.classList.contains(NidgetElement.VISIBLE_CLASS) === true;
-        const h = this.classList.contains(NidgetElement.HIDDEN_CLASS) === true;
+        const v = this.classList.contains(WidgetElement.VISIBLE_CLASS) === true;
+        const h = this.classList.contains(WidgetElement.HIDDEN_CLASS) === true;
 
         if (v && !h) return true;
         if (h && !v) return false;
@@ -107,33 +107,33 @@ class NidgetElement extends HTMLElement {
      * Remove 'hidden' class.
      */
     show() {
-        this.classList.remove(NidgetElement.HIDDEN_CLASS);
-        this.classList.add(NidgetElement.VISIBLE_CLASS);
+        this.classList.remove(WidgetElement.HIDDEN_CLASS);
+        this.classList.add(WidgetElement.VISIBLE_CLASS);
     }
 
     /**
      * Add 'hidden' class.
      */
     hide() {
-        this.classList.remove(NidgetElement.VISIBLE_CLASS);
-        this.classList.add(NidgetElement.HIDDEN_CLASS);
+        this.classList.remove(WidgetElement.VISIBLE_CLASS);
+        this.classList.add(WidgetElement.HIDDEN_CLASS);
     }
 
     /**
-     * Set the disabled flag that is read by nidget mouse functions.
+     * Set the disabled flag that is read by widget mouse functions.
      * @param value
      */
     set disabled(value) {
-        this.setAttribute(NidgetElement.DISABLED_ATTRIBUTE, value);
+        this.setAttribute(WidgetElement.DISABLED_ATTRIBUTE, value);
     }
 
     /**
-     * Get the disabled flag that is read by nidget mouse functions.
+     * Get the disabled flag that is read by widget mouse functions.
      * @param value
      */
     get disabled() {
-        if (!this.hasAttribute(NidgetElement.DISABLED_ATTRIBUTE)) return false;
-        return this.getAttribute(NidgetElement.DISABLED_ATTRIBUTE);
+        if (!this.hasAttribute(WidgetElement.DISABLED_ATTRIBUTE)) return false;
+        return this.getAttribute(WidgetElement.DISABLED_ATTRIBUTE);
     }
 
     /**
@@ -239,12 +239,12 @@ function toCamelCase(input) {
     return split.join("");
 }
 
-NidgetElement.DISABLED_ATTRIBUTE = "nidget-disabled";
-NidgetElement.HIDDEN_CLASS = "hidden";
-NidgetElement.VISIBLE_CLASS = "visible";
+WidgetElement.DISABLED_ATTRIBUTE = "widget-disabled";
+WidgetElement.HIDDEN_CLASS = "hidden";
+WidgetElement.VISIBLE_CLASS = "visible";
 
-if (!window.customElements.get("nidget-element")) {
-    window.customElements.define("nidget-element", NidgetElement);
+if (!window.customElements.get("widget-element")) {
+    window.customElements.define("widget-element", WidgetElement);
 }
 
-export default NidgetElement;
+export default WidgetElement;

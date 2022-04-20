@@ -15,13 +15,13 @@ function discover(records, commands, args){
     _discover(records, settings["src"], settings);
 
     // discover in packages
-    for (const nidgetRCFileDesc of getPropertyFiles()) {          
-        const nidgetRC = loadJSON(nidgetRCFileDesc.full);
-        logger.channel("debug").log(`   \\__ nidgetRCFileDesc.full ${nidgetRCFileDesc.full}`); 
-        logger.channel("debug").log(`   \\__ nidgetRCFileDesc.dir ${nidgetRCFileDesc.dir}`); 
-        logger.channel("debug").log(`   \\__ nidgetRC.input ${nidgetRC.input}`);
+    for (const widgetrcFileDesc of getPropertyFiles()) {          
+        const widgetrc = loadJSON(widgetrcFileDesc.full);
+        logger.channel("debug").log(`   \\__ widgetrcFileDesc.full ${widgetrcFileDesc.full}`); 
+        logger.channel("debug").log(`   \\__ widgetrcFileDesc.dir ${widgetrcFileDesc.dir}`); 
+        logger.channel("debug").log(`   \\__ widgetrc.input ${widgetrc.input}`);
          
-        _discover(records, Path.join(nidgetRCFileDesc.dir, nidgetRC.src), settings);
+        _discover(records, Path.join(widgetrcFileDesc.dir, widgetrc.src), settings);
     }
 }
 
@@ -29,10 +29,10 @@ function _discover(records, path, settings) {
     const files = seekFiles(path, file => file.base === CONSTANTS.NIDGET_INFO_FILE);
 
     for (const file of files) {
-        const nidgetInfo = loadJSON(file.full);
+        const widgetInfo = loadJSON(file.full);
 
-        if (!nidgetInfo.components) continue;
-        for (const component of nidgetInfo.components) {
+        if (!widgetInfo.components) continue;
+        for (const component of widgetInfo.components) {
             component.dir = component.dir || {};
             component.dir.src = component.dir.scr || file.dir;
             component.dir.dest = Path.join(settings["output-dir"], component.package, component.fullName);

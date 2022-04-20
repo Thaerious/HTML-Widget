@@ -1,0 +1,15 @@
+{
+    "components": [
+        {
+            "type": "component",
+            "fullName": "widget-text",
+            "tagName": "widget-text",
+            "es6": "WidgetText.mjs",
+            "dir": {
+                "sub": "widget_core/widget-text",
+                "src": "core-elements/widget-text"
+            },
+            "package": "@html-widget/core"
+        }
+    ]
+}

@@ -2,8 +2,8 @@ COMMAND
     discover - Sub-command used by build to look up info files.
 
 SYNOPSIS
-    npx nidget discover
+    npx widget discover
 
 DESCRIPTION
-    Recrusivly search all source directories for nidget.info files and
+    Recrusivly search all source directories for widget.info files and
     collect them into a dictionary.

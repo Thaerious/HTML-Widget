@@ -1,7 +1,7 @@
 {
   "output-dir": "output",
   "package-dir": "dist",
-  "nidget-src": "./src/",
+  "widget-src": "./src/",
   "view-src": "./src/",
   "src": "./src/"
 }

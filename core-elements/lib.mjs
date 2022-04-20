@@ -1,4 +1,4 @@
-import NidgetElement from "./nidget-element/NidgetElement.mjs";
-import NidgetText from "./nidget-text/NidgetText.mjs";
+import WidgetElement from "./widget-element/WidgetElement.mjs";
+import WidgetText from "./widget-text/WidgetText.mjs";
 
-export {NidgetElement as default, NidgetText};
+export {WidgetElement as default, WidgetText};

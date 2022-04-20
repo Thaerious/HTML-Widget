@@ -1,34 +1,34 @@
 {
   "package-dir": "dist",
   "records": {
-    "nidget-element": {
-      "name": "nidget-element",
-      "es6": "NidgetElement.mjs",
-      "script": "NidgetElement.js",
+    "widget-element": {
+      "name": "widget-element",
+      "es6": "WidgetElement.mjs",
+      "script": "WidgetElement.js",
       "view": "",
       "style": "",
-      "type": "nidget",
-      "package": "@nidget/core",
+      "type": "widget",
+      "package": "@html-widget/core",
       "dependents": [],
       "parents": [
         {
-          "name": "nidget-text",
-          "package": "@nidget/core"
+          "name": "widget-text",
+          "package": "@html-widget/core"
         }
       ]
     },
-    "nidget-text": {
-      "name": "nidget-text",
-      "es6": "NidgetText.mjs",
-      "script": "NidgetText.js",
+    "widget-text": {
+      "name": "widget-text",
+      "es6": "WidgetText.mjs",
+      "script": "WidgetText.js",
       "view": "",
       "style": "",
-      "type": "nidget",
-      "package": "@nidget/core",
+      "type": "widget",
+      "package": "@html-widget/core",
       "dependents": [
         {
-          "name": "nidget-element",
-          "package": "@nidget/core"
+          "name": "widget-element",
+          "package": "@html-widget/core"
         }
       ],
       "parents": []

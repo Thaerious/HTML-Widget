@@ -10,18 +10,18 @@ import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
 /**
- * Search node_modules for directories with a nidget.info file
+ * Search node_modules for directories with a widget.info file
  * that contains a "link" field.
  * 
  * Link that directory under the value found.
- * Will only search packages with a .nidgetrc file.
+ * Will only search packages with a .widgetrc file.
  */
 async function link_packages(records, commands, args){    
     discover(settings["src"], settings);
 
-    for (const nidgetRCFileDesc of getPropertyFiles()) {          
-        const nidgetRC = loadJSON(nidgetRCFileDesc.full);
-        discover(Path.join(nidgetRCFileDesc.dir, nidgetRC.src), settings);
+    for (const widgetrcFileDesc of getPropertyFiles()) {          
+        const widgetrc = loadJSON(widgetrcFileDesc.full);
+        discover(Path.join(widgetrcFileDesc.dir, widgetrc.src), settings);
     }
 }
 
@@ -31,11 +31,11 @@ function discover(path, settings) {
 
     for (const file of files) {
         logger.channel("debug").log(`    \\__ file ${file.full}`);   
-        const nidgetInfo = loadJSON(file.full);
+        const widgetInfo = loadJSON(file.full);
 
-        if (nidgetInfo.link){
+        if (widgetInfo.link){
             logger.channel("very-verbose").log(`    \\__ link ${file.full}`);   
-            const link = Path.join(settings["link-dir"], nidgetInfo.link);            
+            const link = Path.join(settings["link-dir"], widgetInfo.link);            
             const linkDir = Path.parse(link).dir;
             const src = Path.relative(linkDir, file.dir);
 

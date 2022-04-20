@@ -3,12 +3,12 @@ import seekComponents from "../src/seekComponents.js";
 
 
 
-seekComponents("./test/mock/nidgets");
+seekComponents("./test/mock/widgets");
 
 // describe("Test Seek Components", function () {
 //     describe("Single Directory", function () {
 //         before(function (){
-//             this.results = seekComponents("./mock/nidgets");
+//             this.results = seekComponents("./mock/widgets");
 //         });
 
 //         it("finds component in root directory", function(){
@@ -22,7 +22,7 @@ seekComponents("./test/mock/nidgets");
 //         });
 
 //         it("finds component in a nested subdirectory", function(){
-//             // const actual = this.result["nidget-exists"];
+//             // const actual = this.result["widget-exists"];
 //             // assert.ok(actual);
 //         });
 //     });

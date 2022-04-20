@@ -1,9 +1,9 @@
 COMMAND
-    create - create a new nidget or view
+    create - create a new widget or view
 
 SYNOPSIS
-    npx nidget create component NAME
-    npx nidget create view NAME
+    npx widget create component NAME
+    npx widget create view NAME
 
 OPTIONS
 

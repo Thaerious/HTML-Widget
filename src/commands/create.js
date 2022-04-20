@@ -48,7 +48,7 @@ function createView(name, args) {
 }
 
 function createComponent(name, args) {
-    logger.channel("very-verbose").log("\__ create nidget");
+    logger.channel("very-verbose").log("\__ create widget");
 
     if (convertToDash(name).split("-").length < 2) {
         logger.channel(`standard`).log(`error: name must consist of two or more words (${name})`);
@@ -84,14 +84,14 @@ function createComponent(name, args) {
 function instantiateRecord(name, type){
     let record = buildRecord({}, name, type);
     const infoPath = Path.join(record.dir.src, CONSTANTS.NIDGET_INFO_FILE);
-    const nidgetInfo = loadInfoFile(infoPath);
+    const widgetInfo = loadInfoFile(infoPath);
     record = buildRecord(record, name, type);
 
-    const current = bfsObject(nidgetInfo, "fullName", record.fullName);
+    const current = bfsObject(widgetInfo, "fullName", record.fullName);
     if (current) return current;
 
-    nidgetInfo.components.push(record);
-    FS.writeFileSync(infoPath, JSON.stringify(nidgetInfo, null, 4));    
+    widgetInfo.components.push(record);
+    FS.writeFileSync(infoPath, JSON.stringify(widgetInfo, null, 4));    
     return record;
 }
 
@@ -134,11 +134,11 @@ function instantiateRecord(name, type){
 
 function loadInfoFile(path) {
     if (!FS.existsSync(path)) {
-        const nidgetInfo = {
+        const widgetInfo = {
             components: [],
         };
         mkdirIf(path);
-        FS.writeFileSync(path, JSON.stringify(nidgetInfo, null, 4));
+        FS.writeFileSync(path, JSON.stringify(widgetInfo, null, 4));
     }
 
     return loadJSON(path);

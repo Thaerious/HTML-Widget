@@ -1,11 +1,11 @@
 import Path from "path";
 
 const CONSTANTS = {
-    NIDGET_PROPERTY_FILE: `.nidgetrc`,
-    NIDGET_INFO_FILE: `nidget.info`,
+    NIDGET_PROPERTY_FILE: `.widgetrc`,
+    NIDGET_INFO_FILE: `widget.info`,
     NODE_PACKAGE_FILE: `package.json`,
     NODE_MODULES_PATH: `node_modules`,
-    MODULE_NAME: Path.join(`@nidget`, `core`),
+    MODULE_NAME: Path.join(`@html-widget`, `core`),
     FILENAME: {
         TEMPLATES: "templates.ejs",
         LIB_FILE: `import_map.ejs`,

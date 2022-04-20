@@ -2,12 +2,12 @@
     "components": [
         {
             "type": "component",
-            "tagName": "lib-nidget",
-            "view": "lib_nidget.ejs",
-            "es6": "LibNidget.mjs",
+            "tagName": "lib-widget",
+            "view": "lib_widget.ejs",
+            "es6": "LibWidget.mjs",
             "style": {
-                "src": "lib_nidget.scss",
-                "dest": "lib_nidget.css"
+                "src": "lib_widget.scss",
+                "dest": "lib_widget.css"
             },
             "package": "mock-lib"
         }

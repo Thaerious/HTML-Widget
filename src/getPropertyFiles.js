@@ -29,7 +29,7 @@ function recurseDirectory(root, result) {
 }
 
 function processDirectory(root, result) {
-    const propFilePath = Path.join(root, settings["nidget-rc"]);
+    const propFilePath = Path.join(root, settings["widget-rc"]);
     if (!FS.existsSync(propFilePath)) return;
     const fileEntry = Path.parse(propFilePath);
     fileEntry.full = Path.join(fileEntry.dir, fileEntry.base);

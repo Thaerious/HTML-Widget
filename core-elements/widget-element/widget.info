@@ -1,0 +1,15 @@
+{
+    "components": [
+        {
+            "type": "component",
+            "fullName": "widget-element",
+            "tagName": "widget-element",
+            "es6": "WidgetElement.mjs",
+            "dir": {
+                "sub": "widget_core/widget-element",
+                "src": "core-elements/widget-element"
+            },
+            "package": "@html-widget/core"
+        }
+    ]
+}

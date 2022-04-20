@@ -1,25 +1,25 @@
 "use strict";
-import NidgetElement from "../nidget-element/NidgetElement.mjs";
+import WidgetElement from "../widget-element/WidgetElement.mjs";
 
 /**
  * Set the font-size as a multiple of the css variable --fit-text-unit.
  * Style example: calc(45 * var(--fit-text-unit))
  */
 class FitText { 
-    constructor(nidget){
-        this.nidget = nidget;
+    constructor(widget){
+        this.widget = widget;
         this.parseArguments();
         this.coefficient = this.extractUnits();
         this.lastCoefficient = 0;
 
         this.last = {
-            hDiff: this.nidget.parentElement.offsetHeight - this.nidget.scrollHeight,
-            wDiff: this.nidget.parentElement.offsetWidth - this.nidget.scrollWidth
+            hDiff: this.widget.parentElement.offsetHeight - this.widget.scrollHeight,
+            wDiff: this.widget.parentElement.offsetWidth - this.widget.scrollWidth
         };
     }    
 
     extractUnits(){
-        const fontSize = this.nidget.style.fontSize;
+        const fontSize = this.widget.style.fontSize;
         if (fontSize === "") return 1;
         if (!fontSize.endsWith(" * var(--fit-text-unit))")) return 1;
         if (!fontSize.startsWith("calc(")) return 1;
@@ -37,7 +37,7 @@ class FitText {
      * Retrieve the settings from css
      */
     parseArguments(){
-        let args = getComputedStyle(this.nidget).getPropertyValue("--nidget-fit-text");
+        let args = getComputedStyle(this.widget).getPropertyValue("--widget-fit-text");
 
         if (!args || args === false){
             this.hValue = 1;
@@ -60,19 +60,19 @@ class FitText {
         delete this.timeout;
         cb = cb ?? function(){};
 
-        if (this.nidget.textContent === "") return;
-        if (this.nidget.parentElement.offsetHeight === 0) return;
-        if (this.nidget.parentElement.offsetWidth === 0) return;
-        if (this.nidget.style.display === "none") return;
+        if (this.widget.textContent === "") return;
+        if (this.widget.parentElement.offsetHeight === 0) return;
+        if (this.widget.parentElement.offsetWidth === 0) return;
+        if (this.widget.style.display === "none") return;
         if (!this.hValue && !this.wValue) return;
 
         // hDiff growth direction due to height
         // wDiff growth direction due to width
-        let hDiff = this.nidget.parentElement.offsetHeight - this.nidget.scrollHeight;
-        let wDiff = this.nidget.parentElement.offsetWidth - this.nidget.scrollWidth;
+        let hDiff = this.widget.parentElement.offsetHeight - this.widget.scrollHeight;
+        let wDiff = this.widget.parentElement.offsetWidth - this.widget.scrollWidth;
 
         if (this.last.hDiff === hDiff && this.last.wDiff === wDiff) {
-            cb(this.nidget.style.fontSize);
+            cb(this.widget.style.fontSize);
             return;
         }
 
@@ -84,13 +84,13 @@ class FitText {
 
         const fontSize = `calc(${newCoefficient} * var(--fit-text-unit))`;
         if (newCoefficient !== this.coefficient && newCoefficient !== this.lastCoefficient) {
-            this.nidget.style.opacity = 0.0;
-            this.nidget.style.fontSize = fontSize;
+            this.widget.style.opacity = 0.0;
+            this.widget.style.fontSize = fontSize;
             this.lastCoefficient = this.coefficient;
             this.coefficient = newCoefficient;
             this.timeout = setImmediate(()=>this.onResize(cb));
         } else {
-            this.nidget.style.opacity = 1.0;
+            this.widget.style.opacity = 1.0;
             this.lastCoefficient = 0;
             this.last = {hDiff: hDiff, wDiff: wDiff};
             cb(fontSize);
@@ -99,11 +99,11 @@ class FitText {
 }
 
 /**
- * A nidget element for displaying text.
- * put '--nidget-fit-text: 1.0;' into css for this element to enable scaling.
- * see: NidgetStyle.js
+ * A widget element for displaying text.
+ * put '--widget-fit-text: 1.0;' into css for this element to enable scaling.
+ * see: WidgetStyle.js
  */
-class NidgetText extends NidgetElement {
+class WidgetText extends WidgetElement {
 
     constructor() {
         super();
@@ -132,7 +132,7 @@ class NidgetText extends NidgetElement {
 }
 ;
 
-if (!window.customElements.get('nidget-text')) {
-    window.customElements.define('nidget-text', NidgetText);
+if (!window.customElements.get('widget-text')) {
+    window.customElements.define('widget-text', WidgetText);
 }
-export default NidgetText;
+export default WidgetText;

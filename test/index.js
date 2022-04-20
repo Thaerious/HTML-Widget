@@ -1,2 +1,2 @@
 // import lib from "./lib.js";
-const { default: Component } = await import("./mock/nidgets/aspect-container/AspectContainer.mjs");
+const { default: Component } = await import("./mock/widgets/aspect-container/AspectContainer.mjs");

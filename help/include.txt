@@ -3,6 +3,6 @@ COMMAND
     for each component.
 
 SYNOPSIS
-    npx nidget include
+    npx widget include
     
 DESCRIPTION

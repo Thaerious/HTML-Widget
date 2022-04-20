@@ -2,7 +2,7 @@ COMMAND
     init -  Create a new project in the root (current) directory.
 
 SYNOPSIS
-    npx nidget init
+    npx widget init
 
 DESCRIPTION
     1) Creates a .nigetrc file in the root directory with the default settings.  

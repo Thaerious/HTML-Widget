@@ -1,8 +1,8 @@
 NAME
-    nidget - Manage web projects with HTML templates and JS modules.
+    widget - Manage web projects with HTML templates and JS modules.
 
 SYNOPSIS
-    nidget [OPTIONS]... [COMMANDS]...
+    widget [OPTIONS]... [COMMANDS]...
 
 OPTIONS
     -v, -vv

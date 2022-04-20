@@ -54,7 +54,7 @@ if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
 let commands;
 
-logger.channel(`verbose`).log(`Nidget command line interface`);
+logger.channel(`verbose`).log(`Widget command line interface`);
 
 (async () => {
     try {
@@ -80,7 +80,7 @@ async function cli(commandStack) {
         const module = `./commands/${commands.nextCommand().replaceAll("-", "_")}.js`;
         logger.channel(`debug`).log(` -- ${module}`);
 
-        if (module.endsWith("nidget.js") || module.endsWith("cli.js")) {
+        if (module.endsWith("widget.js") || module.endsWith("cli.js")) {
             logger.channel(`debug`).log(` -- started`);
             started = true;
             continue;

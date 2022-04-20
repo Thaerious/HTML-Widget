@@ -3,6 +3,6 @@ COMMAND
     with links to the source packages.
 
 SYNOPSIS
-    npx nidget link-packages
+    npx widget link-packages
 
 DESCRIPTION

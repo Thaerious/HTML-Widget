@@ -1,6 +1,6 @@
-import NidgetElement from "@nidget/core";
+import WidgetElement from "@html-widget/core";
 
-class ${name_pascal} extends NidgetElement {
+class ${name_pascal} extends WidgetElement {
 
     constructor() {
         super("${name_dash}-template");

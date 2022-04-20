@@ -8,13 +8,13 @@ import mkdirIf from "../mkdirIf.js";
 const logger = Logger.getLogger();
 
 function init(records, commands, args) {
-    addNidgetRC(args);
+    addwidgetrc(args);
     addPackageInfo(args);    
 }
 
-function addNidgetRC(args) {
-    let nidgetrc = {
-        ...loadJSON(settings["nidget-rc"]),
+function addwidgetrc(args) {
+    let widgetrc = {
+        ...loadJSON(settings["widget-rc"]),
         ...{
             "output-dir": CONSTANTS.LOCATIONS.OUTPUT,
             "link-dir": CONSTANTS.LOCATIONS.LINK_DIR,
@@ -22,23 +22,32 @@ function addNidgetRC(args) {
         }
     }       
 
-    if (args.flags["output"]) nidgetrc["output-dir"] = args.flags["output"];
-    if (args.flags["src"]) nidgetrc["src"] = args.flags["src"];
-
-    logger.channel(`very-verbose`).log(JSON.stringify(nidgetrc, null, 2));
-
-    FS.writeFileSync(settings["nidget-rc"], JSON.stringify(nidgetrc, null, 2));
+    if (args.flags["output"]) widgetrc["output-dir"] = args.flags["output"];
+    if (args.flags["src"]) widgetrc["src"] = args.flags["src"];
+    
+    if (!FS.existsSync(settings["widget-rc"])){
+        logger.channel(`verbose`).log(`  \\__ + ${settings["widget-rc"]}`);    
+        logger.channel(`debug`).log(JSON.stringify(widgetrc, null, 2));    
+        FS.writeFileSync(settings["widget-rc"], JSON.stringify(widgetrc, null, 2));
+    } else {
+        logger.channel(`verbose`).log(`  \\__ x ${settings["widget-rc"]}`); 
+    }
 }
 
 function addPackageInfo(args){
     const pkg = args.flags.package || settings["package"];
+    const widgetInfo = loadJSON(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE);
+    const path = Path.join(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE);
 
-    const nidgetInfo = loadJSON(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE);
+    if (!FS.existsSync(path)){
+        logger.channel(`verbose`).log(`  \\__ + ${path}`); 
+        mkdirIf(path);
+        FS.writeFileSync(path, JSON.stringify({...widgetInfo, link : pkg}, null, 2));
+    } else {
+        logger.channel(`verbose`).log(`  \\__ x ${path}`); 
+    }
 
-    FS.writeFileSync(
-        mkdirIf(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE),
-        JSON.stringify({...nidgetInfo, link : pkg}, null, 2)
-    );
+
 }
 
 export default init;

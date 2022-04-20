@@ -126,7 +126,7 @@ describe("Test Get Files.js", function () {
             });
         });
 
-        describe("Empty .nidgetrc input paramter", function () {
+        describe("Empty .widgetrc input paramter", function () {
             it("does not have 'file2.mjs'", function () {
                 const actual = !hasName(this.results, "file2.mjs");
                 assert.ok(actual);
@@ -142,7 +142,7 @@ describe("Test Get Files.js", function () {
                 assert.ok(actual);
             });            
         });
-        describe("Non-empy .nidgetrc input paramter (w/o local include)", function () {
+        describe("Non-empy .widgetrc input paramter (w/o local include)", function () {
             it("does not have 'file3.mjs'", function () {
                 const actual = !hasName(this.results, "file3.mjs");
                 assert.ok(actual);

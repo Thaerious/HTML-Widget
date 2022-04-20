@@ -1,9 +1,9 @@
 {
-    "name": "@nidget/core",
+    "name": "@html-widget/core",
     "version": "0.1.0",
     "main": "src/lib.js",
     "bin": {
-        "nidget": "src/cli.js",
+        "widget": "src/cli.js",
         "server": "src/server/server.js"
     },
     "author": "Ed Armstrong",

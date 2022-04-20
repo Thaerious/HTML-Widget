@@ -6,7 +6,7 @@ import loadJSON from "./loadJSON.js";
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 
 /**
- * Load settings from the nidget.json file
+ * Load settings from the widget.json file
  * Overwrite with command line settings
  **/
 function extractSettings() {
@@ -24,7 +24,7 @@ function extractSettings() {
     return {
         "node-modules" : Path.join(CONSTANTS.NODE_MODULES_PATH),
         "package-json" : Path.join(CONSTANTS.NODE_PACKAGE_FILE),
-        "nidget-rc" : Path.join(CONSTANTS.NIDGET_PROPERTY_FILE),
+        "widget-rc" : Path.join(CONSTANTS.NIDGET_PROPERTY_FILE),
         "package" : settings.package,
         "output-dir" : Path.join(settings["output-dir"]),
         "link-dir" : Path.join(settings["link-dir"]),

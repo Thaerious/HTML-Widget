@@ -9,10 +9,10 @@ import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
 /**
-* Build the www/compiled/input_map.ejs file from nidgetrc files.
-* Searches for property files (.nidgetrc) in all packages.
+* Build the www/compiled/input_map.ejs file from widgetrc files.
+* Searches for property files (.widgetrc) in all packages.
 *
-* The .nidgetrc file must contain the 'modules' field.  This will
+* The .widgetrc file must contain the 'modules' field.  This will
 * be appended to the package path resulting in the value of the 
 * import statment.  The key will be the package name found in
 * the package.json file.
@@ -23,13 +23,13 @@ function import_map(records, commands, args) {
     };
 
     // discover in packages
-    for (const nidgetRCFileDesc of getPropertyFiles()) {
-        logger.channel("verbose").log(` \\__ ${nidgetRCFileDesc.full}`);   
-        const nidgetRC = loadJSON(nidgetRCFileDesc.full);
+    for (const widgetrcFileDesc of getPropertyFiles()) {
+        logger.channel("verbose").log(` \\__ ${widgetrcFileDesc.full}`);   
+        const widgetrc = loadJSON(widgetrcFileDesc.full);
         
-        if (nidgetRC.module){
-            const packageJSON = loadJSON(nidgetRCFileDesc.dir, settings["package-json"]);
-            const libPath = Path.join("/", packageJSON.name, nidgetRC.module);
+        if (widgetrc.module){
+            const packageJSON = loadJSON(widgetrcFileDesc.dir, settings["package-json"]);
+            const libPath = Path.join("/", packageJSON.name, widgetrc.module);
             importMap.imports[packageJSON.name] = libPath;
             logger.channel("verbose").log(`   \\__ ${packageJSON.name} : ${libPath}`);   
         }

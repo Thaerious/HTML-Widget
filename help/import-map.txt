@@ -2,6 +2,6 @@ COMMAND
     import-map - Sub-command used by build to create the import_map.ejs file.
 
 SYNOPSIS
-    npx nidget import-map
+    npx widget import-map
     
 DESCRIPTION
