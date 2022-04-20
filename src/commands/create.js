@@ -34,7 +34,6 @@ function createView(name, args) {
         logger.channel(`verbose`).log(`  \\__ + ${viewFullPath}`); 
         FS.copyFileSync(CONSTANTS.TEMPLATES.VIEW, viewFullPath);       
         replaceInFile(viewFullPath, "${style}", Path.join(record.dir.sub, record.style.dest));
-        replaceInFile(viewFullPath, "${templates}", Path.join(record.dir.sub, CONSTANTS.FILENAME.TEMPLATES));
         replaceInFile(viewFullPath, "${script}", Path.join(record.dir.sub, record.es6));
     } else {
         logger.channel(`verbose`).log(`  \\__ = ${viewFullPath}`); 

@@ -65,7 +65,7 @@ logger.channel(`verbose`).log(`Widget command line interface`);
             logger.channel(`verbose`).log(err);
         } else {
             logger.channel(`error`).log("ERROR");
-            logger.channel(`error`).log(err);
+            console.log(err);
         }
     }
 })();
