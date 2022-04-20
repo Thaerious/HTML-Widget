@@ -31,20 +31,38 @@ function createView(name, args) {
     const viewFullPath = mkdirIf(record.dir.src, record.view);
 
     if (!FS.existsSync(viewFullPath)) {
+        logger.channel(`verbose`).log(`  \\__ + ${viewFullPath}`); 
         FS.copyFileSync(CONSTANTS.TEMPLATES.VIEW, viewFullPath);       
         replaceInFile(viewFullPath, "${style}", Path.join(record.dir.sub, record.style.dest));
         replaceInFile(viewFullPath, "${templates}", Path.join(record.dir.sub, CONSTANTS.FILENAME.TEMPLATES));
         replaceInFile(viewFullPath, "${script}", Path.join(record.dir.sub, record.es6));
+    } else {
+        logger.channel(`verbose`).log(`  \\__ = ${viewFullPath}`); 
     }
 
-    if (!FS.existsSync(Path.join(record.dir.src, record.es6)))
-        FS.writeFileSync(mkdirIf(record.dir.src, record.es6), "");
+    if (!FS.existsSync(Path.join(record.dir.src, record.es6))){
+        const path = mkdirIf(record.dir.src, record.es6);
+        logger.channel(`verbose`).log(`  \\__ + ${path}`); 
+        FS.writeFileSync(path, "");
+    } else {
+        logger.channel(`verbose`).log(`  \\__ = ${Path.join(record.dir.src, record.es6)}`); 
+    }
 
-    if (!FS.existsSync(Path.join(record.dir.src, record.style.src)))        
-        FS.writeFileSync(mkdirIf(record.dir.src, record.style.src), "");
+    if (!FS.existsSync(Path.join(record.dir.src, record.style.src))){   
+        const path = mkdirIf(record.dir.src, record.style.src);
+        logger.channel(`verbose`).log(`  \\__ + ${path}`); 
+        FS.writeFileSync(path, "");
+    }else {
+        logger.channel(`verbose`).log(`  \\__ = ${Path.join(record.dir.src, record.style.src)}`); 
+    }
 
-    if (!FS.existsSync(Path.join(record.dir.src, CONSTANTS.FILENAME.BODY_FILE)))        
-        FS.writeFileSync(mkdirIf(record.dir.src, CONSTANTS.FILENAME.BODY_FILE), "");
+    if (!FS.existsSync(Path.join(record.dir.src, CONSTANTS.FILENAME.BODY_FILE))){        
+        const path = mkdirIf(record.dir.src, CONSTANTS.FILENAME.BODY_FILE);
+        logger.channel(`verbose`).log(`  \\__ + ${path}`); 
+        FS.writeFileSync(path, "");
+    }else {
+        logger.channel(`verbose`).log(`  \\__ = ${Path.join(record.dir.src, CONSTANTS.FILENAME.BODY_FILE)}`); 
+    }
 }
 
 function createComponent(name, args) {

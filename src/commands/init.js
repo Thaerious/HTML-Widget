@@ -30,7 +30,7 @@ function addwidgetrc(args) {
         logger.channel(`debug`).log(JSON.stringify(widgetrc, null, 2));    
         FS.writeFileSync(settings["widget-rc"], JSON.stringify(widgetrc, null, 2));
     } else {
-        logger.channel(`verbose`).log(`  \\__ x ${settings["widget-rc"]}`); 
+        logger.channel(`verbose`).log(`  \\__ = ${settings["widget-rc"]}`); 
     }
 }
 
@@ -44,7 +44,7 @@ function addPackageInfo(args){
         mkdirIf(path);
         FS.writeFileSync(path, JSON.stringify({...widgetInfo, link : pkg}, null, 2));
     } else {
-        logger.channel(`verbose`).log(`  \\__ x ${path}`); 
+        logger.channel(`verbose`).log(`  \\__ = ${path}`); 
     }
 
 
