@@ -36,8 +36,8 @@ function addwidgetrc(args) {
 
 function addPackageInfo(args){
     const pkg = args.flags.package || settings["package"];
-    const widgetInfo = loadJSON(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE);
-    const path = Path.join(settings["src"], pkg, CONSTANTS.NIDGET_INFO_FILE);
+    const widgetInfo = loadJSON(settings["src"], pkg, CONSTANTS.WIDGET_INFO_FILE);
+    const path = Path.join(settings["src"], pkg, CONSTANTS.WIDGET_INFO_FILE);
 
     if (!FS.existsSync(path)){
         logger.channel(`verbose`).log(`  \\__ + ${path}`); 

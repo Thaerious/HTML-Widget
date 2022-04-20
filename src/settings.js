@@ -19,12 +19,12 @@ function extractSettings() {
         "src" : CONSTANTS.LOCATIONS.DEFAULT_SRC
     };
 
-    let settings = {...defaultSettings, ...loadJSON(Path.join(CONSTANTS.NIDGET_PROPERTY_FILE))};
+    let settings = {...defaultSettings, ...loadJSON(Path.join(CONSTANTS.WIDGET_PROPERTY_FILE))};
 
     return {
         "node-modules" : Path.join(CONSTANTS.NODE_MODULES_PATH),
         "package-json" : Path.join(CONSTANTS.NODE_PACKAGE_FILE),
-        "widget-rc" : Path.join(CONSTANTS.NIDGET_PROPERTY_FILE),
+        "widget-rc" : Path.join(CONSTANTS.WIDGET_PROPERTY_FILE),
         "package" : settings.package,
         "output-dir" : Path.join(settings["output-dir"]),
         "link-dir" : Path.join(settings["link-dir"]),

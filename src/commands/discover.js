@@ -26,7 +26,7 @@ function discover(records, commands, args){
 }
 
 function _discover(records, path, settings) {        
-    const files = seekFiles(path, file => file.base === CONSTANTS.NIDGET_INFO_FILE);
+    const files = seekFiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
     for (const file of files) {
         const widgetInfo = loadJSON(file.full);

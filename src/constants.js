@@ -1,8 +1,8 @@
 import Path from "path";
 
 const CONSTANTS = {
-    NIDGET_PROPERTY_FILE: `.widgetrc`,
-    NIDGET_INFO_FILE: `widget.info`,
+    WIDGET_PROPERTY_FILE: `.widgetrc`,
+    WIDGET_INFO_FILE: `widget.info`,
     NODE_PACKAGE_FILE: `package.json`,
     NODE_MODULES_PATH: `node_modules`,
     MODULE_NAME: Path.join(`@html-widget`, `core`),

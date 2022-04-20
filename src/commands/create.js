@@ -109,7 +109,7 @@ function createComponent(name, args) {
 
 function instantiateRecord(name, type){
     let record = buildRecord({}, name, type);
-    const infoPath = Path.join(record.dir.src, CONSTANTS.NIDGET_INFO_FILE);
+    const infoPath = Path.join(record.dir.src, CONSTANTS.WIDGET_INFO_FILE);
     const widgetInfo = loadInfoFile(infoPath);
     record = buildRecord(record, name, type);
 

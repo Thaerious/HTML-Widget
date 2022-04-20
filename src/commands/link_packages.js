@@ -27,7 +27,7 @@ async function link_packages(records, commands, args){
 
 function discover(path, settings) {     
     logger.channel("very-verbose").log(`  \\__ path ${path}`);   
-    const files = seekFiles(path, file => file.base === CONSTANTS.NIDGET_INFO_FILE);
+    const files = seekFiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
     for (const file of files) {
         logger.channel("debug").log(`    \\__ file ${file.full}`);   
