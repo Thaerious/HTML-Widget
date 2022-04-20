@@ -122,27 +122,5 @@ describe(`Test Command Create View`, function () {
                 assert.ok(actual);
             });               
         });        
-
-        // it(`injects templates into index.ejs`, function () {
-        //     const text = FS.readFileSync(`test/temp/client-src/@html-widget/test/index/index.ejs`);
-        //     const actual = text.indexOf(`templates.ejs`);
-        //     assert.ok(actual != -1);
-        // });
-        
-        // it(`injects .mjs into .ejs`, function () {
-        //     const text = FS.readFileSync(`test/temp/client-src/@html-widget/test/index/index.ejs`);
-        //     const actual = text.indexOf(`Index.mjs`);
-        //     assert.ok(actual != -1);
-        // }); 
-
-        // it(`creates file body.ejs`, function () {
-        //     const actual = FS.existsSync(`test/temp/client-src/@html-widget/test/index/body.ejs`);
-        //     assert.ok(actual != -1);
-        // }); 
-
-        // it(`creates widget.info file`, function () {
-        //     const actual = FS.existsSync(`test/temp/client-src/@html-widget/test/index/widget.info`);
-        //     assert.ok(actual != -1);
-        // }); 
     });
 });
