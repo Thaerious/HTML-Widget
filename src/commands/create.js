@@ -75,28 +75,36 @@ function createComponent(name, args) {
 
     const record = instantiateRecord(name, CONSTANTS.TYPE.COMPONENT);
     
-    if (!args.flags["skip-templates"]) {       
-        const viewPath = mkdirIf(record.dir.src,  record.view);
-        if (!FS.existsSync(viewPath)) {
-            FS.copyFileSync(Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates/template.ejs"), viewPath);
-            replaceInFile(viewPath, "${name_dash}", convertToDash(name));
-            replaceInFile(viewPath, "${name_underscore}", convertDelimited(name, "_"));
-            replaceInFile(viewPath, "${style_path}", Path.join(record.dir.sub, record.style.dest));
-        }
-
-        const scriptPath = Path.join(record.dir.src, record.es6);
-        if (!FS.existsSync(scriptPath)) {
-            FS.copyFileSync(Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates/template.mjs"), scriptPath);
-            replaceInFile(scriptPath, "${name_dash}", convertToDash(name));
-            replaceInFile(scriptPath, "${name_pascal}", convertToPascal(name));
-        }
-
-        const stylePath = Path.join(record.dir.src, record.style.src);
-        if (!FS.existsSync(stylePath)) {
-            FS.copyFileSync(Path.join(settings["node-modules"], CONSTANTS.MODULE_NAME, "templates/template.scss"), stylePath);
-            replaceInFile(stylePath, "${name_dash}", convertToDash(name));
-        }
+    const viewPath = mkdirIf(record.dir.src,  record.view);
+    if (!FS.existsSync(viewPath)) {
+        logger.channel(`verbose`).log(`  \\__ + ${viewPath}`); 
+        FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_EJS, viewPath);
+        replaceInFile(viewPath, "${name_dash}", convertToDash(name));
+        replaceInFile(viewPath, "${name_underscore}", convertDelimited(name, "_"));
+        replaceInFile(viewPath, "${style_path}", Path.join(record.dir.sub, record.style.dest));
+    } else {
+        logger.channel(`verbose`).log(`  \\__ = ${viewPath}`); 
     }
+
+    const scriptPath = Path.join(record.dir.src, record.es6);
+    if (!FS.existsSync(scriptPath)) {
+        logger.channel(`verbose`).log(`  \\__ + ${scriptPath}`); 
+        FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_MJS, scriptPath);
+        replaceInFile(scriptPath, "${name_dash}", convertToDash(name));
+        replaceInFile(scriptPath, "${name_pascal}", convertToPascal(name));
+    } else {
+        logger.channel(`verbose`).log(`  \\__ = ${scriptPath}`); 
+    }
+
+    const stylePath = Path.join(record.dir.src, record.style.src);
+    if (!FS.existsSync(stylePath)) {
+        logger.channel(`verbose`).log(`  \\__ + ${stylePath}`); 
+        FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_SCSS, stylePath);
+        replaceInFile(stylePath, "${name_dash}", convertToDash(name));
+    } else {
+        logger.channel(`verbose`).log(`  \\__ = ${stylePath}`); 
+    }
+
 }
 
 function instantiateRecord(name, type){

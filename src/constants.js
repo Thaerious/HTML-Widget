@@ -7,7 +7,6 @@ const CONSTANTS = {
     NODE_MODULES_PATH: `node_modules`,
     MODULE_NAME: Path.join(`@html-widget`, `core`),
     FILENAME: {
-        TEMPLATES: "templates.ejs",
         LIB_FILE: `import_map.ejs`,
         BODY_FILE: `body.ejs`
     },
@@ -24,8 +23,11 @@ CONSTANTS.LOCATIONS = {
     TEMPLATES: Path.join(CONSTANTS.NODE_MODULES_PATH, CONSTANTS.MODULE_NAME, "templates")
 }
 
-CONSTANTS.TEMPLATES = {
-    VIEW: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `view.template.ejs`)
+CONSTANTS.TEMPLATES = {    
+    VIEW: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `view.template.ejs`),
+    COMPONENT_EJS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.ejs`),
+    COMPONENT_MJS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.mjs`),
+    COMPONENT_SCSS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.scss`)
 }
 
 export default CONSTANTS;

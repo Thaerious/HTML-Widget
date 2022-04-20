@@ -33,9 +33,9 @@ logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
     app.set("view engine", "ejs");
     app.use((req, res, next) => npp.middleware(req, res, next));
 
+    app.use(Express.static("www/public"));
     app.use(Express.static("www/compiled"));
     app.use(Express.static("www/linked"));
-    app.use(Express.static("www/public"));
 
     app.use(`*`, (req, res) => {
         logger.channel(`server`).log(`404 ${req.originalUrl}`);
