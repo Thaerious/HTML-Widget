@@ -5,7 +5,7 @@ import parseArgsOptions from "./parseArgsOptions.js";
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.flags.cwd) process.chdir(args.flags.cwd);
 
-import Logger from "@thaerious/logger";
+import logger from "./setupLogger.js";
 
 class Commands {
     /**
@@ -34,23 +34,6 @@ class Commands {
         return this._prev[0];
     }
 }
-
-const logger = Logger.getLogger();
-logger.channel(`standard`).enabled = true;
-logger.channel(`verbose`).enabled = false;
-logger.channel(`very-verbose`).enabled = false;
-logger.channel(`debug`).enabled = false;
-logger.channel(`warning`).enabled = true;
-
-logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
-
-// logger.channel(`very-verbose`).prefix = (f, l, o)=>`${f} ${l} `;
-
-if (args.count(`silent`) > 0) logger.channel(`standard`).enabled = false;
-if (args.count(`silent`) > 0) logger.channel(`warning`).enabled = false;
-if (args.count(`verbose`) >= 1) logger.channel(`verbose`).enabled = true;
-if (args.count(`verbose`) >= 2) logger.channel(`very-verbose`).enabled = true;
-if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
 let commands;
 

@@ -5,13 +5,18 @@ import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
 import seekFiles from "../seekFiles.js";
 import getPropertyFiles from "../getPropertyFiles.js";
+import ParseArgs from "@thaerious/parseargs";
 
 const logger = Logger.getLogger();
 
 /**
  * Examine source directories for components and views.
+ * @param {Object} records a dictionary of name -> record
+ * @param {Command} commands a Command object (see cli.js)
+ * @param {ParseArgs} args a parseargs object (see @thaerious/parseargs)
  */
 function discover(records, commands, args){
+    // discover local source
     _discover(records, settings["src"], settings);
 
     // discover in packages

@@ -8,7 +8,8 @@ const CONSTANTS = {
     MODULE_NAME: Path.join(`@html-widget`, `core`),
     FILENAME: {
         LIB_FILE: `import_map.ejs`,
-        BODY_FILE: `body.ejs`
+        BODY_FILE: `body.ejs`,
+        TEMPLATES: `templates.ejs`
     },
     TYPE: {
         COMPONENT: "component",

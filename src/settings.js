@@ -32,6 +32,17 @@ function extractSettings() {
     };
 }
 
+/**
+ * @param {Object} defaults Values to inserted into settings.
+ */
+function reloadSettings(defaults = {}){
+    settings = extractSettings();
+    for (const key of Object.keys(defaults)){
+        settings[key] = defaults[key];
+    }
+    return settings;
+}
+
 let settings;
 if (!settings) settings = extractSettings();
-export default settings;
+export {settings as default, reloadSettings};

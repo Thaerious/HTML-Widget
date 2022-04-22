@@ -15,6 +15,8 @@ const logger = Logger.getLogger();
  * 
  * Link that directory under the value found.
  * Will only search packages with a .widgetrc file.
+ * 
+ * These packages receive a link in the www/linked directory.
  */
 async function link_packages(records, commands, args){    
     discover(settings["src"], settings);

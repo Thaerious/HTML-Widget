@@ -5,14 +5,26 @@ import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
 import Logger from "@thaerious/logger";
 import mkdirIf from "../mkdirIf.js";
+import ParseArgs from "@thaerious/parseargs";
+import parseArgsOptions from "../parseArgsOptions.js";
 const logger = Logger.getLogger();
 
+/**
+ * Examine source directories for components and views.
+ * @param {Object} records a dictionary of name -> record
+ * @param {Command} commands a Command object (see cli.js)
+ * @param {ParseArgs} args a parseargs object (see @thaerious/parseargs)
+ */
 function init(records, commands, args) {
+    args = args || new ParseArgs().loadOptions(parseArgsOptions).run();
     addwidgetrc(args);
-    addPackageInfo(args);    
+    addPackageInfo(args);
 }
 
-function addwidgetrc(args) {
+/**
+ * Create the .widgetrc file in the root directory.
+ */
+function addwidgetrc(args) {    
     let widgetrc = {
         ...loadJSON(settings["widget-rc"]),
         ...{
@@ -20,14 +32,15 @@ function addwidgetrc(args) {
             "link-dir": CONSTANTS.LOCATIONS.LINK_DIR,
             "src": "client-src"
         }
-    }       
+    }
 
+    // update .widgetrc with command line flags.
     if (args.flags["output"]) widgetrc["output-dir"] = args.flags["output"];
     if (args.flags["src"]) widgetrc["src"] = args.flags["src"];
     
     if (!FS.existsSync(settings["widget-rc"])){
         logger.channel(`verbose`).log(`  \\__ + ${settings["widget-rc"]}`);    
-        logger.channel(`debug`).log(JSON.stringify(widgetrc, null, 2));    
+        logger.channel(`debug`).log(JSON.stringify(widgetrc, null, 2));
         FS.writeFileSync(settings["widget-rc"], JSON.stringify(widgetrc, null, 2));
     } else {
         logger.channel(`verbose`).log(`  \\__ = ${settings["widget-rc"]}`); 
@@ -46,8 +59,6 @@ function addPackageInfo(args){
     } else {
         logger.channel(`verbose`).log(`  \\__ = ${path}`); 
     }
-
-
 }
 
 export default init;

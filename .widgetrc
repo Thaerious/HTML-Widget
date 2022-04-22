@@ -1,5 +1,3 @@
 {
-  "output-dir": "www/compiled",
-  "link-dir": "www/linked",
-  "src": "client-src"
+  "src": "core-elements"
 }
