@@ -3,14 +3,10 @@ import ParseArgs from "@thaerious/parseargs";
 import FS from "fs";
 import create from "../src/commands/create.js";
 import { Commands } from "../src/cli.js";
-
+import {init_all, clean_up } from "./scripts/initTest.js";
 import CONSTANTS from "../src/constants.js";
 import settings from "../src/settings.js";
 import loadJSON from "../src/loadJSON.js";
-
-CONSTANTS.TEMPLATES.COMPONENT_EJS = `../../templates/template.ejs`;
-CONSTANTS.TEMPLATES.COMPONENT_MJS = `../../templates/template.mjs`;
-CONSTANTS.TEMPLATES.COMPONENT_SCSS = `../../templates/template.scss`;
 const args = new ParseArgs().run();
 
 settings[`package`] = `@html-widget/test`;
@@ -24,32 +20,6 @@ function assertFiles(...paths) {
     }
 }
 
-function hashFiles(...paths) {
-    const dictionary = {};
-    for (const path of paths) {
-        dictionary[path] = JSON.stringify(FS.statSync(path));
-    }
-    return dictionary;
-}
-
-function assertHashes(dictionary, changed) {
-    console.log("here");
-    for (const path in dictionary) {
-        console.log(path);
-        const actual = FS.statSync(path);
-        const expected = dictionary[path];
-        if (path === changed) {
-            it(`path changed`, function () {
-                assert.notStrictEqual(actual, expected);
-            });
-        } else {
-            it(`path didn't change`, function () {
-                assert.strictEqual(actual, expected);
-            });
-        }
-    }
-}
-
 const filenames = [
     "client-src/@html-widget/test/my-component/MyComponent.mjs",
     "client-src/@html-widget/test/my-component/my-component.ejs",
@@ -57,17 +27,8 @@ const filenames = [
 ];
 
 describe(`Test Command Create Component`, function () {
-    before(function () {
-        if (FS.existsSync(`test/temp`)) FS.rmSync(`test/temp`, { recursive: true });
-        FS.mkdirSync(`test/temp`);
-        process.chdir(`test/temp`);
-    });
-
-    after(function () {
-        if (!args.flags[`no-clean`]) {
-            if (FS.existsSync(`test/temp`)) FS.rmSync(`test/temp`, { recursive: true });
-        }
-    });
+    before(init_all);
+    after(clean_up);
 
     describe(`Run command 'create component my-component'`, function () {
         before(function () {

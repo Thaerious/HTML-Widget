@@ -1,30 +1,19 @@
 import assert from "assert";
 import ParseArgs from "@thaerious/parseargs";
 import FS from "fs";
+import Path from "path";
 import create from "../src/commands/create.js";
 import { Commands } from "../src/cli.js";
-
-import CONSTANTS from "../src/constants.js";
+import {init_all, clean_up } from "./scripts/initTest.js";
 import settings from "../src/settings.js";
 import loadJSON from "../src/loadJSON.js";
-
-CONSTANTS.TEMPLATES.VIEW = `../../templates/view.template.ejs`;
 const args = new ParseArgs().run();
 
 settings[`package`] = `@html-widget/test`;
 
 describe(`Test Command Create View`, function () {
-    before(function () {
-        if (FS.existsSync(`test/temp`)) FS.rmSync(`test/temp`, { recursive: true });
-        FS.mkdirSync(`test/temp`);
-        process.chdir(`test/temp`);
-    });
-
-    after(function () {
-        if (!args.flags[`no-clean`]) {
-            if (FS.existsSync(`test/temp`)) FS.rmSync(`test/temp`, { recursive: true });
-        }
-    });
+    before(init_all);
+    after(clean_up);
 
     describe(`Test Command Create View`, function () {
         before(function () {

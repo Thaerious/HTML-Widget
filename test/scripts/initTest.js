@@ -31,6 +31,9 @@ const args = new ParseArgs().run();
     });
 }
 
+/**
+ * NPM install the html-widget package into the test directory.
+ */
 function npm_i_widget() {
     const cmd = "npm i ../..";
 
@@ -47,8 +50,8 @@ function npm_i_widget() {
 
 async function init_all(){
     if (FS.existsSync(`test/temp`)) FS.rmSync(`test/temp`, { recursive: true });
-    FS.mkdirSync(`test/temp`);
-    process.chdir(`test/temp`);
+    FS.mkdirSync(`test/temp`, {recursive : true});
+    if (!process.cwd().endsWith("test/temp")) process.chdir(`test/temp`);
     console.log(Path.resolve(CONSTANTS.NODE_PACKAGE_FILE));
     await npm_init();
     await npm_i_widget();
