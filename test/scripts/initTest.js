@@ -6,6 +6,7 @@ import loadJSON from "../../src/loadJSON.js";
 import { reloadSettings } from "../../src/settings.js"
 import ParseArgs from "@thaerious/parseargs";
 import logger from "../../src/setupLogger.js";
+import assert from "assert";
 
 const args = new ParseArgs().run();
 
@@ -67,4 +68,26 @@ function clean_up () {
     }
 };
 
-export {init_all, clean_up};
+function itHasFiles(...paths) {
+    for (const path of paths) {
+        it(`creates file ${path}`, function () {
+            const actual = FS.existsSync(path);
+            assert.ok(actual);
+        });
+    }
+}
+
+/**
+ * Assert that all fields in expected are equal to any field in actual
+ * @param actual
+ * @param expected
+ */
+ function assertFields(actual, expected) {
+    for (let parameter in expected) {
+        const exp = expected[parameter];
+        const acp = actual[parameter];
+        assert.deepStrictEqual(acp, exp);
+    };
+}
+
+export {init_all, clean_up, itHasFiles, assertFields};

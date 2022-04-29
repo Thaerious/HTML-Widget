@@ -1,7 +1,8 @@
 import assert from "assert";
 import FS from "fs";
 import init from "../src/commands/init.js";
-import {init_all, clean_up } from "./scripts/initTest.js";
+import import_map from "../src/commands/import_map.js";
+import {init_all, clean_up, itHasFiles, assertFields} from "./scripts/initTest.js";
 import loadJSON from "../src/loadJSON.js";
 
 describe(`Test Command Init`, async function () {
@@ -10,84 +11,16 @@ describe(`Test Command Init`, async function () {
 
     describe(`Test Command Init`, function () {
         before(function () {
-            init(null, null, null);
+            init();
+            import_map();
         });
 
-        it(`creates the 'client-src' directory`, function () {
-            const actual = FS.existsSync(`client-src/@html-widget/test/`);
-            assert.ok(actual);
-        });
+        itHasFiles("www/compiled/import_map.ejs");
 
-        it(`creates the '.widgetrc' file in the root directory`, function () {
-            const actual = FS.existsSync(`.widgetrc`);
-            assert.ok(actual);
-        });
-
-        it(`creates the '.widgetinfo' file in the package source directory`, function () {
-            const actual = FS.existsSync(`client-src/@html-widget/test/widget.info`);
-            assert.ok(actual);
-        });
-
-        it(`'.widgetinfo' has the link key with package name value`, function () {
-            const json = loadJSON(`client-src/@html-widget/test/widget.info`);
-            const actual = json.link;
-            const expected = "@html-widget/test";
-            assert.ok(actual);
-        });
-
-        describe("Run the init command again", function () {
-            before(function () {
-                // mark the .widgetrc file
-                const widgetrc = loadJSON(`.widgetrc`);
-                widgetrc.modified = "not-modified";
-                FS.writeFileSync(`.widgetrc`, JSON.stringify(widgetrc, null, 2));
-
-                // mark the .widgetinfo file
-                const widgetinfo = loadJSON(`client-src/@html-widget/test/widget.info`);
-                widgetinfo.modified = "not-modified";
-                FS.writeFileSync(`client-src/@html-widget/test/widget.info`, JSON.stringify(widgetinfo, null, 2));
-                init(null, null, null);
-            });
-
-            it(`does not create a new .widgetrc file`, function () {
-                const json = loadJSON(`.widgetrc`);
-                const actual = json.modified;
-                const expected = "not-modified";
-                assert.strictEqual(actual, expected);
-            });
-
-            it(`does not create a new .widgetinfo file`, function () {
-                const json = loadJSON(`client-src/@html-widget/test/widget.info`);
-                const actual = json.modified;
-                const expected = "not-modified";
-                assert.strictEqual(actual, expected);
-            });
-        });
-
-        describe(`Delete the .widgetrc file and run the init command again`, function () {
-            before(function () {
-                // mark the .widgetrc file
-                FS.rmSync(`.widgetrc`);
-                init(null, null, null);
-            });
-
-            it(`creates the '.widgetinfo' file in the package source directory`, function () {
-                const actual = FS.existsSync(`client-src/@html-widget/test/widget.info`);
-                assert.ok(actual);
-            });
-        });
-
-        describe(`Delete the 'client-src' directory and run the init command again`, function () {
-            before(function () {
-                // mark the .widgetrc file
-                FS.rmSync(`client-src`, { recursive: true });
-                init(null, null, null);
-            });
-
-            it(`creates the '.widgetrc' file in the root directory`, function () {
-                const actual = FS.existsSync(`.widgetrc`);
-                assert.ok(actual);
-            });
+        it(`has field @html-widget/core with /@html-widget/core/lib.mjs `, function(){
+            const actual = loadJSON(`www/compiled/import_map.ejs`)
+            const expected = {"imports": {"@html-widget/core": "/@html-widget/core/lib.mjs"}}
+            assertFields(actual, expected);
         });
     });
 });

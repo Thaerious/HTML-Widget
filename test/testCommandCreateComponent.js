@@ -3,22 +3,13 @@ import ParseArgs from "@thaerious/parseargs";
 import FS from "fs";
 import create from "../src/commands/create.js";
 import { Commands } from "../src/cli.js";
-import {init_all, clean_up } from "./scripts/initTest.js";
+import {init_all, clean_up, assertFiles} from "./scripts/initTest.js";
 import CONSTANTS from "../src/constants.js";
 import settings from "../src/settings.js";
 import loadJSON from "../src/loadJSON.js";
 const args = new ParseArgs().run();
 
 settings[`package`] = `@html-widget/test`;
-
-function assertFiles(...paths) {
-    for (const path of paths) {
-        it(`creates file ${path}`, function () {
-            const actual = FS.existsSync(path);
-            assert.ok(actual);
-        });
-    }
-}
 
 const filenames = [
     "client-src/@html-widget/test/my-component/MyComponent.mjs",
