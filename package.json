@@ -1,7 +1,7 @@
 {
     "name": "@html-widget/core",
     "version": "0.1.0",
-    "main": "src/lib.js",
+    "browser": "core-elements/lib.mjs",
     "bin": {
         "widget": "src/cli.js",
         "server": "src/server/server.js"

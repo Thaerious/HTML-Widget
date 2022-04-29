@@ -23,15 +23,13 @@ function import_map(records, commands, args) {
     };
 
     // discover in packages
-    for (const widgetrcFileDesc of getPropertyFiles()) {
-        logger.channel("verbose").log(` \\__ ${widgetrcFileDesc.full}`);   
-        const widgetrc = loadJSON(widgetrcFileDesc.full);
+    for (const packageFile of getPropertyFiles(CONSTANTS.NODE_PACKAGE_FILE)) {
+        logger.channel("verbose").log(` \\__ ${packageFile.full}`);   
+        const packageJSON = loadJSON(packageFile.full);
         
-        if (widgetrc.imports){
-            for (const key in widgetrc.imports){
-                importMap.imports[key] = widgetrc.imports[key];
-                logger.channel("verbose").log(`   \\__ ${key} : ${widgetrc.imports[key]}`);   
-            }
+        if (packageJSON.browser){
+            importMap.imports[packageJSON.name] = Path.join(packageJSON.name, packageJSON.browser);
+            linkPackage(packageJSON);
         }
     }
 
@@ -39,6 +37,20 @@ function import_map(records, commands, args) {
     FS.writeFileSync(importMapPath, JSON.stringify(importMap, null, 2));
 
     logger.channel("debug").log(JSON.stringify(importMap, null, 2));
+}
+
+function linkPackage(packageJSON){
+    logger.channel("very-verbose").log(`    \\__ link ${packageJSON.name}`);   
+    const from = Path.join(CONSTANTS.NODE_MODULES_PATH, packageJSON.name);
+    const to = Path.join(settings["link-dir"], packageJSON.name);
+
+    if (!FS.existsSync(Path.parse(to).dir)) FS.mkdirSync(Path.parse(to).dir, {recursive : true});
+    if (FS.existsSync(to)) FS.rmSync(to, {recursive : true});
+
+    logger.channel("verbose").log(`  \\__ from ${from}`);
+    logger.channel("verbose").log(`  \\__ to ${to}`);
+
+    FS.symlinkSync(Path.resolve(from), to);
 }
 
 export default import_map;

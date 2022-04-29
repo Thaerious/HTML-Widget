@@ -1,4 +1,6 @@
 {
-  "src": "core-elements",
-  "module": "lib.mjs"
+    "src": "core-elements",
+    "imports": {
+        "@html-widget/core": "/@html-widget/core/lib.mjs"
+    }
 }
