@@ -34,7 +34,6 @@ async function getDependencies(rootRecord, records) {
             if (!FS.existsSync(path)) continue;
 
             const fileString = await render(path, record);      
-
             const dom = parseHTML(fileString);
             const template = dom.document.querySelector(`template`);
 
@@ -55,6 +54,10 @@ async function getDependencies(rootRecord, records) {
     return visited.values();
 }
 
+/**
+ * Render the html file to search for widgets.
+ * Set ejs variable 'prebuild' to true which turns off injecting the template file.
+ */
 async function render(path, record){
     return new Promise((resolve, reject)=>{
 
@@ -62,7 +65,7 @@ async function render(path, record){
         const template_file = Path.join(settings['output-dir'], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
 
         const data = {
-            prebuild : false,
+            prebuild : true,
             lib_file : Path.resolve(lib_file),
             template_file : Path.resolve(template_file)
         };

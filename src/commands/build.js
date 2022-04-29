@@ -19,11 +19,11 @@ async function build(records, commands, args){
     logger.channel(`verbose`).log(`# style`);
     style(records);
 
+    logger.channel(`verbose`).log(`# import map`);
+    import_map(records);    
+
     logger.channel(`verbose`).log(`# include`);
     include(records);
-
-    logger.channel(`verbose`).log(`# import map`);
-    import_map(records);
 }
 
 export default build;

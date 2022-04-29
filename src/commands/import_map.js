@@ -9,7 +9,7 @@ import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
 /**
-* Build the www/compiled/input_map.ejs file from widgetrc files.
+* Build the www/compiled/input_map.ejs file from .widgetrc files.
 * Searches for property files (.widgetrc) in all packages.
 *
 * The .widgetrc file must contain the 'modules' field.  This will

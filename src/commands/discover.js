@@ -22,9 +22,9 @@ function discover(records, commands, args){
     // discover in packages
     for (const widgetrcFileDesc of getPropertyFiles()) {          
         const widgetrc = loadJSON(widgetrcFileDesc.full);
-        logger.channel("debug").log(`   \\__ widgetrcFileDesc.full ${widgetrcFileDesc.full}`); 
-        logger.channel("debug").log(`   \\__ widgetrcFileDesc.dir ${widgetrcFileDesc.dir}`); 
-        logger.channel("debug").log(`   \\__ widgetrc.input ${widgetrc.input}`);
+        logger.channel("debug").log(`    \\__ widgetrcFileDesc.full ${widgetrcFileDesc.full}`); 
+        logger.channel("debug").log(`    \\__ widgetrcFileDesc.dir ${widgetrcFileDesc.dir}`); 
+        logger.channel("debug").log(`    \\__ widgetrc.input ${widgetrc.input}`);
          
         _discover(records, Path.join(widgetrcFileDesc.dir, widgetrc.src), settings);
     }

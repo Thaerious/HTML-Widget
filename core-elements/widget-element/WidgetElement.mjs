@@ -4,9 +4,13 @@
  * Calling methods on the widget will treat shadow contents as regular contents.
  */
 class WidgetElement extends HTMLElement {
-    constructor(templateId) {
+    constructor(templateId, settings) {
         super();
-        if (templateId) this.applyTemplate(templateId);
+        if (!templateId) return;
+
+        settings = settings || { shadowroot: true };
+        if (settings.shadowroot) this.shadowTemplate(templateId);
+        else this.copyTemplate(templateId);
     }
 
     /**
@@ -14,8 +18,7 @@ class WidgetElement extends HTMLElement {
      */
     async connectedCallback() {
         this.detectDOM();
-        await this.ready();
-
+        if (typeof this.ready === "function") window.addEventListener("load", async ()=>await this.ready(), {once : true});
         if (!this.classList.contains("hidden")) this.classList.add("visible");
     }
 
@@ -26,11 +29,19 @@ class WidgetElement extends HTMLElement {
      * @returns {*} all elements moved
      */
     internalize(selector, innerTarget = this.shadowRoot) {
-        const outerSelection = this.outerSelectorAll(selector);
-
-        if (typeof innerTarget === "string"){
+        if (typeof innerTarget === "string") {
             innerTarget = this.querySelector(innerTarget);
         }
+
+        if (!selector){
+            for (const node of this.childNodes){
+                this.removeChild(node);
+                innerTarget.append(node);
+            }
+            return;
+        }
+
+        const outerSelection = this.outerSelectorAll(selector);
 
         for (let item of outerSelection) {
             item.detach();
@@ -41,10 +52,11 @@ class WidgetElement extends HTMLElement {
     }
 
     detectDOM() {
-        this.DOM = {};
+        this.dom = {};
         for (const element of this.querySelectorAll("[id]")) {
-            this.DOM[toCamelCase(element.id)] = element;
+            this.dom[toCamelCase(element.id)] = element;
         }
+        return this.dom;
     }
 
     /**
@@ -66,7 +78,7 @@ class WidgetElement extends HTMLElement {
      * Attach a shadow element with the contents of the template named (templateID).
      * @return {undefined}
      */
-    async applyTemplate(templateId) {
+    async shadowTemplate(templateId) {
         if (this.shadowRoot !== null) return;
         let template = document.getElementById(templateId);
 
@@ -84,10 +96,32 @@ class WidgetElement extends HTMLElement {
             throw new Error("Element with id '" + templateId + "' is not a template.");
         }
 
-        this.attachShadow({ mode: "open" }).appendChild(template.content.cloneNode(true));
+        const content = template.content.cloneNode(true);
+        this.attachShadow({ mode: "open" }).appendChild(content);
     }
 
-    async ready() {}
+    /**
+     * Append the contents of the template named into the body of this element.
+     */
+    async copyTemplate(templateId) {
+        let template = document.getElementById(templateId);
+
+        if (!template) {
+            throw new Error(
+                "Template '" +
+                    templateId +
+                    "' not found\n" +
+                    "Has the .ejs directive been added to the source file?\n" +
+                    "<%- include('../partials/widget-templates'); %>"
+            );
+        }
+
+        if (template.tagName.toUpperCase() !== "TEMPLATE") {
+            throw new Error("Element with id '" + templateId + "' is not a template.");
+        }
+
+        this.append(template.content.cloneNode(true));
+    }
 
     get visible() {
         const v = this.classList.contains(WidgetElement.VISIBLE_CLASS) === true;
@@ -212,15 +246,15 @@ class WidgetElement extends HTMLElement {
 
     closestParent(selector) {
         let el = this;
-        while (el && el !== document && el !== window){
+        while (el && el !== document && el !== window) {
             const found = el.closest(selector);
             if (found) return found;
             el = el.getRootNode().host;
         }
     }
 
-    dispatchEvent(event_name, options = {}){
-        options = {...{composed: true, bubbles: true}, options};
+    dispatchEvent(event_name, options = {}) {
+        options = { ...{ composed: true, bubbles: true }, options };
         if (typeof event_name === "string") super.dispatchEvent(new CustomEvent(event_name, options));
         else super.dispatchEvent(event_name);
     }

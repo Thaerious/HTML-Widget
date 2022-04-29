@@ -3,7 +3,6 @@ COMMAND
 
 SYNOPSIS
     npx build
-    npx discover link-packages style include import-map
 
 OPTIONS    
 

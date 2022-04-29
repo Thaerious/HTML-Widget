@@ -21,7 +21,7 @@ logger.channel(`error`).enabled = true;
 logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
 
 (() => {
-    const npp = new WidgetMiddleware();
+    const wmw = new WidgetMiddleware();
     const app = Express();
 
     app.use(`*`, (req, res, next) => {
@@ -31,7 +31,7 @@ logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
 
     app.set("views", "www/linked");
     app.set("view engine", "ejs");
-    app.use((req, res, next) => npp.middleware(req, res, next));
+    app.use((req, res, next) => wmw.middleware(req, res, next));
 
     app.use(Express.static("www/public"));
     app.use(Express.static("www/compiled"));
