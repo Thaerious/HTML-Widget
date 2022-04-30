@@ -10,21 +10,16 @@ import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
 /**
- * Search node_modules for directories with a widget.info file
- * that contains a "link" field.
+ * Recursively creates dir links in the /linked directory for every 
+ * directory in 'client-src' that has a widget.info file with a link
+ * field.
  * 
- * Link that directory under the value found.
- * Will only search packages with a .widgetrc file.
+ * The name of the link is the value in the link field.  By default
+ * the directory name.
  * 
- * These packages receive a link in the www/linked directory.
- */
-async function link_packages(records, commands, args){    
+*/
+async function link(records, commands, args){    
     discover(settings["src"], settings);
-
-    for (const widgetrcFileDesc of getPropertyFiles()) {          
-        const widgetrc = loadJSON(widgetrcFileDesc.full);
-        discover(Path.join(widgetrcFileDesc.dir, widgetrc.src), settings);
-    }
 }
 
 function discover(path, settings) {     
@@ -32,7 +27,7 @@ function discover(path, settings) {
     const files = seekFiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
     for (const file of files) {
-        logger.channel("debug").log(`    \\__ file ${file.full}`);   
+        logger.channel("debug").log(`    \\__ file ${JSON.stringify(file, null, 2)}`);   
         const widgetInfo = loadJSON(file.full);
 
         if (widgetInfo.link){
@@ -53,4 +48,4 @@ function discover(path, settings) {
     }
 }
 
-export default link_packages;
+export default link;

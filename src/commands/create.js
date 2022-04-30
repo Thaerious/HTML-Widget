@@ -6,11 +6,14 @@ import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
 import replaceInFile from "../replaceInFile.js";
 import mkdirIf from "../mkdirIf.js";
+import {Commands} from "../cli.js";
 import { bfsObject } from "../bfsObject.js";
 import { convertToDash, convertToPascal, convertDelimited } from "../names.js";
 const logger = Logger.getLogger();
 
 function create(records, commands, args) {
+    if (Array.isArray(commands)) commands = new Commands(commands);
+
     switch (commands.peekCommand()) {
         case "component":
             commands.nextCommand();

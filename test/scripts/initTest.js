@@ -1,13 +1,12 @@
 import child_process from "child_process";
 import FS from "fs";
-import Path from "path";
 import CONSTANTS from "../../src/constants.js";
-import loadJSON from "../../src/loadJSON.js";
 import { reloadSettings } from "../../src/settings.js"
 import ParseArgs from "@thaerious/parseargs";
-import logger from "../../src/setupLogger.js";
 import assert from "assert";
+import { writeFileField } from "../../src/loadJSON.js";
 
+const TEST_DIRECTORY = `test/temp`;
 const args = new ParseArgs().run();
 
 /**
@@ -23,9 +22,7 @@ const args = new ParseArgs().run();
             if (err) {
                 reject(err);
             } else {
-                const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
-                packageJSON.name = "@html-widget/test";
-                FS.writeFileSync(CONSTANTS.NODE_PACKAGE_FILE, JSON.stringify(packageJSON, null, 2));
+                writeFileField(CONSTANTS.NODE_PACKAGE_FILE, "name", "@mock/test");
                 resolve(stdout);
             }
         });
@@ -49,25 +46,40 @@ function npm_i_widget() {
     });
 }
 
-async function init_all(){
-    if (FS.existsSync(`test/temp`)) FS.rmSync(`test/temp`, { recursive: true });
-    FS.mkdirSync(`test/temp`, {recursive : true});
-    if (!process.cwd().endsWith("test/temp")) process.chdir(`test/temp`);
-    console.log(Path.resolve(CONSTANTS.NODE_PACKAGE_FILE));
+/**
+ * Create the test directory.
+ * Initialize NPM.
+ * Install html-widget.
+ * Change directory and reload settings.
+ */
+const cwd = process.cwd();
+async function init_all(){        
+    if (!process.cwd().endsWith(TEST_DIRECTORY)){
+        if (FS.existsSync(TEST_DIRECTORY)) FS.rmSync(TEST_DIRECTORY, { recursive: true });
+        FS.mkdirSync(TEST_DIRECTORY, {recursive : true});
+        process.chdir(TEST_DIRECTORY);
+    }
     await npm_init();
     await npm_i_widget();
     reloadSettings();
 }
 
+/**
+ * Remove test directory unless --no-clean flag is set.
+ */
 function clean_up () {
     if (!args.flags[`no-clean`]) {
         // clean up test directory unless --no-clean is specified
-        if (FS.existsSync(`test/temp`)) FS.rmSync(`test/temp`, { recursive: true });
+        process.chdir(cwd);       
+        if (FS.existsSync(TEST_DIRECTORY)) FS.rmSync(TEST_DIRECTORY, { recursive: true });
     } else {
         console.log("\n *** see test directory: test/temp");
     }
 };
 
+/**
+ * Perform a series of tests that the files in 'path' exist.
+ */
 function itHasFiles(...paths) {
     for (const path of paths) {
         it(`creates file ${path}`, function () {
@@ -90,4 +102,4 @@ function itHasFiles(...paths) {
     };
 }
 
-export {init_all, clean_up, itHasFiles, assertFields};
+export {init_all, clean_up, itHasFiles, assertFields, TEST_DIRECTORY};

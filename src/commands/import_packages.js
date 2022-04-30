@@ -17,7 +17,7 @@ const logger = Logger.getLogger();
 * import statment.  The key will be the package name found in
 * the package.json file.
 */
-function import_map(records, commands, args) {
+function import_packages(records, commands, args) {
     const importMap = {
         imports : {}
     };
@@ -28,7 +28,7 @@ function import_map(records, commands, args) {
         const packageJSON = loadJSON(packageFile.full);
         
         if (packageJSON.browser){
-            importMap.imports[packageJSON.name] = Path.join(packageJSON.name, packageJSON.browser);
+            importMap.imports["/" + packageJSON.name] = Path.join(packageJSON.name, packageJSON.browser);
             linkPackage(packageJSON);
         }
     }
@@ -53,4 +53,4 @@ function linkPackage(packageJSON){
     FS.symlinkSync(Path.resolve(from), to);
 }
 
-export default import_map;
+export default import_packages;

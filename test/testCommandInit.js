@@ -14,7 +14,7 @@ describe(`Test Command Init`, async function () {
         });
 
         it(`creates the 'client-src' directory`, function () {
-            const actual = FS.existsSync(`client-src/@html-widget/test/`);
+            const actual = FS.existsSync(`client-src/@mock/test/`);
             assert.ok(actual);
         });
 
@@ -24,14 +24,14 @@ describe(`Test Command Init`, async function () {
         });
 
         it(`creates the '.widgetinfo' file in the package source directory`, function () {
-            const actual = FS.existsSync(`client-src/@html-widget/test/widget.info`);
+            const actual = FS.existsSync(`client-src/@mock/test/widget.info`);
             assert.ok(actual);
         });
 
         it(`'.widgetinfo' has the link key with package name value`, function () {
-            const json = loadJSON(`client-src/@html-widget/test/widget.info`);
+            const json = loadJSON(`client-src/@mock/test/widget.info`);
             const actual = json.link;
-            const expected = "@html-widget/test";
+            const expected = "@mock/test";
             assert.ok(actual);
         });
 
@@ -43,9 +43,9 @@ describe(`Test Command Init`, async function () {
                 FS.writeFileSync(`.widgetrc`, JSON.stringify(widgetrc, null, 2));
 
                 // mark the .widgetinfo file
-                const widgetinfo = loadJSON(`client-src/@html-widget/test/widget.info`);
+                const widgetinfo = loadJSON(`client-src/@mock/test/widget.info`);
                 widgetinfo.modified = "not-modified";
-                FS.writeFileSync(`client-src/@html-widget/test/widget.info`, JSON.stringify(widgetinfo, null, 2));
+                FS.writeFileSync(`client-src/@mock/test/widget.info`, JSON.stringify(widgetinfo, null, 2));
                 init(null, null, null);
             });
 
@@ -57,7 +57,7 @@ describe(`Test Command Init`, async function () {
             });
 
             it(`does not create a new .widgetinfo file`, function () {
-                const json = loadJSON(`client-src/@html-widget/test/widget.info`);
+                const json = loadJSON(`client-src/@mock/test/widget.info`);
                 const actual = json.modified;
                 const expected = "not-modified";
                 assert.strictEqual(actual, expected);
@@ -72,7 +72,7 @@ describe(`Test Command Init`, async function () {
             });
 
             it(`creates the '.widgetinfo' file in the package source directory`, function () {
-                const actual = FS.existsSync(`client-src/@html-widget/test/widget.info`);
+                const actual = FS.existsSync(`client-src/@mock/test/widget.info`);
                 assert.ok(actual);
             });
         });
