@@ -5,6 +5,7 @@ import { reloadSettings } from "../../src/settings.js"
 import ParseArgs from "@thaerious/parseargs";
 import assert from "assert";
 import { writeFileField } from "../../src/loadJSON.js";
+import logger from "../../src/setupLogger.js";
 
 const TEST_DIRECTORY = `test/temp`;
 const args = new ParseArgs().run();

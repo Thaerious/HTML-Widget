@@ -2,7 +2,6 @@ import FS from "fs";
 import Path from "path";
 import CONSTANTS from "../constants.js";
 import settings from "../settings.js";
-import getPropertyFiles from "../getPropertyFiles.js";
 import loadJSON from "../loadJSON.js";
 import seekFiles from "../seekFiles.js";
 import Logger from "@thaerious/logger";
