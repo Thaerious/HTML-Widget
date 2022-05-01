@@ -28,7 +28,7 @@ function import_packages(records, commands, args) {
         const packageJSON = loadJSON(packageFile.full);
         
         if (packageJSON.browser){
-            importMap.imports["/" + packageJSON.name] = Path.join("/", packageJSON.name, packageJSON.browser);
+            importMap.imports[packageJSON.name] = Path.join("/", packageJSON.name, packageJSON.browser);
             linkPackage(packageJSON);
         }
     }

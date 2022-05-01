@@ -19,7 +19,7 @@ describe(`Test Command Init`, async function () {
 
         it(`has field @html-widget/core with /@html-widget/core/lib.mjs `, function(){
             const actual = loadJSON(`www/compiled/import_map.ejs`)
-            const expected = {"imports": {"/@html-widget/core": "/@html-widget/core/core-elements/lib.mjs"}}
+            const expected = {"imports": {"@html-widget/core": "/@html-widget/core/core-elements/lib.mjs"}}
             assertFields(actual, expected);
         });
     });
