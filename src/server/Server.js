@@ -35,7 +35,7 @@ class Server{
         this.app.set("view engine", "ejs");
         this.app.use((req, res, next) => wmw.middleware(req, res, next));
     
-        this.app.use(Express.static("www/public"));
+        this.app.use(Express.static("www/static"));
         this.app.use(Express.static("www/compiled"));
         this.app.use(Express.static("www/linked"));
     

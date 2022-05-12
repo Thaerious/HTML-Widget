@@ -19,6 +19,7 @@ function init(records, commands, args) {
     args = args || new ParseArgs().loadOptions(parseArgsOptions).run();
     addwidgetrc(args);
     addPackageInfo(args);
+    mkdirIf(CONSTANTS.LOCATIONS.STATIC_DIR);
 }
 
 /**
