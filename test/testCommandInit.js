@@ -18,6 +18,11 @@ describe(`Test Command Init`, async function () {
             assert.ok(actual);
         });
 
+        it(`creates the 'www/static' directory`, function () {
+            const actual = FS.existsSync(`www/static`);
+            assert.ok(actual);
+        });
+
         it(`creates the '.widgetrc' file in the root directory`, function () {
             const actual = FS.existsSync(`.widgetrc`);
             assert.ok(actual);

@@ -27,10 +27,11 @@ function import_packages(records, commands, args) {
         logger.channel("verbose").log(` \\__ ${packageFile.full}`);   
         const packageJSON = loadJSON(packageFile.full);
         
-        if (packageJSON.browser){
-            importMap.imports[packageJSON.name] = Path.join("/", packageJSON.name, packageJSON.browser);
-            linkPackage(packageJSON);
-        }
+        if (typeof packageJSON.name !== "string") continue;
+        if (typeof packageJSON.browser !== "string") continue;
+
+        importMap.imports[packageJSON.name] = Path.join("/", packageJSON.name, packageJSON.browser);
+        linkPackage(packageJSON);
     }
 
     const importMapPath = mkdirIf(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);

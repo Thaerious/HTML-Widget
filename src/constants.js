@@ -18,9 +18,9 @@ const CONSTANTS = {
 };
 
 CONSTANTS.LOCATIONS = {
-    STATIC_DIR: Path.join("www", "static"),
-    LINK_DIR: Path.join("www", "linked"),
-    OUTPUT: Path.join("www", "compiled"),
+    STATIC_DIR: Path.join("www", "static/"),
+    LINK_DIR: Path.join("www", "linked/"),
+    OUTPUT: Path.join("www", "compiled/"),
     DEFAULT_SRC: "client-src",
     TEMPLATES: Path.join(CONSTANTS.NODE_MODULES_PATH, CONSTANTS.MODULE_NAME, "templates")
 }
