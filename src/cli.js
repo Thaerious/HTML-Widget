@@ -45,7 +45,7 @@ logger.channel(`verbose`).log(`Widget command line interface`);
     } catch (err) {
         if (err.code === "ERR_MODULE_NOT_FOUND") {
             logger.channel(`standard`).log(`unknown command : ${commands.prev}`);
-            logger.channel(`verbose`).log(err);
+            logger.channel(`standard`).log(err);
         } else {
             logger.channel(`error`).log("ERROR");
             console.log(err);
