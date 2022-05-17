@@ -2,6 +2,7 @@
     "name": "@html-widget/core",
     "version": "0.1.0",
     "browser": "core-elements/lib.mjs",
+    "main": "src/server/WidgetMiddleware.js",
     "bin": {
         "widget": "src/cli.js",
         "server": "src/server/startServer.js"

@@ -53,4 +53,4 @@ class WidgetMiddleware {
     }
 }
 
-export default WidgetMiddleware;
+export { WidgetMiddleware };
