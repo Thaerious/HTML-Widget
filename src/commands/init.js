@@ -18,7 +18,7 @@ const logger = Logger.getLogger();
 function init(records, commands, args) {
     args = args || new ParseArgs().loadOptions(parseArgsOptions).run();
     addwidgetrc(args);
-    addPackageInfo(args);
+    addWidgetInfoFile(args.flags.package || settings["package"]);
     mkdirIf(CONSTANTS.LOCATIONS.STATIC_DIR);
 }
 
@@ -48,8 +48,14 @@ function addwidgetrc(args) {
     }
 }
 
-function addPackageInfo(args){
-    const pkg = args.flags.package || settings["package"];
+/**
+ * Add the widget.info file to the package directory.
+ * The directory is 'client-src/pkg'.
+ * Only creates the file if it doesn't already exist.
+ * The default widget.info file contains only the link field.
+ * @param {string} pkg The name of the package to add.
+ */
+function addWidgetInfoFile(pkg){
     const widgetInfo = loadJSON(settings["src"], pkg, CONSTANTS.WIDGET_INFO_FILE);
     const path = Path.join(settings["src"], pkg, CONSTANTS.WIDGET_INFO_FILE);
 
@@ -62,4 +68,4 @@ function addPackageInfo(args){
     }
 }
 
-export default init;
+export {init as default, addWidgetInfoFile, addwidgetrc}

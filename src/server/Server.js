@@ -1,33 +1,24 @@
-#!/usr/bin/env node
-
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "../parseArgsOptions.js";
+import Logger from "@thaerious/logger";
+import Express from "express";
+import http from "http";
+import { WidgetMiddleware } from "./WidgetMiddleware.js";
+
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.flags.cwd) process.chdir(args.flags.cwd);
 
-import Express from "express";
-import http from "http";
-import WidgetMiddleware from "./WidgetMiddleware.js";
-import Logger from "@thaerious/logger";
-
 const logger = Logger.getLogger();
-logger.channel(`standard`).enabled = true;
-logger.channel(`verbose`).enabled = false;
-logger.channel(`very-verbose`).enabled = false;
-logger.channel(`debug`).enabled = false;
-logger.channel(`warning`).enabled = true;
-logger.channel(`error`).enabled = true;
-
-logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
+logger.channel("server").links.add(logger.channel("standard"));
+const log = logger.all();
 
 class Server{
-
     constructor(){
         const wmw = new WidgetMiddleware();
         this.app = Express();
 
         this.app.use(`*`, (req, res, next) => {
-            logger.channel(`this.server`).log(`${req.method} ${req.originalUrl}`);
+            log.server(`${req.method} ${req.originalUrl}`);
             next();
         });
 
@@ -40,7 +31,7 @@ class Server{
         this.app.use(Express.static("www/linked"));
     
         this.app.use(`*`, (req, res) => {
-            logger.channel(`this.server`).log(`404 ${req.originalUrl}`);
+            log.server(`404 ${req.originalUrl}`);
             res.statusMessage = `404 Page Not Found: ${req.originalUrl}`;
             res.status(404);
             res.send(`404: page not found`);
@@ -51,16 +42,16 @@ class Server{
     start(port = 8000, ip = "0.0.0.0"){
         this.server = http.createServer(this.app);
         this.server.listen(port, ip, () => {
-            logger.channel(`this.server`).log(`Listening on port ${port}`);
+            log.server(`Listening on port ${port}`);
         });
     
-        process.on(`SIGINT`, () => stop(this.server));
-        process.on(`SIGTERM`, () => stop(this.server));
+        process.on(`SIGINT`, () => this.stop(this.server));
+        process.on(`SIGTERM`, () => this.stop(this.server));
         return this;        
     }
 
     stop(){
-        logger.channel(`this.server`).log(`Stopping this.server`);
+        log.server(`Stopping this.server`);
         this.server.close();
         process.exit();
     }

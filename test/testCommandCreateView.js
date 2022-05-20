@@ -20,6 +20,10 @@ describe(`Test Command Create View`, function () {
             create(null, [`view`, `index`], args);
         });
 
+        it(`creates widget.info file in client-src/@mock/test/`, function () {
+            assert.ok(FS.existsSync(`client-src/@mock/test/widget.info`));
+        });
+
         it(`creates directory client-src/@mock/test/index`, function () {
             const actual = FS.existsSync(`client-src/@mock/test/index`);
             assert.ok(actual);
@@ -280,6 +284,7 @@ describe(`Test Command Create View`, function () {
                 assert.strictEqual(actual, expected);
             });
         });  
+
         describe(`Remove Index.mjs file and run the command again`, function () {
             before(function () {
                 FS.writeFileSync(`client-src/@mock/test/index/Index.mjs`, `not-modified`);

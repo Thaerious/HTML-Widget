@@ -27,6 +27,10 @@ describe(`Test Command Create Component`, function () {
 
         itHasFiles.bind(this)(...filenames, "client-src/@mock/test/my-component/widget.info");
 
+        it(`creates widget.info file in client-src/@mock/test/`, function () {
+            assert.ok(FS.existsSync(`client-src/@mock/test/widget.info`));
+        });
+
         it("widget.info has 1 entry under components", function(){
             const json = loadJSON("client-src/@mock/test/my-component/widget.info");
             const actual = json.components.length;

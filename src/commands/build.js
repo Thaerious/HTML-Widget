@@ -14,7 +14,7 @@ async function build(records, commands, args){
     }
     
     logger.channel(`verbose`).log(`# link`);
-    link(records);
+    await link(records);
 
     logger.channel(`verbose`).log(`# style`);
     style(records);
@@ -23,7 +23,7 @@ async function build(records, commands, args){
     import_packages(records);    
 
     logger.channel(`verbose`).log(`# include`);
-    include(records);
+    await include(records);
 }
 
 export default build;

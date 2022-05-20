@@ -1,15 +1,13 @@
 import assert from "assert";
 import ParseArgs from "@thaerious/parseargs";
-import FS from "fs";
 import create from "../src/commands/create.js";
 import discover from "../src/commands/discover.js";
 import init from "../src/commands/init.js";
 import {init_all, clean_up } from "./scripts/initTest.js";
 import { Commands } from "../src/cli.js";
-import {reloadSettings} from "../src/settings.js";
 import CONSTANTS from "../src/constants.js";
-import loadJSON from "../src/loadJSON.js";
 
+const args = new ParseArgs().run();
 CONSTANTS.TEMPLATES.VIEW = `../../templates/view.template.ejs`;
 
 describe(`Test Command Discover`, function () {
@@ -32,7 +30,7 @@ describe(`Test Command Discover`, function () {
     });
 
     describe(`Add a root view named index`, function () {
-        before(()=>create(null, new Commands([`view`, `index`])));
+        before(()=>create(null, new Commands([`view`, `index`]), args));
 
         it(`has index`, function () {
             const records = {};
@@ -42,7 +40,7 @@ describe(`Test Command Discover`, function () {
     });
 
     describe(`Add a nested view named nested/index`, function () {
-        before(()=>create(null, new Commands([`view`, `nested/index`])));
+        before(()=>create(null, new Commands([`view`, `nested/index`]), args));
 
         it(`has nested/index`, function () {
             const records = {};
@@ -52,7 +50,7 @@ describe(`Test Command Discover`, function () {
     });
 
     describe(`Add a root component named my-componenet`, function () {
-        before(()=>create(null, new Commands([`component`, `my-componenet`])));
+        before(()=>create(null, new Commands([`component`, `my-componenet`]), args));
 
         it(`has my-componenet`, function () {
             const records = {};

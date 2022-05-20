@@ -13,9 +13,8 @@ const logger = Logger.getLogger();
  * directory in 'client-src' that has a widget.info file with a link
  * field.
  * 
- * The name of the link is the value in the link field.  By default
- * the directory name.
- * 
+ * The name of the link is the value in the link field of the widget-info
+ * file.  By default the directory name.
 */
 async function link(records, commands, args){    
     discover(settings["src"], settings);
@@ -37,12 +36,11 @@ function discover(path, settings) {
 
             if (!FS.existsSync(linkDir)) FS.mkdirSync(linkDir, {recursive : true});
             if (FS.existsSync(link)) FS.rmSync(link, {recursive : true});
+            FS.symlinkSync(src, link);
 
             logger.channel("debug").log(`  \\__ path ${file.dir}`);
             logger.channel("verbose").log(`  \\__ src ${src}`);
             logger.channel("verbose").log(`  \\__ link ${link}`);
-
-            FS.symlinkSync(src, link);
         }
     }
 }

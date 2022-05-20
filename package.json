@@ -11,7 +11,7 @@
     "license": "MIT",
     "type": "module",
     "dependencies": {
-        "@thaerious/logger": "^0.1.1",
+        "@thaerious/logger": "^0.2.*",
         "@thaerious/parseargs": "^0.*.*",
         "acorn": "^8.6.0",
         "ejs": "^3.0.2",

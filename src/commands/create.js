@@ -6,7 +6,8 @@ import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
 import replaceInFile from "../replaceInFile.js";
 import mkdirIf from "../mkdirIf.js";
-import {Commands} from "../cli.js";
+import { addWidgetInfoFile } from "./init.js";
+import { Commands } from "../cli.js";
 import { bfsObject } from "../bfsObject.js";
 import { convertToDash, convertToPascal, convertDelimited } from "../names.js";
 const logger = Logger.getLogger();
@@ -32,6 +33,8 @@ function create(records, commands, args) {
 function createView(name, args) {
     const record = instantiateRecord(name, CONSTANTS.TYPE.VIEW);
     const viewFullPath = mkdirIf(record.dir.src, record.view);
+
+    addWidgetInfoFile(args.flags.package || settings["package"]);
 
     if (!FS.existsSync(viewFullPath)) {
         logger.channel(`verbose`).log(`  \\__ + ${viewFullPath}`); 
@@ -69,6 +72,8 @@ function createView(name, args) {
 
 function createComponent(name, args) {
     logger.channel("very-verbose").log("\__ create widget");
+
+    addWidgetInfoFile(args.flags.package || settings["package"]);
 
     if (convertToDash(name).split("-").length < 2) {
         logger.channel(`standard`).log(`error: name must consist of two or more words (${name})`);
