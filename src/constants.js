@@ -12,24 +12,24 @@ const CONSTANTS = {
         TEMPLATES: `templates.ejs`
     },
     TYPE: {
-        COMPONENT: "component",
-        VIEW: "view",
-    },
+        COMPONENT: `component`,
+        VIEW: `view`
+    }
 };
 
 CONSTANTS.LOCATIONS = {
-    STATIC_DIR: Path.join("www", "static/"),
-    LINK_DIR: Path.join("www", "linked/"),
-    OUTPUT: Path.join("www", "compiled/"),
-    DEFAULT_SRC: "client-src",
-    TEMPLATES: Path.join(CONSTANTS.NODE_MODULES_PATH, CONSTANTS.MODULE_NAME, "templates")
-}
+    STATIC_DIR: Path.join(`www`, `static/`),
+    LINK_DIR: Path.join(`www`, `linked/`),
+    OUTPUT: Path.join(`www`, `compiled/`),
+    DEFAULT_SRC: `client-src`,
+    TEMPLATES: Path.join(CONSTANTS.NODE_MODULES_PATH, CONSTANTS.MODULE_NAME, `templates`)
+};
 
-CONSTANTS.TEMPLATES = {    
+CONSTANTS.TEMPLATES = {
     VIEW: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `view.template.ejs`),
     COMPONENT_EJS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.ejs`),
     COMPONENT_MJS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.mjs`),
     COMPONENT_SCSS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.scss`)
-}
+};
 
 export default CONSTANTS;

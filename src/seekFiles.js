@@ -1,22 +1,19 @@
 import FS from "fs";
 import Path from "path";
-import Logger from "@thaerious/logger";
-
-const logger = Logger.getLogger();
 
 /**
  * Search root and all subdirectories for files that pass 'test'.
  * Test is passed a fileEntry from FS, with the full path appended.
  */
-function seekFiles(roots, test, result = []) {
-    for (const root of [roots].flat()){
+function seekFiles (roots, test, result = []) {
+    for (const root of [roots].flat()) {
         processDirectory(root, test, result);
     }
 
     return result;
 }
 
-function processDirectory(root, test, result) {
+function processDirectory (root, test, result) {
     const contents = FS.readdirSync(root, { withFileTypes: true });
 
     for (const dirEntry of contents) {
@@ -31,7 +28,7 @@ function processDirectory(root, test, result) {
         } else {
             const path = Path.join(root, dirEntry.name);
             const fileEntry = Path.parse(path);
-            fileEntry.full = Path.join(fileEntry.dir, fileEntry.base);   
+            fileEntry.full = Path.join(fileEntry.dir, fileEntry.base);
             if (test(fileEntry)) result.push(fileEntry);
         }
     }

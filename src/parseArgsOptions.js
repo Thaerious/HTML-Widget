@@ -3,29 +3,29 @@ const parseArgsOptions = {
         {
             long: `verbose`,
             short: `v`,
-            type: `boolean`,
+            type: `boolean`
         },
         {
             long: `name`,
             short: `n`,
-            type: `string`,
+            type: `string`
         },
         {
             long: `output`,
             short: `o`,
-            type: `string`,
+            type: `string`
         },
         {
             long: `input`,
             short: `i`,
-            type: `string`,
+            type: `string`
         },
         {
             long: `dest`,
             short: `d`,
-            type: `string`,
-        },
-    ],
+            type: `string`
+        }
+    ]
 };
 
 export default parseArgsOptions;

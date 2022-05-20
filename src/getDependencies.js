@@ -9,7 +9,7 @@ import CONSTANTS from "./constants.js";
 const logger = Logger.getLogger();
 
 class DependencyError extends Error {
-    constructor(message, record, error) {
+    constructor (message, record, error) {
         super(message);
         this.record = record;
         this.source = error;
@@ -20,20 +20,20 @@ class DependencyError extends Error {
  * For a given view-record return all component-records that need to
  * be injected into the view.
  */
-async function getDependencies(rootRecord, records) {
+async function getDependencies (rootRecord, records) {
     const stack = [rootRecord];
     const visited = new Set();
 
     while (stack.length > 0) {
         const record = stack.shift();
-        logger.channel("debug").log(`  \\__ considering ${record.fullName}`);
+        logger.channel(`debug`).log(`  \\__ considering ${record.fullName}`);
 
-        try {       
+        try {
             if (!record.view || record.view === ``) continue;
             const path = Path.join(record.dir.src, record.view);
             if (!FS.existsSync(path)) continue;
 
-            const fileString = await render(path, record);      
+            const fileString = await render(path, record);
             const dom = parseHTML(fileString);
             const template = dom.document.querySelector(`template`);
 
@@ -58,23 +58,22 @@ async function getDependencies(rootRecord, records) {
  * Render the html file to search for widgets.
  * Set ejs variable 'prebuild' to true which turns off injecting the template file.
  */
-async function render(path, record){
-    return new Promise((resolve, reject)=>{
-
-        const lib_file = Path.join(settings['output-dir'], CONSTANTS.FILENAME.LIB_FILE);
-        const template_file = Path.join(settings['output-dir'], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
+async function render (path, record) {
+    return new Promise((resolve, reject) => {
+        const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
+        const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
 
         const data = {
-            prebuild : true,
-            lib_file : Path.resolve(lib_file),
-            template_file : Path.resolve(template_file)
+            prebuild: true,
+            lib_file: Path.resolve(libFile),
+            template_file: Path.resolve(templateFile)
         };
 
-        ejs.renderFile(path, data, {}, function(err, str){
+        ejs.renderFile(path, data, {}, function (err, str) {
             if (err) reject(err);
             resolve(str);
         });
     });
 }
 
-export {getDependencies as default, DependencyError};
+export { getDependencies as default, DependencyError };

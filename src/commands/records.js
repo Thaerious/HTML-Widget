@@ -2,8 +2,8 @@ import discover from "./discover.js";
 import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
-function records(records, commands, args) {
-    if (Object.keys(records).length == 0){
+function records (records, commands, args) {
+    if (Object.keys(records).length === 0) {
         discover(records);
     }
 
