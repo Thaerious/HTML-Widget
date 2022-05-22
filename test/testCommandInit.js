@@ -2,7 +2,7 @@ import assert from "assert";
 import FS from "fs";
 import init from "../src/commands/init.js";
 import {init_all, clean_up } from "./scripts/initTest.js";
-import loadJSON from "../src/loadJSON.js";
+import {fsjson} from "@thaerious/utility"
 
 describe(`Test Command Init`, async function () {
     before(init_all);
@@ -34,7 +34,7 @@ describe(`Test Command Init`, async function () {
         });
 
         it(`'.widgetinfo' has the link key with package name value`, function () {
-            const json = loadJSON(`client-src/@mock/test/widget.info`);
+            const json = fsjson.load(`client-src/@mock/test/widget.info`);
             const actual = json.link;
             const expected = "@mock/test";
             assert.ok(actual);
@@ -43,26 +43,26 @@ describe(`Test Command Init`, async function () {
         describe("Run the init command again", function () {
             before(function () {
                 // mark the .widgetrc file
-                const widgetrc = loadJSON(`.widgetrc`);
+                const widgetrc = fsjson.load(`.widgetrc`);
                 widgetrc.modified = "not-modified";
                 FS.writeFileSync(`.widgetrc`, JSON.stringify(widgetrc, null, 2));
 
                 // mark the .widgetinfo file
-                const widgetinfo = loadJSON(`client-src/@mock/test/widget.info`);
+                const widgetinfo = fsjson.load(`client-src/@mock/test/widget.info`);
                 widgetinfo.modified = "not-modified";
                 FS.writeFileSync(`client-src/@mock/test/widget.info`, JSON.stringify(widgetinfo, null, 2));
                 init(null, null, null);
             });
 
             it(`does not create a new .widgetrc file`, function () {
-                const json = loadJSON(`.widgetrc`);
+                const json = fsjson.load(`.widgetrc`);
                 const actual = json.modified;
                 const expected = "not-modified";
                 assert.strictEqual(actual, expected);
             });
 
             it(`does not create a new .widgetinfo file`, function () {
-                const json = loadJSON(`client-src/@mock/test/widget.info`);
+                const json = fsjson.load(`client-src/@mock/test/widget.info`);
                 const actual = json.modified;
                 const expected = "not-modified";
                 assert.strictEqual(actual, expected);

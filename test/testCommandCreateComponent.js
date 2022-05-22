@@ -1,12 +1,10 @@
 import assert from "assert";
-import ParseArgs from "@thaerious/parseargs";
 import FS from "fs";
 import create from "../src/commands/create.js";
 import { Commands } from "../src/cli.js";
 import {init_all, clean_up, itHasFiles} from "./scripts/initTest.js";
-import CONSTANTS from "../src/constants.js";
-import settings from "../src/settings.js";
-import loadJSON from "../src/loadJSON.js";
+import {fsjson} from "@thaerious/utility"
+import ParseArgs from "@thaerious/parseargs";
 const args = new ParseArgs().run();
 
 const filenames = [
@@ -32,7 +30,7 @@ describe(`Test Command Create Component`, function () {
         });
 
         it("widget.info has 1 entry under components", function(){
-            const json = loadJSON("client-src/@mock/test/my-component/widget.info");
+            const json = fsjson.load("client-src/@mock/test/my-component/widget.info");
             const actual = json.components.length;
             const expected = 1;
             assert.strictEqual(actual, expected);
@@ -65,7 +63,7 @@ describe(`Test Command Create Component`, function () {
                 }
 
                 it("widget.info has 1 entry under components", function(){
-                    const json = loadJSON("client-src/@mock/test/my-component/widget.info");
+                    const json = fsjson.load("client-src/@mock/test/my-component/widget.info");
                     const actual = json.components.length;
                     const expected = 1;
                     assert.strictEqual(actual, expected);

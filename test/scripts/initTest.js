@@ -4,8 +4,7 @@ import CONSTANTS from "../../src/constants.js";
 import { reloadSettings } from "../../src/settings.js"
 import ParseArgs from "@thaerious/parseargs";
 import assert from "assert";
-import { writeFileField } from "../../src/loadJSON.js";
-import logger from "../../src/setupLogger.js";
+import {fsjson} from "@thaerious/utility"
 
 const TEST_DIRECTORY = `test/temp`;
 const args = new ParseArgs().run();
@@ -23,7 +22,7 @@ const args = new ParseArgs().run();
             if (err) {
                 reject(err);
             } else {
-                writeFileField(CONSTANTS.NODE_PACKAGE_FILE, "name", "@mock/test");
+                fsjson.writeField(CONSTANTS.NODE_PACKAGE_FILE, "name", "@mock/test");
                 resolve(stdout);
             }
         });

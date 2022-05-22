@@ -1,13 +1,13 @@
 import CONSTANTS from "./constants.js";
 import Path from "path";
-import loadJSON from "./loadJSON.js";
+import { fsjson } from "@thaerious/utility";
 
 /**
  * Load settings from the widget.json file
  * Overwrite with command line settings
  **/
 function extractSettings () {
-    const packageJSON = loadJSON(CONSTANTS.NODE_PACKAGE_FILE);
+    const packageJSON = fsjson.load(CONSTANTS.NODE_PACKAGE_FILE);
 
     const defaultSettings = {
         package: packageJSON?.name || ``,
@@ -16,7 +16,7 @@ function extractSettings () {
         src: CONSTANTS.LOCATIONS.DEFAULT_SRC
     };
 
-    const settings = { ...defaultSettings, ...loadJSON(Path.join(CONSTANTS.WIDGET_PROPERTY_FILE)) };
+    const settings = { ...defaultSettings, ...fsjson.load(Path.join(CONSTANTS.WIDGET_PROPERTY_FILE)) };
 
     return {
         "node-modules": Path.join(CONSTANTS.NODE_MODULES_PATH),

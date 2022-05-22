@@ -2,14 +2,11 @@ import FS from "fs";
 import Path from "path";
 import Logger from "@thaerious/logger";
 import CONSTANTS from "../constants.js";
-import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
 import replaceInFile from "../replaceInFile.js";
-import mkdirIf from "../mkdirIf.js";
 import { addWidgetInfoFile } from "./init.js";
 import { Commands } from "../cli.js";
-import { bfsObject } from "../bfsObject.js";
-import { convertToDash, convertToPascal, convertDelimited } from "../names.js";
+import { convert, mkdirif, fsjson, bfsObject as bfs } from "@thaerious/utility";
 const logger = Logger.getLogger();
 
 function create (records, commands, args) {
@@ -32,7 +29,7 @@ function create (records, commands, args) {
 
 function createView (name, args) {
     const record = instantiateRecord(name, CONSTANTS.TYPE.VIEW);
-    const viewFullPath = mkdirIf(record.dir.src, record.view);
+    const viewFullPath = mkdirif(record.dir.src, record.view);
 
     addWidgetInfoFile(args.flags.package || settings.package);
 
@@ -46,7 +43,7 @@ function createView (name, args) {
     }
 
     if (!FS.existsSync(Path.join(record.dir.src, record.es6))) {
-        const path = mkdirIf(record.dir.src, record.es6);
+        const path = mkdirif(record.dir.src, record.es6);
         logger.channel(`verbose`).log(`  \\__ + ${path}`);
         FS.writeFileSync(path, ``);
     } else {
@@ -54,7 +51,7 @@ function createView (name, args) {
     }
 
     if (!FS.existsSync(Path.join(record.dir.src, record.style.src))) {
-        const path = mkdirIf(record.dir.src, record.style.src);
+        const path = mkdirif(record.dir.src, record.style.src);
         logger.channel(`verbose`).log(`  \\__ + ${path}`);
         FS.writeFileSync(path, ``);
     } else {
@@ -62,7 +59,7 @@ function createView (name, args) {
     }
 
     if (!FS.existsSync(Path.join(record.dir.src, CONSTANTS.FILENAME.BODY_FILE))) {
-        const path = mkdirIf(record.dir.src, CONSTANTS.FILENAME.BODY_FILE);
+        const path = mkdirif(record.dir.src, CONSTANTS.FILENAME.BODY_FILE);
         logger.channel(`verbose`).log(`  \\__ + ${path}`);
         FS.writeFileSync(path, ``);
     } else {
@@ -75,19 +72,19 @@ function createComponent (name, args) {
 
     addWidgetInfoFile(args.flags.package || settings.package);
 
-    if (convertToDash(name).split(`-`).length < 2) {
+    if (convert.dash(name).split(`-`).length < 2) {
         logger.channel(`standard`).log(`error: name must consist of two or more words (${name})`);
         process.exit();
     }
 
     const record = instantiateRecord(name, CONSTANTS.TYPE.COMPONENT);
 
-    const viewPath = mkdirIf(record.dir.src, record.view);
+    const viewPath = mkdirif(record.dir.src, record.view);
     if (!FS.existsSync(viewPath)) {
         logger.channel(`verbose`).log(`  \\__ + ${viewPath}`);
         FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_EJS, viewPath);
-        replaceInFile(viewPath, `\${name_dash}`, convertToDash(name));
-        replaceInFile(viewPath, `\${name_underscore}`, convertDelimited(name, `_`));
+        replaceInFile(viewPath, `\${name_dash}`, convert.dash(name));
+        replaceInFile(viewPath, `\${name_underscore}`, convert.delimiter(name, `_`));
         replaceInFile(viewPath, `\${style_path}`, Path.join(record.dir.sub, record.style.dest));
     } else {
         logger.channel(`verbose`).log(`  \\__ = ${viewPath}`);
@@ -97,8 +94,8 @@ function createComponent (name, args) {
     if (!FS.existsSync(scriptPath)) {
         logger.channel(`verbose`).log(`  \\__ + ${scriptPath}`);
         FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_MJS, scriptPath);
-        replaceInFile(scriptPath, `\${name_dash}`, convertToDash(name));
-        replaceInFile(scriptPath, `\${name_pascal}`, convertToPascal(name));
+        replaceInFile(scriptPath, `\${name_dash}`, convert.dash(name));
+        replaceInFile(scriptPath, `\${name_pascal}`, convert.pascal(name));
     } else {
         logger.channel(`verbose`).log(`  \\__ = ${scriptPath}`);
     }
@@ -107,7 +104,7 @@ function createComponent (name, args) {
     if (!FS.existsSync(stylePath)) {
         logger.channel(`verbose`).log(`  \\__ + ${stylePath}`);
         FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_SCSS, stylePath);
-        replaceInFile(stylePath, `\${name_dash}`, convertToDash(name));
+        replaceInFile(stylePath, `\${name_dash}`, convert.dash(name));
     } else {
         logger.channel(`verbose`).log(`  \\__ = ${stylePath}`);
     }
@@ -119,11 +116,11 @@ function instantiateRecord (name, type) {
     const widgetInfo = loadInfoFile(infoPath);
     record = buildRecord(record, name, type);
 
-    const current = bfsObject(widgetInfo, `fullName`, record.fullName);
+    const current = bfs.first(widgetInfo, `fullName`, record.fullName);
     if (current) return current;
 
     widgetInfo.components.push(record);
-    FS.writeFileSync(infoPath, JSON.stringify(widgetInfo, null, 4));
+    fsjson.save(infoPath, widgetInfo);
     return record;
 }
 
@@ -144,16 +141,16 @@ function buildRecord (source, name, type) {
     const record = {
         ...{
             type: type,
-            fullName: Path.join(root, convertToDash(name)),
+            fullName: Path.join(root, convert.dash(name)),
             view: Path.join(name + `.ejs`),
-            es6: Path.join(convertToPascal(name) + `.mjs`),
+            es6: Path.join(convert.pascal(name) + `.mjs`),
             style: {
                 src: Path.join(name + `.scss`),
                 dest: Path.join(name + `.css`)
             },
             dir: {
-                sub: Path.join(settings.package, root, convertToDash(name)),
-                src: Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? `src` : `src`], settings.package, root, convertToDash(name))
+                sub: Path.join(settings.package, root, convert.dash(name)),
+                src: Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? `src` : `src`], settings.package, root, convert.dash(name))
             },
             package: settings.package
         },
@@ -161,22 +158,16 @@ function buildRecord (source, name, type) {
     };
 
     if (type === CONSTANTS.TYPE.COMPONENT) {
-        record.tagName = convertToDash(name);
+        record.tagName = convert.dash(name);
     }
 
     return record;
 }
 
 function loadInfoFile (path) {
-    if (!FS.existsSync(path)) {
-        const widgetInfo = {
-            components: []
-        };
-        mkdirIf(path);
-        FS.writeFileSync(path, JSON.stringify(widgetInfo, null, 4));
-    }
-
-    return loadJSON(path);
+    if (!FS.existsSync(path))
+        fsjson.merge(mkdirif(path), {components: []});
+    return fsjson.load(path);
 }
 
 export default create;

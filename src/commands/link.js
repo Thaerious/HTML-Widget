@@ -2,8 +2,7 @@ import FS from "fs";
 import Path from "path";
 import CONSTANTS from "../constants.js";
 import settings from "../settings.js";
-import loadJSON from "../loadJSON.js";
-import seekFiles from "../seekFiles.js";
+import {seekfiles, fsjson} from "@thaerious/utility";
 import Logger from "@thaerious/logger";
 
 const logger = Logger.getLogger();
@@ -22,11 +21,11 @@ async function link (records, commands, args) {
 
 function discover (path, settings) {
     logger.channel(`very-verbose`).log(`  \\__ path ${path}`);
-    const files = seekFiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
+    const files = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
     for (const file of files) {
         logger.channel(`debug`).log(`    \\__ file ${JSON.stringify(file, null, 2)}`);
-        const widgetInfo = loadJSON(file.full);
+        const widgetInfo = fsjson.load(file.full);
 
         if (widgetInfo.link) {
             logger.channel(`very-verbose`).log(`    \\__ link ${file.full}`);

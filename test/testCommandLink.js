@@ -3,7 +3,7 @@ import FS from "fs";
 import init from "../src/commands/init.js";
 import link from "../src/commands/link.js";
 import {init_all, clean_up, itHasFiles } from "./scripts/initTest.js";
-import loadJSON, {saveJSON} from "../src/loadJSON.js";
+import {fsjson} from "@thaerious/utility"
 
 describe(`Test Command Init`, async function () {
     before(init_all);
@@ -19,7 +19,7 @@ describe(`Test Command Init`, async function () {
 
         describe("the directory only requires a widget.info file with link field", function(){
             before(function(){
-                saveJSON("client-src/manual/widget.info", {link : "manual"});
+                fsjson.save("client-src/manual/widget.info", {link : "manual"});
                 link();
             });
 
@@ -28,7 +28,7 @@ describe(`Test Command Init`, async function () {
 
         describe("change the link value to change the resulting link target", function(){
             before(function(){
-                saveJSON("client-src/manual2/widget.info", {link : "ima-manual"});
+                fsjson.save("client-src/manual2/widget.info", {link : "ima-manual"});
                 link();
             });
 

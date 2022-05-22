@@ -1,10 +1,10 @@
 import FS from "fs";
 import Path from "path";
 import settings from "../settings.js";
-import loadJSON from "../loadJSON.js";
+import {fsjson} from "@thaerious/utility";
 import getPropertyFiles from "../getPropertyFiles.js";
 import CONSTANTS from "../constants.js";
-import mkdirIf from "../mkdirIf.js";
+import {mkdirif} from "@thaerious/utility";
 import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
@@ -25,7 +25,7 @@ function importPackages (records, commands, args) {
     // discover in packages
     for (const packageFile of getPropertyFiles(CONSTANTS.NODE_PACKAGE_FILE)) {
         logger.channel(`verbose`).log(` \\__ ${packageFile.full}`);
-        const packageJSON = loadJSON(packageFile.full);
+        const packageJSON = fsjson.load(packageFile.full);
 
         if (typeof packageJSON.name !== `string`) continue;
         if (typeof packageJSON.browser !== `string`) continue;
@@ -34,7 +34,7 @@ function importPackages (records, commands, args) {
         linkPackage(packageJSON);
     }
 
-    const importMapPath = mkdirIf(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
+    const importMapPath = mkdirif(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
     FS.writeFileSync(importMapPath, JSON.stringify(importMap, null, 2));
 
     logger.channel(`debug`).log(JSON.stringify(importMap, null, 2));

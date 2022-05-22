@@ -1,9 +1,8 @@
 import Path from "path";
 import Logger from "@thaerious/logger";
 import CONSTANTS from "../constants.js";
-import loadJSON from "../loadJSON.js";
 import settings from "../settings.js";
-import seekFiles from "../seekFiles.js";
+import {seekfiles, fsjson} from "@thaerious/utility";
 import getPropertyFiles from "../getPropertyFiles.js";
 
 const logger = Logger.getLogger();
@@ -20,7 +19,7 @@ function discover (records, commands, args) {
 
     // discover in packages
     for (const widgetrcFileDesc of getPropertyFiles()) {
-        const widgetrc = loadJSON(widgetrcFileDesc.full);
+        const widgetrc = fsjson.load(widgetrcFileDesc.full);
         logger.channel(`debug`).log(`    \\__ widgetrcFileDesc.full ${widgetrcFileDesc.full}`);
         logger.channel(`debug`).log(`    \\__ widgetrcFileDesc.dir ${widgetrcFileDesc.dir}`);
         logger.channel(`debug`).log(`    \\__ widgetrc.input ${widgetrc.input}`);
@@ -30,10 +29,10 @@ function discover (records, commands, args) {
 }
 
 function _discover (records, path, settings) {
-    const files = seekFiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
+    const files = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
     for (const file of files) {
-        const widgetInfo = loadJSON(file.full);
+        const widgetInfo = fsjson.load(file.full);
 
         if (!widgetInfo.components) continue;
         for (const component of widgetInfo.components) {

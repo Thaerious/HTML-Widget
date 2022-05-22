@@ -6,7 +6,7 @@ import create from "../src/commands/create.js";
 import { Commands } from "../src/cli.js";
 import {init_all, clean_up } from "./scripts/initTest.js";
 import settings from "../src/settings.js";
-import loadJSON from "../src/loadJSON.js";
+import { fsjson } from "@thaerious/utility";
 const args = new ParseArgs().run();
 
 settings[`package`] = `@mock/test`;
@@ -52,7 +52,7 @@ describe(`Test Command Create View`, function () {
                 FS.writeFileSync(`client-src/@mock/test/index/index.ejs`, `not-modified`);
                 FS.writeFileSync(`client-src/@mock/test/index/index.scss`, `not-modified`);
 
-                const json = loadJSON(`client-src/@mock/test/index/widget.info`);
+                const json = fsjson.load(`client-src/@mock/test/index/widget.info`);
                 json.modified = "not-modified";
                 FS.writeFileSync(`client-src/@mock/test/index/widget.info`, JSON.stringify(json, null, 2));
 
@@ -86,7 +86,7 @@ describe(`Test Command Create View`, function () {
             });
 
             it(`doesn't overwrite widget.info file`, function () {
-                const actual = loadJSON(`client-src/@mock/test/index/widget.info`).modified;
+                const actual = fsjson.load(`client-src/@mock/test/index/widget.info`).modified;
                 const expected = `not-modified`;
                 assert.strictEqual(actual, expected);
             });
@@ -145,7 +145,7 @@ describe(`Test Command Create View`, function () {
                 FS.writeFileSync(`client-src/@mock/test/index/index.ejs`, `not-modified`);
                 FS.writeFileSync(`client-src/@mock/test/index/index.scss`, `not-modified`);
 
-                const json = loadJSON(`client-src/@mock/test/index/widget.info`);
+                const json = fsjson.load(`client-src/@mock/test/index/widget.info`);
                 json.modified = "not-modified";
                 FS.writeFileSync(`client-src/@mock/test/index/widget.info`, JSON.stringify(json, null, 2));
 
@@ -181,7 +181,7 @@ describe(`Test Command Create View`, function () {
             });
 
             it(`doesn't overwrite widget.info file`, function () {
-                const actual = loadJSON(`client-src/@mock/test/index/widget.info`).modified;
+                const actual = fsjson.load(`client-src/@mock/test/index/widget.info`).modified;
                 const expected = `not-modified`;
                 assert.strictEqual(actual, expected);
             });
@@ -194,7 +194,7 @@ describe(`Test Command Create View`, function () {
                 FS.writeFileSync(`client-src/@mock/test/index/index.ejs`, `not-modified`);
                 FS.writeFileSync(`client-src/@mock/test/index/index.scss`, `not-modified`);
 
-                const json = loadJSON(`client-src/@mock/test/index/widget.info`);
+                const json = fsjson.load(`client-src/@mock/test/index/widget.info`);
                 json.modified = "not-modified";
                 FS.writeFileSync(`client-src/@mock/test/index/widget.info`, JSON.stringify(json, null, 2));
 
@@ -230,7 +230,7 @@ describe(`Test Command Create View`, function () {
             });
 
             it(`doesn't overwrite widget.info file`, function () {
-                const actual = loadJSON(`client-src/@mock/test/index/widget.info`).modified;
+                const actual = fsjson.load(`client-src/@mock/test/index/widget.info`).modified;
                 const expected = `not-modified`;
                 assert.strictEqual(actual, expected);
             });
@@ -243,7 +243,7 @@ describe(`Test Command Create View`, function () {
                 FS.writeFileSync(`client-src/@mock/test/index/index.ejs`, `not-modified`);
                 FS.writeFileSync(`client-src/@mock/test/index/index.scss`, `not-modified`);
 
-                const json = loadJSON(`client-src/@mock/test/index/widget.info`);
+                const json = fsjson.load(`client-src/@mock/test/index/widget.info`);
                 json.modified = "not-modified";
                 FS.writeFileSync(`client-src/@mock/test/index/widget.info`, JSON.stringify(json, null, 2));
 
@@ -279,7 +279,7 @@ describe(`Test Command Create View`, function () {
             });
 
             it(`doesn't overwrite widget.info file`, function () {
-                const actual = loadJSON(`client-src/@mock/test/index/widget.info`).modified;
+                const actual = fsjson.load(`client-src/@mock/test/index/widget.info`).modified;
                 const expected = `not-modified`;
                 assert.strictEqual(actual, expected);
             });
@@ -292,7 +292,7 @@ describe(`Test Command Create View`, function () {
                 FS.writeFileSync(`client-src/@mock/test/index/index.ejs`, `not-modified`);
                 FS.writeFileSync(`client-src/@mock/test/index/index.scss`, `not-modified`);
 
-                const json = loadJSON(`client-src/@mock/test/index/widget.info`);
+                const json = fsjson.load(`client-src/@mock/test/index/widget.info`);
                 json.modified = "not-modified";
                 FS.writeFileSync(`client-src/@mock/test/index/widget.info`, JSON.stringify(json, null, 2));
 
@@ -328,7 +328,7 @@ describe(`Test Command Create View`, function () {
             });
 
             it(`doesn't overwrite widget.info file`, function () {
-                const actual = loadJSON(`client-src/@mock/test/index/widget.info`).modified;
+                const actual = fsjson.load(`client-src/@mock/test/index/widget.info`).modified;
                 const expected = `not-modified`;
                 assert.strictEqual(actual, expected);
             });
