@@ -9,8 +9,7 @@ const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.flags.cwd) process.chdir(args.flags.cwd);
 
 const logger = Logger.getLogger();
-logger.channel(`server`).links.add(logger.channel(`standard`));
-const log = logger.all();
+const log = logger.all("server");
 
 class Server {
     constructor () {
@@ -51,7 +50,7 @@ class Server {
     }
 
     stop () {
-        log.server(`Stopping this.server`);
+        log.server(`Stopping server`);
         this.server.close();
         process.exit();
     }

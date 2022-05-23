@@ -9,13 +9,14 @@ import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
 /**
-* Build the www/compiled/input_map.ejs file from .widgetrc files.
-* Searches for property files (.widgetrc) in all packages.
+* Builds the import map file and links packages from node_modules to /linked.
+* 
+* Every package.json file with either a 'browser' field, or a 'module' field 
+* will have a link created to the value of that filed in the /linked directory.
+* It will also be given an entry in the import map.  This entry will have the
+* key as the package name, and the value as the entry in the browser/module field.
 *
-* The .widgetrc file must contain the 'modules' field.  This will
-* be appended to the package path resulting in the value of the
-* import statment.  The key will be the package name found in
-* the package.json file.
+* Node: The browser field takes precedence over the module field.
 */
 function importPackages (records, commands, args) {
     const importMap = {
@@ -28,9 +29,13 @@ function importPackages (records, commands, args) {
         const packageJSON = fsjson.load(packageFile.full);
 
         if (typeof packageJSON.name !== `string`) continue;
-        if (typeof packageJSON.browser !== `string`) continue;
+        
+        let moduleLoc = undefined;
+        if (typeof packageJSON.browser === 'string') moduleLoc = packageJSON.browser;
+        else if (typeof packageJSON.module === 'string') moduleLoc = packageJSON.module;
+        else continue;
 
-        importMap.imports[packageJSON.name] = Path.join(`/`, packageJSON.name, packageJSON.browser);
+        importMap.imports[packageJSON.name] = Path.join(`/`, packageJSON.name, moduleLoc);
         linkPackage(packageJSON);
     }
 

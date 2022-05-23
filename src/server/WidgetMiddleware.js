@@ -4,10 +4,8 @@ import build from "../commands/build.js";
 import CONSTANTS from "../constants.js";
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "../parseArgsOptions.js";
-import Logger from "@thaerious/logger";
-import url from "url";
+import logger from "../setupLogger.js";
 import settings from "../settings.js";
-const logger = Logger.getLogger();
 
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 
@@ -23,12 +21,12 @@ class WidgetMiddleware {
     async middleware (req, res, next) {
         this._records = {};
         discover(this._records);
-        const myurl = url.URL(req.url).pathname.substr(1);
+        const myurl = req.originalUrl.substring(1);
 
         if (this._records[myurl]) {
             const record = this.records[myurl];
             if (record.type === CONSTANTS.TYPE.VIEW) {
-                logger.channel(`standard`).log(`#view ${record.fullName}`);
+                logger.standard(`#view ${record.fullName}`);
                 await build(this._records, null, args);
 
                 const path = Path.join(record.dir.sub, record.view);
@@ -43,8 +41,8 @@ class WidgetMiddleware {
 
                 res.render(path, data, (err, html) => {
                     if (err) {
-                        logger.channel(`error`).log(`ERROR: view rendering`);
-                        logger.channel(`error`).log(JSON.stringify(err, null, 2));
+                        logger.error(`ERROR: view rendering`);
+                        logger.error(JSON.stringify(err, null, 2));
                         res.status(500);
                         res.send(err);
                     } else res.send(html);

@@ -18,4 +18,4 @@ if (args.count(`verbose`) >= 1) logger.channel(`verbose`).enabled = true;
 if (args.count(`verbose`) >= 2) logger.channel(`very-verbose`).enabled = true;
 if (args.count(`verbose`) >= 3) logger.channel(`debug`).enabled = true;
 
-export default logger;
+export default logger.all();

@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "./parseArgsOptions.js";
-
 import logger from "./setupLogger.js";
+
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.flags.cwd) process.chdir(args.flags.cwd);
 
@@ -37,7 +36,7 @@ class Commands {
 
 let commands;
 
-logger.channel(`verbose`).log(`Widget command line interface`);
+logger.verbose(`Widget command line interface`);
 
 (async () => {
     try {
@@ -61,10 +60,10 @@ async function cli (commandStack) {
 
     while (commandStack.length > 0) {
         const module = `./commands/${commands.nextCommand().replaceAll(`-`, `_`)}.js`;
-        logger.channel(`debug`).log(` -- ${module}`);
+        logger.debug(` -- ${module}`);
 
         if (module.endsWith(`widget.js`) || module.endsWith(`cli.js`)) {
-            logger.channel(`debug`).log(` -- started`);
+            logger.debug(` -- started`);
             started = true;
             continue;
         }
@@ -74,9 +73,9 @@ async function cli (commandStack) {
         }
 
         const { default: command } = await import(module);
-        logger.channel(`verbose`).log(`# ${commands.prev}`);
+        logger.verbose(`# ${commands.prev}`);
         rvalue = await command(records, commands, args);
-        logger.channel(`very-verbose`).log(`uptime ${process.uptime()} s`);
+        logger["very-verbose"](`uptime ${process.uptime()} s`);
     }
 
     return rvalue;

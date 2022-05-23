@@ -1,10 +1,9 @@
 import Path from "path";
 import sass from "sass";
 import FS from "fs";
-import Logger from "@thaerious/logger";
-import mkdirIf from "../mkdirIf.js";
+import { mkdirif } from "@thaerious/utility";
 import settings from "../settings.js";
-const logger = Logger.getLogger().all();
+import logger from "../setupLogger.js";
 
 /**
  * Compile sass files into css files and place then into
@@ -37,7 +36,7 @@ function renderSCSS (record, settings) {
     const result = sass.compile(src);
 
     if (result) {
-        mkdirIf(outpath);
+        mkdirif(outpath);
         FS.writeFileSync(outpath, result.css);
         logger.verbose(`      \\_ ${src}`);
         logger.verbose(`      \\_ ${outpath}`);
