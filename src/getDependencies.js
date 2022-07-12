@@ -29,11 +29,11 @@ async function getDependencies (rootRecord, records) {
         logger.channel(`debug`).log(`  \\__ considering ${record.fullName}`);
 
         try {
-            if (!record.view || record.view === ``) continue;
+            if (!record.view || record.view === ``) continue;            
             const path = Path.join(record.dir.src, record.view);
             if (!FS.existsSync(path)) continue;
 
-            const fileString = await render(path, record);
+            const fileString = await render(path, record, record.data);
             const dom = parseHTML(fileString);
             const template = dom.document.querySelector(`template`);
 
@@ -58,15 +58,18 @@ async function getDependencies (rootRecord, records) {
  * Render the html file to search for widgets.
  * Set ejs variable 'prebuild' to true which turns off injecting the template file.
  */
-async function render (path, record) {
+async function render (path, record, dataIn) {
     return new Promise((resolve, reject) => {
         const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
         const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
 
         const data = {
-            prebuild: true,
-            lib_file: Path.resolve(libFile),
-            template_file: Path.resolve(templateFile)
+            widget : {
+                prebuild: true,
+                lib_file: Path.resolve(libFile),
+                template_file: Path.resolve(templateFile)
+            },
+            ...dataIn
         };
 
         ejs.renderFile(path, data, {}, function (err, str) {
