@@ -3,6 +3,8 @@ import parseArgsOptions from "../parseArgsOptions.js";
 import Logger from "@thaerious/logger";
 import Express from "express";
 import http from "http";
+import FS from "fs";
+import Path from "path";
 import { WidgetMiddleware } from "./WidgetMiddleware.js";
 
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
@@ -12,7 +14,7 @@ const logger = Logger.getLogger();
 const log = logger.all("server");
 
 class Server {
-    constructor () {
+    async init () {
         const wmw = new WidgetMiddleware();
         this.app = Express();
 
@@ -25,6 +27,8 @@ class Server {
         this.app.set(`view engine`, `ejs`);
         this.app.use((req, res, next) => wmw.middleware(req, res, next));
 
+        await this.loadRoutes();
+
         this.app.use(Express.static(`www/static`));
         this.app.use(Express.static(`www/compiled`));
         this.app.use(Express.static(`www/linked`));
@@ -36,6 +40,8 @@ class Server {
             res.send(`404: page not found`);
             res.end();
         });
+
+        return this;
     }
 
     start (port = 8000, ip = `0.0.0.0`) {
@@ -53,6 +59,19 @@ class Server {
         log.server(`Stopping server`);
         this.server.close();
         process.exit();
+    }
+
+    async loadRoutes(path = "www/routes"){
+        if (!FS.existsSync(path)) return;
+        
+        const contents = FS.readdirSync(path);
+        for (const entry of contents){            
+            const fullpath = Path.join(process.cwd(), path, entry);
+            console.log(fullpath);
+            console.log(process.cwd());
+            const { default: route } = await import(fullpath);
+            this.app.use(route);
+        }        
     }
 }
 

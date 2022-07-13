@@ -17,6 +17,8 @@ logger.channel(`warning`).enabled = true;
 logger.channel(`error`).enabled = true;
 logger.channel(`warning`).prefix = (f, l, o) => `* WARNING `;
 
-(() => {
-    new Server().start();
+(async () => {
+    const server = new Server();
+    await server.init();
+    server.start();
 })();
