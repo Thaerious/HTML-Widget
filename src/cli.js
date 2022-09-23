@@ -43,10 +43,10 @@ logger.verbose(`Widget command line interface`);
         await cli(args.args);
     } catch (err) {
         if (err.code === `ERR_MODULE_NOT_FOUND`) {
-            logger.channel(`standard`).log(`unknown command : ${commands.prev}`);
-            logger.channel(`standard`).log(err);
+            logger.standard(`unknown command : ${commands.prev}`);
+            logger.standard(err);
         } else {
-            logger.channel(`error`).log(`ERROR`);
+            logger.standard(`ERROR`);
             console.log(err);
         }
     }

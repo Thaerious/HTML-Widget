@@ -4,11 +4,12 @@ import CONSTANTS from "../constants.js";
 import settings from "../settings.js";
 import {seekfiles, fsjson} from "@thaerious/utility";
 import getPropertyFiles from "../getPropertyFiles.js";
+import loadRecords from "../loadRecords.js";
 
 const logger = Logger.getLogger();
 
 /**
- * Examine source directories for components and views.
+ * Examine source directories (client-src) for components and views.
  * @param {Object} records a dictionary of name -> record
  * @param {Command} commands a Command object (see cli.js)
  * @param {ParseArgs} args a parseargs object (see @thaerious/parseargs)
@@ -29,30 +30,19 @@ function discover (records, commands, args) {
 }
 
 function _discover (records, path, settings) {
-    const files = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
-
-    for (const file of files) {
-        const widgetInfo = fsjson.load(file.full);
-
-        if (!widgetInfo.components) continue;
-        for (const component of widgetInfo.components) {
-            component.dir = component.dir || {};
-            component.dir.src = component.dir.scr || file.dir;
-            component.dir.dest = Path.join(settings[`output-dir`], component.package, component.fullName);
-            storeRecord(records, component);
-
-            logger.channel(`very-verbose`).log(`    \\__ ${file.full}`);
-        }
+    for (const record of loadRecords(path)){
+        storeRecord(records, record);
+        logger.channel(`very-verbose`).log(`    \\__ ${record.tagname}`);
     }
 }
 
-function storeRecord (records, component) {
-    if (records[component.fullName]) {
-        logger.channel(`warning`).log(`duplicate component: ${component.package}:${component.fullName}`);
+function storeRecord (records, record) {
+    if (records[record.fullName]) {
+        logger.channel(`warning`).log(`duplicate component: ${record.package}:${record.fullName}`);
     }
 
-    records[component.fullName] = component;
-    logger.channel(`verbose`).log(` \\__ ${component.package}:${component.fullName}`);
+    records[record.fullName] = record;
+    logger.channel(`verbose`).log(` \\__ ${record.package}:${record.fullName}`);
 }
 
 export default discover;

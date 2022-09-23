@@ -21,6 +21,10 @@ function create (records, commands, args) {
         commands.nextCommand();
         createView(commands.nextCommand(), args);
         break;
+    case `server`:
+        commands.nextCommand();
+        createServer(args);
+        break;
     default:
         createComponent(commands.nextCommand(), args);
         break;
@@ -73,7 +77,7 @@ function createComponent (name, args) {
     addWidgetInfoFile(args.flags.package || settings.package);
 
     if (convert.dash(name).split(`-`).length < 2) {
-        logger.channel(`standard`).log(`error: name must consist of two or more words (${name})`);
+        logger.channel(`standard`).log(`error: name must consist of two or more dash-delimited words (${name})`);
         process.exit();
     }
 
@@ -168,6 +172,17 @@ function loadInfoFile (path) {
     if (!FS.existsSync(path))
         fsjson.merge(mkdirif(path), {components: []});
     return fsjson.load(path);
+}
+
+function createServer(){
+    const destPath = mkdirif(CONSTANTS.LOCATIONS.SERVER, CONSTANTS.SERVER_DEST_FILE);
+    const srcPath = Path.join(
+        settings[`node-modules`],
+        CONSTANTS.MODULE_NAME, 
+        CONSTANTS.SERVER_SRC_FILE
+    );
+
+    FS.copyFileSync(srcPath, destPath);
 }
 
 export default create;

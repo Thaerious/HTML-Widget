@@ -13,7 +13,8 @@ function extractSettings () {
         package: packageJSON?.name || ``,
         "output-dir": CONSTANTS.LOCATIONS.OUTPUT,
         "link-dir": CONSTANTS.LOCATIONS.LINK_DIR,
-        src: CONSTANTS.LOCATIONS.DEFAULT_SRC
+        src: CONSTANTS.LOCATIONS.DEFAULT_SRC,
+        "server-dir": CONSTANTS.LOCATIONS.SERVER
     };
 
     const settings = { ...defaultSettings, ...fsjson.load(Path.join(CONSTANTS.WIDGET_PROPERTY_FILE)) };

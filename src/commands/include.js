@@ -30,6 +30,7 @@ async function include (records, commands, args) {
         return;
     }
 
+    // for each record by name
     for (const fullName in records) {
         try {
             await doInclude(settings, records[fullName], records);
@@ -49,11 +50,11 @@ async function doInclude (settings, record, records) {
     logger.channel(`verbose`).log(`  \\__ ${record.fullName}`);
 
     const dependencies = await getDependencies(record, records);
-    const filename = Path.join(record.dir.dest, CONSTANTS.FILENAME.TEMPLATES);
-    logger.channel(`very-verbose`).log(`  \\__ dest ${filename}`);
+    const templatesFilename = Path.join(record.dir.dest, CONSTANTS.FILENAME.TEMPLATES);
+    logger.channel(`very-verbose`).log(`  \\__ dest ${templatesFilename}`);
 
     if (!FS.existsSync(record.dir.dest)) FS.mkdirSync(record.dir.dest, { recursive: true });
-    const fp = FS.openSync(filename, `w`);
+    const fp = FS.openSync(templatesFilename, `w`);
 
     for (const dependency of dependencies) {
         logger.channel(`very-verbose`).log(`  \\__ dependency ${dependency.fullName}`);

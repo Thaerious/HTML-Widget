@@ -5,6 +5,8 @@ const CONSTANTS = {
     WIDGET_INFO_FILE: `widget.info`,
     NODE_PACKAGE_FILE: `package.json`,
     NODE_MODULES_PATH: `node_modules`,
+    SERVER_SRC_FILE: `src/server/Server.js`,
+    SERVER_DEST_FILE: `Server.js`,
     MODULE_NAME: Path.join(`@html-widget`, `core`),
     FILENAME: {
         LIB_FILE: `import_map.ejs`,
@@ -18,10 +20,12 @@ const CONSTANTS = {
 };
 
 CONSTANTS.LOCATIONS = {
+    ROUTES_DIR: Path.join('server-src', 'routes'),
     STATIC_DIR: Path.join(`www`, `static/`),
     LINK_DIR: Path.join(`www`, `linked/`),
     OUTPUT: Path.join(`www`, `compiled/`),
-    DEFAULT_SRC: `client-src`,
+    DEFAULT_SRC: `client-src/`,
+    SERVER: `server-src/`,
     TEMPLATES: Path.join(CONSTANTS.NODE_MODULES_PATH, CONSTANTS.MODULE_NAME, `templates`)
 };
 

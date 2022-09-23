@@ -33,10 +33,12 @@ async function getDependencies (rootRecord, records) {
             const path = Path.join(record.dir.src, record.view);
             if (!FS.existsSync(path)) continue;
 
+            // Tranform the .ejs into .html to parse out nested components.
             const fileString = await render(path, record, record.data);
             const dom = parseHTML(fileString);
             const template = dom.document.querySelector(`template`);
 
+            // For every record add record tagnames that match the element tagname
             for (const fullName in records) {
                 const record = records[fullName];
                 if (visited.has(record)) continue;

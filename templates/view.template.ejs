@@ -3,16 +3,12 @@
 <head>
     <link rel="stylesheet" href="/${style}">
     <script type="importmap">
-        <% if (typeof widget.prebuild === "undefined" || !widget.prebuild) { %>
         <%- include(widget.lib_file) %>
-        <% } %>
     </script>
 </head>
 <body>
     <script type="module" src="/${script}"></script>
-    <% if (typeof widget.prebuild === "undefined" || !widget.prebuild) { %>
     <%- include(widget.template_file) %>
-    <% } %>
     <%- include('./body.ejs'); %>
 </body>
 </html>

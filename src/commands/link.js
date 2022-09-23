@@ -16,10 +16,10 @@ const logger = Logger.getLogger();
  * file.  By default the directory name.
 */
 async function link (records, commands, args) {
-    discover(settings.src, settings);
+    _link(settings.src, settings);
 }
 
-function discover (path, settings) {
+function _link (path, settings) {
     logger.channel(`very-verbose`).log(`  \\__ path ${path}`);
     const files = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 

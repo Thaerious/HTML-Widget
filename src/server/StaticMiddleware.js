@@ -8,7 +8,7 @@ import settings from "../settings.js";
 
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 
-class WidgetMiddleware {
+class StaticMiddleware {
     constructor() {
         this._records = {};
     }
@@ -74,4 +74,4 @@ class WidgetMiddleware {
     }
 }
 
-export { WidgetMiddleware };
+export default StaticMiddleware;
