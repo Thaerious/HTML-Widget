@@ -1,11 +1,12 @@
 import FS from "fs";
 import Path from "path";
 import CONSTANTS from "../constants.js";
-import {fsjson, mkdirif} from "@thaerious/utility"
+import { fsjson, mkdirif } from "@thaerious/utility"
 import settings from "../settings.js";
 import Logger from "@thaerious/logger";
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "../parseArgsOptions.js";
+import { createReference } from "./reference.js";
 const logger = Logger.getLogger();
 
 /**
@@ -14,18 +15,19 @@ const logger = Logger.getLogger();
  * @param {Command} commands a Command object (see cli.js)
  * @param {ParseArgs} args a parseargs object (see @thaerious/parseargs)
  */
-function init (records, commands, args) {
+function init(records, commands, args) {
     args = args || new ParseArgs().loadOptions(parseArgsOptions).run();
     addWidgetRC(args);
     updateWidgetRC(args);
     addWidgetInfoFile(args.flags.package || settings.package);
     mkdirif(CONSTANTS.LOCATIONS.STATIC_DIR);
+    createReference(CONSTANTS.MODULE_NAME);
 }
 
 /**
  * Create the .widgetrc file in the root directory.
  */
-function addWidgetRC (args) {
+function addWidgetRC(args) {
     if (FS.existsSync(settings[`widget-rc`])) return;
 
     const widgetrc = {
@@ -42,7 +44,7 @@ function addWidgetRC (args) {
     fsjson.save(settings[`widget-rc`], widgetrc);
 }
 
-function updateWidgetRC(args){
+function updateWidgetRC(args) {
     const widgetrc = fsjson.load(settings[`widget-rc`]);
     if (args.flags.output) widgetrc[`output-dir`] = args.flags.output;
     if (args.flags.src) widgetrc.src = args.flags.src;
@@ -59,9 +61,9 @@ function updateWidgetRC(args){
  * The default widget.info file contains only the link field.
  * @param {string} pkg The name of the package to add.
  */
-function addWidgetInfoFile (pkg) {
-    const widgetInfo = fsjson.load(settings.src, pkg, CONSTANTS.WIDGET_INFO_FILE);
-    const path = Path.join(settings.src, pkg, CONSTANTS.WIDGET_INFO_FILE);
+function addWidgetInfoFile(pkg) {
+    const widgetInfo = fsjson.load(settings['client-src'], pkg, CONSTANTS.WIDGET_INFO_FILE);
+    const path = Path.join(settings['client-src'], pkg, CONSTANTS.WIDGET_INFO_FILE);
 
     if (!FS.existsSync(path)) {
         logger.channel(`verbose`).log(`  \\__ + ${path}`);

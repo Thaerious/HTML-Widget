@@ -16,10 +16,11 @@ const logger = Logger.getLogger();
  * file.  By default the directory name.
 */
 async function link (records, commands, args) {
-    _link(settings.src, settings);
+    linkClientSrc(settings['client-src'], settings);    
+    linkPackages();
 }
 
-function _link (path, settings) {
+function linkClientSrc (path, settings) {
     logger.channel(`very-verbose`).log(`  \\__ path ${path}`);
     const files = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
@@ -42,6 +43,38 @@ function _link (path, settings) {
             logger.channel(`verbose`).log(`  \\__ link ${link}`);
         }
     }
+}
+
+/**
+ * Create a symlink in the www/linked directory for each 
+ * package linked in the root widget.info file.
+ * @param {*} packageJSON 
+ */
+function linkPackages(){
+    const widgetInfoPath = Path.join(settings['client-src'], CONSTANTS.WIDGET_INFO_FILE);
+    let widgetInfo = fsjson.load(widgetInfoPath);
+    if (!widgetInfo.imports) return;
+
+    for (const name in widgetInfo.imports){
+        const pkgPath = widgetInfo.imports[name].path;
+        const fullpath = Path.join(CONSTANTS.NODE_MODULES_PATH, pkgPath, settings[`package-json`]);
+        const pkgJSON = fsjson.load(fullpath);
+        linkPackage(pkgJSON);
+    }
+}
+
+function linkPackage (pkgJSON) {
+    logger.channel(`very-verbose`).log(`    \\__ link ${pkgJSON.name}`);
+    const from = Path.join(CONSTANTS.NODE_MODULES_PATH, pkgJSON.name);
+    const to = Path.join(settings[`link-dir`], pkgJSON.name);
+
+    if (!FS.existsSync(Path.parse(to).dir)) FS.mkdirSync(Path.parse(to).dir, { recursive: true });
+    if (FS.existsSync(to)) FS.rmSync(to, { recursive: true });
+
+    logger.channel(`verbose`).log(`  \\__ from ${from}`);
+    logger.channel(`verbose`).log(`  \\__ to ${to}`);
+
+    FS.symlinkSync(Path.resolve(from), to);
 }
 
 export default link;

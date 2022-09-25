@@ -24,6 +24,11 @@ const parseArgsOptions = {
             long: `dest`,
             short: `d`,
             type: `string`
+        },
+        {
+            long: `path`,
+            short: `p`,
+            type: `string`
         }
     ]
 };

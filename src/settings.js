@@ -13,7 +13,7 @@ function extractSettings () {
         package: packageJSON?.name || ``,
         "output-dir": CONSTANTS.LOCATIONS.OUTPUT,
         "link-dir": CONSTANTS.LOCATIONS.LINK_DIR,
-        src: CONSTANTS.LOCATIONS.DEFAULT_SRC,
+        "client-src": CONSTANTS.LOCATIONS.DEFAULT_SRC,
         "server-dir": CONSTANTS.LOCATIONS.SERVER
     };
 
@@ -26,7 +26,7 @@ function extractSettings () {
         package: settings.package,
         "output-dir": Path.join(settings[`output-dir`]),
         "link-dir": Path.join(settings[`link-dir`]),
-        src: Path.join(settings.src)
+        "client-src": Path.join(settings['client-src'])
     };
 }
 

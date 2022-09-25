@@ -16,7 +16,7 @@ const logger = Logger.getLogger();
  */
 function discover (records, commands, args) {
     // discover local source
-    _discover(records, settings.src, settings);
+    _discover(records, settings['client-src'], settings);
 
     // discover in packages
     for (const widgetrcFileDesc of getPropertyFiles()) {

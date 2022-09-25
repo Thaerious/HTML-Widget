@@ -12,7 +12,7 @@ import loadRecords from "../loadRecords.js";
  */
 function tree(records, commands, args) {
     
-    for (const record of loadRecords(settings.src)){
+    for (const record of loadRecords(settings['client-src'])){
         if (record.type == "view"){
             const templatesFilename = Path.join(record.dir.dest, CONSTANTS.FILENAME.TEMPLATES);
             mkdirif(templatesFilename);

@@ -3,7 +3,7 @@ import link from "./link.js";
 import style from "./style.js";
 import include from "./include.js";
 import tree from "./tree.js";
-import importPackages from "./import_packages.js";
+import doimport from "./doimport.js";
 import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
@@ -23,7 +23,7 @@ async function build (records, commands, args) {
     style(records);
 
     logger.channel(`verbose`).log(`# import packages`);
-    importPackages(records);
+    doimport(records);
 
     logger.channel(`verbose`).log(`# include`);
     await include(records);

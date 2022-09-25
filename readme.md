@@ -93,6 +93,21 @@ npx widget include
 
 Populates the templates.ejs file for each view.  This file copies all the required .ejs files from each component element.  The required files are determined automatically by traversing the DOM and looking for components.
 
+Reference
+=========
+
+npx widget reference NAME
+npx widget reference NAME -p,--path FILEPATH
+npx widget reference NAME -p,--path DIRPATH
+
+Add an external refernce to the to the import map file.  
+
+1) If just the name is provided then the package in node_modules with that name will be used.  The path will be extracted from the browser field of the package.json file in the the package directory.  If there is no browser filed, then the module field be used.  If there is neither, then and error will be emitted.
+
+2) If a name and a path to a file is provided then those will be added without further processing.
+
+3) If a name and a path to a directory is provided then that directory will be searched for a package.json file and proceed as (1) above.
+
 Widget View Record
 ==================
 
@@ -113,37 +128,3 @@ Widget View Record
   "package": "test_widget"
 }
 
-LIB
-===
-
-Search node_modules for widget libraries.
-Using the package-dir field in widget.json
-copy any files found there to the output/lib_name 
-directory. Loads the records from widget.json and 
-updates the records to match the destination
-files.
-
-Creates an import_map.ejs file that contains a mapping from
-the package name to the location of module field in the
-package.json file.
-
-Copy MJS
-========
-
-Copy or link all es6 files found in the records.
-Updates the records to match the destination file.
-Only operates on records from this package.
-  
-Notes
-=====
-
-widget source and view source will default to "./src"
-
-Initializing a package
-======================
-
-mkdir package_name
-cd package_name
-npm init
-npm i @html-widget/core
-npx widget init
