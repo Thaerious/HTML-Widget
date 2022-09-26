@@ -1,7 +1,7 @@
 import assert from "assert";
 import FS from "fs";
-import create from "../src/commands/create.js";
-import { Commands } from "../src/cli.js";
+import create from "../../src/commands/create.js";
+import { Commands } from "../../src/cli.js";
 import {init_all, clean_up, itHasFiles} from "./scripts/initTest.js";
 import {fsjson} from "@thaerious/utility"
 import ParseArgs from "@thaerious/parseargs";

@@ -1,6 +1,6 @@
 import assert from "assert";
 import FS from "fs";
-import init from "../src/commands/init.js";
+import init from "../../src/commands/init.js";
 import {init_all, clean_up } from "./scripts/initTest.js";
 import {fsjson} from "@thaerious/utility"
 

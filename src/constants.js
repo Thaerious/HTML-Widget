@@ -9,7 +9,7 @@ const CONSTANTS = {
     SERVER_DEST_FILE: `Server.js`,
     MODULE_NAME: Path.join(`@html-widget`, `core`),
     FILENAME: {
-        LIB_FILE: `import_map.ejs`,
+        IMPORT_FILE: `import_map.ejs`,
         BODY_FILE: `body.ejs`,
         TEMPLATES: `templates.ejs`
     },

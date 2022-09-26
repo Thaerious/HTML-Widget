@@ -1,11 +1,10 @@
 import assert from "assert";
 import ParseArgs from "@thaerious/parseargs";
 import FS from "fs";
-import Path from "path";
-import create from "../src/commands/create.js";
-import { Commands } from "../src/cli.js";
+import create from "../../src/commands/create.js";
+import { Commands } from "../../src/cli.js";
 import {init_all, clean_up } from "./scripts/initTest.js";
-import settings from "../src/settings.js";
+import settings from "../../src/settings.js";
 import { fsjson } from "@thaerious/utility";
 const args = new ParseArgs().run();
 

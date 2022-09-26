@@ -1,11 +1,11 @@
 import assert from "assert";
 import ParseArgs from "@thaerious/parseargs";
-import create from "../src/commands/create.js";
-import discover from "../src/commands/discover.js";
-import init from "../src/commands/init.js";
+import create from "../../src/commands/create.js";
+import discover from "../../src/commands/discover.js";
+import init from "../../src/commands/init.js";
 import {init_all, clean_up } from "./scripts/initTest.js";
-import { Commands } from "../src/cli.js";
-import CONSTANTS from "../src/constants.js";
+import { Commands } from "../../src/cli.js";
+import CONSTANTS from "../../src/constants.js";
 
 const args = new ParseArgs().run();
 CONSTANTS.TEMPLATES.VIEW = `../../templates/view.template.ejs`;

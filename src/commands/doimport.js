@@ -1,7 +1,6 @@
 import FS from "fs";
 import Path from "path";
 import settings from "../settings.js";
-import enumeratePackages from "../enumeratePackages.js";
 import CONSTANTS from "../constants.js";
 import {fsjson, mkdirif} from "@thaerious/utility";
 import Logger from "@thaerious/logger";

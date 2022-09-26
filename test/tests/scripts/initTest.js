@@ -1,7 +1,7 @@
 import child_process from "child_process";
 import FS from "fs";
-import CONSTANTS from "../../src/constants.js";
-import { reloadSettings } from "../../src/settings.js"
+import CONST from "../../../src/constants.js";
+import { reloadSettings } from "../../../src/settings.js"
 import ParseArgs from "@thaerious/parseargs";
 import assert from "assert";
 import {fsjson} from "@thaerious/utility"
@@ -22,7 +22,7 @@ const args = new ParseArgs().run();
             if (err) {
                 reject(err);
             } else {
-                fsjson.writeField(CONSTANTS.NODE_PACKAGE_FILE, "name", "@mock/test");
+                fsjson.writeField(CONST.NODE_PACKAGE_FILE, "name", "@mock/test");
                 resolve(stdout);
             }
         });

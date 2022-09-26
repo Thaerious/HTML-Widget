@@ -4,7 +4,7 @@ import Path from "path";
 import ejs from "ejs";
 import settings from "./settings.js";
 import Logger from "@thaerious/logger";
-import CONSTANTS from "./constants.js";
+import CONST from "./constants.js";
 
 const logger = Logger.getLogger();
 
@@ -62,8 +62,8 @@ async function getDependencies (rootRecord, records) {
  */
 async function render (path, record, dataIn) {
     return new Promise((resolve, reject) => {
-        const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
-        const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
+        const libFile = Path.join(settings[`output-dir`], CONST.FILENAME.IMPORT_FILE);
+        const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONST.FILENAME.TEMPLATES);
 
         const data = {
             widget : {

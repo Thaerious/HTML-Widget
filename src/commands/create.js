@@ -9,29 +9,25 @@ import { Commands } from "../cli.js";
 import { convert, mkdirif, fsjson, bfsObject as bfs } from "@thaerious/utility";
 const logger = Logger.getLogger();
 
-function create (records, commands, args) {
+function create(records, commands, args) {
     if (Array.isArray(commands)) commands = new Commands(commands);
 
-    switch (commands.peekCommand()) {
-    case `component`:
-        commands.nextCommand();
-        createComponent(commands.nextCommand(), args);
-        break;
-    case `view`:
-        commands.nextCommand();
-        createView(commands.nextCommand(), args);
-        break;
-    case `server`:
-        commands.nextCommand();
-        createServer(args);
-        break;
-    default:
-        createComponent(commands.nextCommand(), args);
-        break;
+    switch (commands.nextCommand()) {
+        case `component`:
+            createComponent(commands.nextCommand(), args);
+            break;
+        case `view`:
+            createView(commands.nextCommand(), args);
+            break;
+        case `server`:
+            createServer(args);
+            break;
+        default:
+            throw new Exception("missing command option {component, view, server}");
     }
 }
 
-function createView (name, args) {
+function createView(name, args) {
     const record = instantiateRecord(name, CONSTANTS.TYPE.VIEW);
     const viewFullPath = mkdirif(record.dir.src, record.view);
 
@@ -71,7 +67,7 @@ function createView (name, args) {
     }
 }
 
-function createComponent (name, args) {
+function createComponent(name, args) {
     logger.channel(`very-verbose`).log(`\\__ create widget`);
 
     addWidgetInfoFile(args.flags.package || settings.package);
@@ -114,10 +110,11 @@ function createComponent (name, args) {
     }
 }
 
-function instantiateRecord (name, type) {
+function instantiateRecord(name, type) {
     let record = buildRecord({}, name, type);
     const infoPath = Path.join(record.dir.src, CONSTANTS.WIDGET_INFO_FILE);
-    const widgetInfo = loadInfoFile(infoPath);
+    const widgetInfo = fsjson.loadIf(infoPath, { components: [] });
+    
     record = buildRecord(record, name, type);
 
     const current = bfs.first(widgetInfo, `fullName`, record.fullName);
@@ -129,18 +126,33 @@ function instantiateRecord (name, type) {
 }
 
 /**
- * Build a record from a given name,
- * @param source Predefined fields
+ * Build a new empty record with the provided name,
+ * @param source Will copy all fields from source.
  * @param name component / view name
- * @param type view or componentn
+ * @param type 'view' or 'component'
  */
-function buildRecord (source, name, type) {
+function buildRecord(source, name, type) {
     let root = ``;
+
+    // Names with package prefixes. (ie package/name)
     if (name.indexOf(`/`) !== -1) {
         const parsed = Path.parse(name);
         name = parsed.name;
         root = parsed.dir;
     }
+
+    // Path unique to this package, used for output subdirectories.
+    const subDirectory = Path.join(
+        settings.package,
+        root, 
+        convert.dash(name)
+    );
+
+    // Path to the source files
+    const sourceDirectory = Path.join(
+        settings['client-src'],
+        subDirectory
+    );
 
     const record = {
         ...{
@@ -153,8 +165,8 @@ function buildRecord (source, name, type) {
                 dest: Path.join(name + `.css`)
             },
             dir: {
-                sub: Path.join(settings.package, root, convert.dash(name)),
-                src: Path.join(settings[type === CONSTANTS.TYPE.COMPONENT ? `src` : `src`], settings.package, root, convert.dash(name))
+                sub: subDirectory,
+                src: sourceDirectory,
             },
             package: settings.package
         },
@@ -168,17 +180,18 @@ function buildRecord (source, name, type) {
     return record;
 }
 
-function loadInfoFile (path) {
-    if (!FS.existsSync(path))
-        fsjson.merge(mkdirif(path), {components: []});
-    return fsjson.load(path);
+function loadInfoFile(path) {
+    if (!FS.existsSync(path)){
+        fsjson.merge(mkdirif(path), { components: [] });
+    }
+    return fsjson.load(mkdirif(path));
 }
 
-function createServer(){
+function createServer() {
     const destPath = mkdirif(CONSTANTS.LOCATIONS.SERVER, CONSTANTS.SERVER_DEST_FILE);
     const srcPath = Path.join(
         settings[`node-modules`],
-        CONSTANTS.MODULE_NAME, 
+        CONSTANTS.MODULE_NAME,
         CONSTANTS.SERVER_SRC_FILE
     );
 
