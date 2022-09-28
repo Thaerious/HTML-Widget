@@ -6,7 +6,7 @@ SYNOPSIS
 
 OPTIONS
     -v, -vv
-        Display verbose information, or very-verbose information
+        Display verbose information, or veryverbose information
 
     --cwd [VALUE]
         Use the provided directory as the project root.

@@ -51,13 +51,13 @@ async function doInclude (settings, record, records) {
 
     const dependencies = await getDependencies(record, records);
     const templatesFilename = Path.join(record.dir.dest, CONSTANTS.FILENAME.TEMPLATES);
-    logger.channel(`very-verbose`).log(`  \\__ dest ${templatesFilename}`);
+    logger.channel(`veryverbose`).log(`  \\__ dest ${templatesFilename}`);
 
     if (!FS.existsSync(record.dir.dest)) FS.mkdirSync(record.dir.dest, { recursive: true });
     const fp = FS.openSync(templatesFilename, `w`);
 
     for (const dependency of dependencies) {
-        logger.channel(`very-verbose`).log(`  \\__ dependency ${dependency.fullName}`);
+        logger.channel(`veryverbose`).log(`  \\__ dependency ${dependency.fullName}`);
         if (!dependency.view || dependency.view === ``) continue;
         const dependencyFilename = Path.join(dependency.dir.src, dependency.view);
         const scriptPath = Path.relative(settings[`output-dir`], Path.join(dependency.dir.dest, dependency.es6));

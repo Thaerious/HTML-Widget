@@ -12,7 +12,7 @@ function help (records, commands, args) {
 
     if (!FS.existsSync(path)) {
         logger.channel(`standard`).log(`Help for command '${helpContext}' not found.`);
-        logger.channel(`very-verbose`).log(`${path}`);
+        logger.channel(`veryverbose`).log(`${path}`);
     } else {
         const text = FS.readFileSync(path, `utf-8`);
         logger.channel(`standard`).log(text);

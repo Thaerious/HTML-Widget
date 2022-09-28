@@ -25,7 +25,7 @@ function loadRecords(path) {
             component.dir.dest = Path.join(settings[`output-dir`], component.package, component.fullName);
             records.push(component);
 
-            logger.channel(`very-verbose`).log(`    \\__ ${file.full}`);
+            logger.channel(`veryverbose`).log(`    \\__ ${file.full}`);
         }
     }
 

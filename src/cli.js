@@ -75,7 +75,7 @@ async function cli (commandStack) {
         const { default: command } = await import(module);
         logger.verbose(`# ${commands.prev}`);
         rvalue = await command(records, commands, args);
-        logger["very-verbose"](`uptime ${process.uptime()} s`);
+        logger["veryverbose"](`uptime ${process.uptime()} s`);
     }
 
     return rvalue;

@@ -41,7 +41,7 @@ class StaticMiddleware {
             await build(this._records, null, args);
 
             const path = Path.join(record.dir.sub, record.view);
-            const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
+            const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.IMPORT_FILE);
             const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
 
             const data = {

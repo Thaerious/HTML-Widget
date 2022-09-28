@@ -5,7 +5,9 @@ import CONSTANTS from "../constants.js";
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "../parseArgsOptions.js";
 import settings from "../settings.js";
+import Logger from "@thaerious/logger";
 
+const logger = Logger.getLogger();
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 
 class WidgetMiddleware {
@@ -24,8 +26,10 @@ class WidgetMiddleware {
      * @param {function} res Response callback called by express.
      * @param {function} next Next callback called by express.
      */
-    async render(view, dataIn, res, next) {
+    async render(view, dataIn, res, next) {        
         view = this.cleanName(view);
+        logger.channel(`verbose`).log(`- render view (${view})`);
+
         this._records = {};
         discover(this._records);
 
@@ -41,7 +45,7 @@ class WidgetMiddleware {
             await build(this._records, null, args);
 
             const path = Path.join(record.dir.sub, record.view);
-            const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
+            const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.IMPORT_FILE);
             const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
 
             const data = {

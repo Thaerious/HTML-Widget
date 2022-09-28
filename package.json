@@ -1,6 +1,6 @@
 {
     "name": "@html-widget/core",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "browser": "core-elements/lib.mjs",
     "main": "src/server/middleware.js",
     "bin": {
@@ -15,6 +15,7 @@
         "@thaerious/parseargs": "^0.*.*",
         "@thaerious/utility": "*",
         "acorn": "^8.6.0",
+        "dotenv": "^16.0.2",
         "ejs": "^3.0.2",
         "express": "^4.17.2",
         "http": "^0.0.1-security",

@@ -1,15 +1,23 @@
 import FS from "fs";
 import Path from "path";
 import settings from "../settings.js";
-import CONSTANTS from "../constants.js";
+import CONST from "../constants.js";
 import {fsjson, mkdirif} from "@thaerious/utility";
 import Logger from "@thaerious/logger";
 
 const logger = Logger.getLogger();
 
+/**
+ * Build the import_map.ejs file from the 'client-src/widget.info' file.
+ * 
+ * @param {*} records 
+ * @param {*} commands 
+ * @param {*} args 
+ * @returns 
+ */
 function doimport (records, commands, args){
     const imports = {};
-    const widgetInfoPath = Path.join(settings['client-src'], CONSTANTS.WIDGET_INFO_FILE);
+    const widgetInfoPath = Path.join(settings['client-src'], CONST.WIDGET_INFO_FILE);
     let widgetInfo = fsjson.load(widgetInfoPath);
     if (!widgetInfo.imports) return;
 
@@ -17,7 +25,7 @@ function doimport (records, commands, args){
         imports[name] = widgetInfo.imports[name].file;
     }
 
-    const importMapPath = mkdirif(settings[`output-dir`], CONSTANTS.FILENAME.LIB_FILE);
+    const importMapPath = mkdirif(settings[`output-dir`], CONST.FILENAME.IMPORT_FILE);
     FS.writeFileSync(importMapPath, JSON.stringify({imports : imports}, null, 2));    
 }
 

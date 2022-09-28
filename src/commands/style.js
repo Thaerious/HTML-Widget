@@ -25,11 +25,11 @@ function style (records, commands, args) {
 
 function renderSCSS (record, settings) {
     if (!record?.style?.src || !record?.style?.dest) {
-        logger["very-verbose"](`    \\_ skip`);
+        logger["veryverbose"](`    \\_ skip`);
         return;
     }
 
-    logger["very-verbose"](`    \\_ ${record.package}:${record.fullName}`);
+    logger["veryverbose"](`    \\_ ${record.package}:${record.fullName}`);
 
     const src = Path.join(record.dir.src, record.style.src);
     const outpath = Path.join(record.dir.dest, record.style.dest);

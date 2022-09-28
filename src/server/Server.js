@@ -1,21 +1,19 @@
-import ParseArgs from "@thaerious/parseargs";
-import parseArgsOptions from "../parseArgsOptions.js";
-import Logger from "@thaerious/logger";
+import dotenv from "dotenv";
 import Express from "express";
 import http from "http";
 import FS from "fs";
 import Path from "path";
 import { WidgetMiddleware } from "./WidgetMiddleware.js";
 import CONSTANTS from "../constants.js";
+import log, {logger, args} from "../setupLogger.js";
 
-const args = new ParseArgs().loadOptions(parseArgsOptions).run();
-if (args.flags.cwd) process.chdir(args.flags.cwd);
-
-const logger = Logger.getLogger();
-const log = logger.all("server");
+if (args.flags["env"]){
+    dotenv.config();
+}
 
 class Server {
     async init () {
+        log.verbose("Server Initialize");
         const wmw = new WidgetMiddleware();
         this.app = Express();
 
@@ -68,8 +66,6 @@ class Server {
         const contents = FS.readdirSync(path);
         for (const entry of contents){            
             const fullpath = Path.join(process.cwd(), path, entry);
-            console.log(fullpath);
-            console.log(process.cwd());
             const { default: route } = await import(fullpath);
             this.app.use(route);
         }        

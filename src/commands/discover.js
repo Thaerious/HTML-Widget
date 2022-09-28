@@ -32,7 +32,7 @@ function discover (records, commands, args) {
 function _discover (records, path, settings) {
     for (const record of loadRecords(path)){
         storeRecord(records, record);
-        logger.channel(`very-verbose`).log(`    \\__ ${record.tagname}`);
+        logger.channel(`veryverbose`).log(`    \\__ ${record.tagname}`);
     }
 }
 

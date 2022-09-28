@@ -15,21 +15,20 @@ const logger = Logger.getLogger();
  * The name of the link is the value in the link field of the widget-info
  * file.  By default the directory name.
 */
-async function link (records, commands, args) {
+async function link (records, commands, args) {    
     linkClientSrc(settings['client-src'], settings);    
     linkPackages();
 }
 
 function linkClientSrc (path, settings) {
-    logger.channel(`very-verbose`).log(`  \\__ path ${path}`);
+    logger.channel(`veryverbose`).log(`  \\__ link client source (${path})`);
     const files = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
     for (const file of files) {
-        logger.channel(`debug`).log(`    \\__ file ${JSON.stringify(file, null, 2)}`);
         const widgetInfo = fsjson.load(file.full);
 
         if (widgetInfo.link) {
-            logger.channel(`very-verbose`).log(`    \\__ link ${file.full}`);
+            logger.channel(`veryverbose`).log(`    \\__ link ${file.full}`);
             const link = Path.join(settings[`link-dir`], widgetInfo.link);
             const linkDir = Path.parse(link).dir;
             const src = Path.relative(linkDir, file.dir);
@@ -51,6 +50,7 @@ function linkClientSrc (path, settings) {
  * @param {*} packageJSON 
  */
 function linkPackages(){
+    logger.channel(`veryverbose`).log(`  \\__ link packages`);
     const widgetInfoPath = Path.join(settings['client-src'], CONSTANTS.WIDGET_INFO_FILE);
     let widgetInfo = fsjson.load(widgetInfoPath);
     if (!widgetInfo.imports) return;
@@ -64,7 +64,7 @@ function linkPackages(){
 }
 
 function linkPackage (pkgJSON) {
-    logger.channel(`very-verbose`).log(`    \\__ link ${pkgJSON.name}`);
+    logger.channel(`veryverbose`).log(`    \\__ link ${pkgJSON.name}`);
     const from = Path.join(CONSTANTS.NODE_MODULES_PATH, pkgJSON.name);
     const to = Path.join(settings[`link-dir`], pkgJSON.name);
 

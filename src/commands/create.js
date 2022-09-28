@@ -68,7 +68,7 @@ function createView(name, args) {
 }
 
 function createComponent(name, args) {
-    logger.channel(`very-verbose`).log(`\\__ create widget`);
+    logger.channel(`veryverbose`).log(`\\__ create widget`);
 
     addWidgetInfoFile(args.flags.package || settings.package);
 
