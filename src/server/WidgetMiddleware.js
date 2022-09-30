@@ -38,8 +38,6 @@ class WidgetMiddleware {
             return false;
         }
 
-        this.records[view].data = {...this.records[view].data, ...dataIn};
-
         const record = this.records[view];
         if (record.type === CONSTANTS.TYPE.VIEW) {
             await build(this._records, null, args);
@@ -53,7 +51,8 @@ class WidgetMiddleware {
                     lib_file: Path.resolve(libFile),
                     template_file: Path.resolve(templateFile),
                 },
-                ...this.records[view].data
+                ...this.records[view].data, 
+                ...dataIn,
             };
 
             res.render(path, data, (err, html) => {

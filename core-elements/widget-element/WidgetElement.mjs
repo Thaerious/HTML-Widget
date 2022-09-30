@@ -54,8 +54,6 @@ class WidgetElement extends HTMLElement {
     detectDOM() {
         this.dom = {};
         for (const element of this.querySelectorAll("[id]")) {
-            console.log(element.id);
-            console.log(convertToCamel(element.id));
             this.dom[convertToCamel(element.id)] = element;
         }
         return this.dom;

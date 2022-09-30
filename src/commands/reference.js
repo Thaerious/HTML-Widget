@@ -24,7 +24,6 @@ function createReference(packageName, packagePath) {
         const field = getTargetField(packageJSON);
 
         if (!field){
-            console.log(fullpath);
             log.error(`package.json for '${packageName}' missing valid field`);
             log.verbose(JSON.stringify(packageJSON, null, 2));
             return;
