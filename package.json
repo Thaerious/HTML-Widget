@@ -1,6 +1,6 @@
 {
     "name": "@html-widget/core",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "browser": "core-elements/lib.mjs",
     "main": "src/server/middleware.js",
     "bin": {
