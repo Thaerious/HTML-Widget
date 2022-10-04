@@ -22,13 +22,14 @@ async function link (records, commands, args) {
 
 function linkClientSrc (path, settings) {
     logger.channel(`veryverbose`).log(`  \\__ link client source (${path})`);
-    const files = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
+    const widgetInfoFiles = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
 
-    for (const file of files) {
+    for (const file of widgetInfoFiles) {
+        logger.channel(`veryverbose`).log(`    \\__ ${file.full}`);
         const widgetInfo = fsjson.load(file.full);
-
+        
         if (widgetInfo.link) {
-            logger.channel(`veryverbose`).log(`    \\__ link ${file.full}`);
+            logger.channel(`veryverbose`).log(`    \\__ widgetInfo.link ${widgetInfo.link}`);
             const link = Path.join(settings[`link-dir`], widgetInfo.link);
             const linkDir = Path.parse(link).dir;
             const src = Path.relative(linkDir, file.dir);
