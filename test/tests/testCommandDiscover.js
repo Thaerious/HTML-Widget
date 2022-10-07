@@ -5,10 +5,10 @@ import discover from "../../src/commands/discover.js";
 import init from "../../src/commands/init.js";
 import {init_all, clean_up } from "./scripts/initTest.js";
 import { Commands } from "../../src/cli.js";
-import CONSTANTS from "../../src/constants.js";
+import CONST from "../../src/constants.js";
 
 const args = new ParseArgs().run();
-CONSTANTS.TEMPLATES.VIEW = `../../templates/view.template.ejs`;
+CONST.TEMPLATES.VIEW = `../../templates/view.template.ejs`;
 
 describe(`Test Command Discover`, function () {
     before(init_all);

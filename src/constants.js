@@ -1,6 +1,6 @@
 import Path from "path";
 
-const CONSTANTS = {
+const CONST = {
     WIDGET_PROPERTY_FILE: `.widgetrc`,
     WIDGET_INFO_FILE: `widget.info`,
     NODE_PACKAGE_FILE: `package.json`,
@@ -19,21 +19,32 @@ const CONSTANTS = {
     }
 };
 
-CONSTANTS.LOCATIONS = {
+// .widgetrc fields
+CONST.RC = {
+    "PACKAGE": "package",
+    "OUTPUT_DIR": 'output-dir',
+    "LINK_DIR": 'link-dir',
+    "CLIENT_SRC": 'client-src',
+    "SERVER_DIR": 'server-dir',
+    "NODE_MODULES": 'node-modules',
+    "PCAKGE_JSON": 'package-json'
+}
+
+CONST.LOCATIONS = {
     ROUTES_DIR: Path.join('server-src', 'routes'),
     STATIC_DIR: Path.join(`www`, `static/`),
     LINK_DIR: Path.join(`www`, `linked/`),
     OUTPUT: Path.join(`www`, `compiled/`),
-    DEFAULT_SRC: `client-src/`,
+    CLIENT_SRC: `client-src/`,
     SERVER: `server-src/`,
-    TEMPLATES: Path.join(CONSTANTS.NODE_MODULES_PATH, CONSTANTS.MODULE_NAME, `templates`)
+    TEMPLATES: Path.join(CONST.NODE_MODULES_PATH, CONST.MODULE_NAME, `templates`)
 };
 
-CONSTANTS.TEMPLATES = {
-    VIEW: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `view.template.ejs`),
-    COMPONENT_EJS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.ejs`),
-    COMPONENT_MJS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.mjs`),
-    COMPONENT_SCSS: Path.join(CONSTANTS.LOCATIONS.TEMPLATES, `template.scss`)
+CONST.TEMPLATES = {
+    VIEW: Path.join(CONST.LOCATIONS.TEMPLATES, `view.template.ejs`),
+    COMPONENT_EJS: Path.join(CONST.LOCATIONS.TEMPLATES, `template.ejs`),
+    COMPONENT_MJS: Path.join(CONST.LOCATIONS.TEMPLATES, `template.mjs`),
+    COMPONENT_SCSS: Path.join(CONST.LOCATIONS.TEMPLATES, `template.scss`)
 };
 
-export default CONSTANTS;
+export default CONST;

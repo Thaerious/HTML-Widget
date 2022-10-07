@@ -2,23 +2,26 @@ import settings from "../settings.js";
 import getDependencies, { DependencyError } from "../getDependencies.js";
 import FS from "fs";
 import Path from "path";
-import CONSTANTS from "../constants.js";
+import CONST from "../constants.js";
 import discover from "./discover.js";
 
 import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
 /**
- * Build the templates.mjs file for the views.
+ * Build the templates.mjs file for each of the views.
+ * 
+ * 
  */
-async function include (records, commands, args) {
+async function templates (records, commands, args) {
     if (Object.keys(records).length === 0) {
         discover(records);
     }
 
+    // Only build for the view specified by --view flag
     if (args && args.flags.view) {
         try {
-            await doInclude(settings, records[args.flags.view], records);
+            await doTemplate(settings, records[args.flags.view], records);
         } catch (error) {
             if (error instanceof DependencyError) {
                 console.error(error.source);
@@ -30,10 +33,10 @@ async function include (records, commands, args) {
         return;
     }
 
-    // for each record by name
+    // for each record by name (default)
     for (const fullName in records) {
         try {
-            await doInclude(settings, records[fullName], records);
+            await doTemplate(settings, records[fullName], records);
         } catch (error) {
             if (error instanceof DependencyError) {
                 console.error(error.source);
@@ -45,12 +48,12 @@ async function include (records, commands, args) {
     }
 }
 
-async function doInclude (settings, record, records) {
-    if (record.type !== CONSTANTS.TYPE.VIEW) return;
+async function doTemplate (settings, record, records) {
+    if (record.type !== CONST.TYPE.VIEW) return;
     logger.channel(`verbose`).log(`  \\__ ${record.fullName}`);
 
     const dependencies = await getDependencies(record, records);
-    const templatesFilename = Path.join(record.dir.dest, CONSTANTS.FILENAME.TEMPLATES);
+    const templatesFilename = Path.join(record.dir.dest, CONST.FILENAME.TEMPLATES);
     logger.channel(`veryverbose`).log(`  \\__ dest ${templatesFilename}`);
 
     if (!FS.existsSync(record.dir.dest)) FS.mkdirSync(record.dir.dest, { recursive: true });
@@ -68,4 +71,4 @@ async function doInclude (settings, record, records) {
     FS.close(fp);
 }
 
-export default include;
+export default templates;

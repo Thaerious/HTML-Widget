@@ -1,6 +1,6 @@
 import FS from "fs";
 import Path from "path";
-import CONSTANTS from "../constants.js";
+import CONST from "../constants.js";
 import settings from "../settings.js";
 import {seekfiles, fsjson} from "@thaerious/utility";
 import Logger from "@thaerious/logger";
@@ -22,7 +22,7 @@ async function link (records, commands, args) {
 
 function linkClientSrc (path, settings) {
     logger.channel(`veryverbose`).log(`  \\__ link client source (${path})`);
-    const widgetInfoFiles = seekfiles(path, file => file.base === CONSTANTS.WIDGET_INFO_FILE);
+    const widgetInfoFiles = seekfiles(path, file => file.base === CONST.WIDGET_INFO_FILE);
 
     for (const file of widgetInfoFiles) {
         logger.channel(`veryverbose`).log(`    \\__ ${file.full}`);
@@ -52,21 +52,27 @@ function linkClientSrc (path, settings) {
  */
 function linkPackages(){
     logger.channel(`veryverbose`).log(`  \\__ link packages`);
-    const widgetInfoPath = Path.join(settings['client-src'], CONSTANTS.WIDGET_INFO_FILE);
-    let widgetInfo = fsjson.load(widgetInfoPath);
-    if (!widgetInfo.imports) return;
+    const rootWidgetInfoPath = Path.join(settings['client-src'], CONST.WIDGET_INFO_FILE);
+    let rootWidgetInfo = fsjson.load(rootWidgetInfoPath);
+    if (!rootWidgetInfo.imports) return;
 
-    for (const name in widgetInfo.imports){
-        const pkgPath = widgetInfo.imports[name].path;
-        const fullpath = Path.join(CONSTANTS.NODE_MODULES_PATH, pkgPath, settings[`package-json`]);
+    for (const name in rootWidgetInfo.imports){
+        const pkgPath = rootWidgetInfo.imports[name].path;
+        const fullpath = Path.join(CONST.NODE_MODULES_PATH, pkgPath, settings[`package-json`]);
         const pkgJSON = fsjson.load(fullpath);
-        linkPackage(pkgJSON);
+
+        if (pkgJSON.widget) {
+            const widgetPath = Path.join(CONST.NODE_MODULES_PATH, pkgPath, pkgJSON.widget);
+            linkClientSrc(widgetPath, settings);
+        } else {
+            linkPackage(pkgJSON);
+        }
     }
 }
 
 function linkPackage (pkgJSON) {
     logger.channel(`veryverbose`).log(`    \\__ link ${pkgJSON.name}`);
-    const from = Path.join(CONSTANTS.NODE_MODULES_PATH, pkgJSON.name);
+    const from = Path.join(CONST.NODE_MODULES_PATH, pkgJSON.name);
     const to = Path.join(settings[`link-dir`], pkgJSON.name);
 
     if (!FS.existsSync(Path.parse(to).dir)) FS.mkdirSync(Path.parse(to).dir, { recursive: true });

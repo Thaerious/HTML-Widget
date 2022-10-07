@@ -1,6 +1,6 @@
 import Path from "path";
 import Logger from "@thaerious/logger";
-import CONSTANTS from "../constants.js";
+import CONST from "../constants.js";
 import settings from "../settings.js";
 import {seekfiles, fsjson} from "@thaerious/utility";
 import getPropertyFiles from "../getPropertyFiles.js";
@@ -24,8 +24,7 @@ function discover (records, commands, args) {
         logger.channel(`debug`).log(`    \\__ widgetrcFileDesc.full ${widgetrcFileDesc.full}`);
         logger.channel(`debug`).log(`    \\__ widgetrcFileDesc.dir ${widgetrcFileDesc.dir}`);
         logger.channel(`debug`).log(`    \\__ widgetrc.input ${widgetrc.input}`);
-
-        _discover(records, Path.join(widgetrcFileDesc.dir, widgetrc.src), settings);
+        _discover(records, Path.join(widgetrcFileDesc.dir, widgetrc[CONST.RC.CLIENT_SRC]), settings);
     }
 }
 

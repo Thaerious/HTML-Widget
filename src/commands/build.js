@@ -1,9 +1,9 @@
 import discover from "./discover.js";
 import link from "./link.js";
 import style from "./style.js";
-import include from "./include.js";
+import templates from "./templates.js";
 import tree from "./tree.js";
-import doimport from "./doimport.js";
+import importmap from "./importmap.js";
 import Logger from "@thaerious/logger";
 const logger = Logger.getLogger();
 
@@ -23,10 +23,10 @@ async function build (records, commands, args) {
     style(records);
 
     logger.channel(`verbose`).log(`# import packages`);
-    doimport(records);
+    importmap(records);
 
-    logger.channel(`verbose`).log(`# include`);
-    await include(records);
+    logger.channel(`verbose`).log(`# templates`);
+    await templates(records);
 }
 
 export default build;

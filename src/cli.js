@@ -6,6 +6,12 @@ import logger from "./setupLogger.js";
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.flags.cwd) process.chdir(args.flags.cwd);
 
+class EmptyCommandStackError extends Error{
+    constructor() {
+        super(`command parsing error`);
+    }
+}
+
 class Commands {
     /**
      * @param commandStack An array to use for the command stack.
@@ -16,7 +22,7 @@ class Commands {
     }
 
     nextCommand () {
-        if (this.commandStack.length === 0) throw new Error(`command parse error: empty command stack`);
+        if (this.commandStack.length === 0) throw new EmptyCommandStackError();
         this._prev.unshift(this.commandStack.shift().toLowerCase());
         return this._prev[0];
     }
@@ -81,4 +87,4 @@ async function cli (commandStack) {
     return rvalue;
 }
 
-export { cli, Commands };
+export { cli, Commands, EmptyCommandStackError };

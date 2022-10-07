@@ -1,6 +1,6 @@
 import FS from "fs";
 import Path from "path";
-import CONSTANTS from "./constants.js";
+import CONST from "./constants.js";
 import settings from "./settings.js";
 import {fsjson} from "@thaerious/utility";
 
@@ -9,7 +9,7 @@ import {fsjson} from "@thaerious/utility";
  * When found add the package name and path to the returned map. 
  * */
 function enumeratePackages(root = ".") {
-    let stack = [Path.join(root, CONSTANTS.NODE_MODULES_PATH)];
+    let stack = [Path.join(root, CONST.NODE_MODULES_PATH)];
     const map = new Map();
 
     while (stack.length > 0) {

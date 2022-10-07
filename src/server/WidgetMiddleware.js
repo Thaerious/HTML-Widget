@@ -1,7 +1,7 @@
 import Path from "path";
 import discover from "../commands/discover.js";
 import build from "../commands/build.js";
-import CONSTANTS from "../constants.js";
+import CONST from "../constants.js";
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "../parseArgsOptions.js";
 import settings from "../settings.js";
@@ -39,12 +39,12 @@ class WidgetMiddleware {
         }
 
         const record = this.records[view];
-        if (record.type === CONSTANTS.TYPE.VIEW) {
+        if (record.type === CONST.TYPE.VIEW) {
             await build(this._records, null, args);
 
             const path = Path.join(record.dir.sub, record.view);
-            const libFile = Path.join(settings[`output-dir`], CONSTANTS.FILENAME.IMPORT_FILE);
-            const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONSTANTS.FILENAME.TEMPLATES);
+            const libFile = Path.join(settings[`output-dir`], CONST.FILENAME.IMPORT_FILE);
+            const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONST.FILENAME.TEMPLATES);
 
             const data = {
                 widget : {

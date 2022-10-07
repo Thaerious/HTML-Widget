@@ -1,10 +1,9 @@
 import FS from "fs";
 import Path from "path";
 import Logger from "@thaerious/logger";
-import CONSTANTS from "../constants.js";
+import CONST from "../constants.js";
 import settings from "../settings.js";
 import replaceInFile from "../replaceInFile.js";
-import { addWidgetInfoFile } from "./init.js";
 import { Commands } from "../cli.js";
 import { convert, mkdirif, fsjson, bfsObject as bfs } from "@thaerious/utility";
 const logger = Logger.getLogger();
@@ -28,14 +27,12 @@ function create(records, commands, args) {
 }
 
 function createView(name, args) {
-    const record = instantiateRecord(name, CONSTANTS.TYPE.VIEW);
+    const record = instantiateRecord(name, CONST.TYPE.VIEW);
     const viewFullPath = mkdirif(record.dir.src, record.view);
-
-    addWidgetInfoFile(args.flags.package || settings.package);
 
     if (!FS.existsSync(viewFullPath)) {
         logger.channel(`verbose`).log(`  \\__ + ${viewFullPath}`);
-        FS.copyFileSync(CONSTANTS.TEMPLATES.VIEW, viewFullPath);
+        FS.copyFileSync(CONST.TEMPLATES.VIEW, viewFullPath);
         replaceInFile(viewFullPath, `\${style}`, Path.join(record.dir.sub, record.style.dest));
         replaceInFile(viewFullPath, `\${script}`, Path.join(record.dir.sub, record.es6));
     } else {
@@ -58,31 +55,29 @@ function createView(name, args) {
         logger.channel(`verbose`).log(`  \\__ = ${Path.join(record.dir.src, record.style.src)}`);
     }
 
-    if (!FS.existsSync(Path.join(record.dir.src, CONSTANTS.FILENAME.BODY_FILE))) {
-        const path = mkdirif(record.dir.src, CONSTANTS.FILENAME.BODY_FILE);
+    if (!FS.existsSync(Path.join(record.dir.src, CONST.FILENAME.BODY_FILE))) {
+        const path = mkdirif(record.dir.src, CONST.FILENAME.BODY_FILE);
         logger.channel(`verbose`).log(`  \\__ + ${path}`);
         FS.writeFileSync(path, ``);
     } else {
-        logger.channel(`verbose`).log(`  \\__ = ${Path.join(record.dir.src, CONSTANTS.FILENAME.BODY_FILE)}`);
+        logger.channel(`verbose`).log(`  \\__ = ${Path.join(record.dir.src, CONST.FILENAME.BODY_FILE)}`);
     }
 }
 
 function createComponent(name, args) {
     logger.channel(`veryverbose`).log(`\\__ create widget`);
 
-    addWidgetInfoFile(args.flags.package || settings.package);
-
     if (convert.dash(name).split(`-`).length < 2) {
         logger.channel(`standard`).log(`error: name must consist of two or more dash-delimited words (${name})`);
         process.exit();
     }
 
-    const record = instantiateRecord(name, CONSTANTS.TYPE.COMPONENT);
+    const record = instantiateRecord(name, CONST.TYPE.COMPONENT);
 
     const viewPath = mkdirif(record.dir.src, record.view);
     if (!FS.existsSync(viewPath)) {
         logger.channel(`verbose`).log(`  \\__ + ${viewPath}`);
-        FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_EJS, viewPath);
+        FS.copyFileSync(CONST.TEMPLATES.COMPONENT_EJS, viewPath);
         replaceInFile(viewPath, `\${name_dash}`, convert.dash(name));
         replaceInFile(viewPath, `\${name_underscore}`, convert.delimiter(name, `_`));
         replaceInFile(viewPath, `\${style_path}`, Path.join(record.dir.sub, record.style.dest));
@@ -93,7 +88,7 @@ function createComponent(name, args) {
     const scriptPath = Path.join(record.dir.src, record.es6);
     if (!FS.existsSync(scriptPath)) {
         logger.channel(`verbose`).log(`  \\__ + ${scriptPath}`);
-        FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_MJS, scriptPath);
+        FS.copyFileSync(CONST.TEMPLATES.COMPONENT_MJS, scriptPath);
         replaceInFile(scriptPath, `\${name_dash}`, convert.dash(name));
         replaceInFile(scriptPath, `\${name_pascal}`, convert.pascal(name));
     } else {
@@ -103,16 +98,22 @@ function createComponent(name, args) {
     const stylePath = Path.join(record.dir.src, record.style.src);
     if (!FS.existsSync(stylePath)) {
         logger.channel(`verbose`).log(`  \\__ + ${stylePath}`);
-        FS.copyFileSync(CONSTANTS.TEMPLATES.COMPONENT_SCSS, stylePath);
+        FS.copyFileSync(CONST.TEMPLATES.COMPONENT_SCSS, stylePath);
         replaceInFile(stylePath, `\${name_dash}`, convert.dash(name));
     } else {
         logger.channel(`verbose`).log(`  \\__ = ${stylePath}`);
     }
 }
 
+/**
+ * Create a new record for component/view called 'name'.
+ * @param {string} name 
+ * @param {string} type {component, view}
+ * @returns 
+ */
 function instantiateRecord(name, type) {
     let record = buildRecord({}, name, type);
-    const infoPath = Path.join(record.dir.src, CONSTANTS.WIDGET_INFO_FILE);
+    const infoPath = Path.join(record.dir.src, CONST.WIDGET_INFO_FILE);
     const widgetInfo = fsjson.loadIf(infoPath, { components: [] });
     
     record = buildRecord(record, name, type);
@@ -129,7 +130,7 @@ function instantiateRecord(name, type) {
  * Build a new empty record with the provided name,
  * @param source Will copy all fields from source.
  * @param name component / view name
- * @param type 'view' or 'component'
+ * @param type 'view' or 'component' see CONST.TYPE
  */
 function buildRecord(source, name, type) {
     let root = ``;
@@ -173,7 +174,7 @@ function buildRecord(source, name, type) {
         ...source
     };
 
-    if (type === CONSTANTS.TYPE.COMPONENT) {
+    if (type === CONST.TYPE.COMPONENT) {
         record.tagName = convert.dash(name);
     }
 
@@ -188,11 +189,11 @@ function loadInfoFile(path) {
 }
 
 function createServer() {
-    const destPath = mkdirif(CONSTANTS.LOCATIONS.SERVER, CONSTANTS.SERVER_DEST_FILE);
+    const destPath = mkdirif(CONST.LOCATIONS.SERVER, CONST.SERVER_DEST_FILE);
     const srcPath = Path.join(
         settings[`node-modules`],
-        CONSTANTS.MODULE_NAME,
-        CONSTANTS.SERVER_SRC_FILE
+        CONST.MODULE_NAME,
+        CONST.SERVER_SRC_FILE
     );
 
     FS.copyFileSync(srcPath, destPath);

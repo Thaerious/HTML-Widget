@@ -15,18 +15,20 @@ const logger = Logger.getLogger();
  * @param {*} args 
  * @returns 
  */
-function doimport (records, commands, args){
+function importmap (records, commands, args){
     const imports = {};
     const widgetInfoPath = Path.join(settings['client-src'], CONST.WIDGET_INFO_FILE);
     let widgetInfo = fsjson.load(widgetInfoPath);
     if (!widgetInfo.imports) return;
 
-    for (const name in widgetInfo.imports){
-        imports[name] = widgetInfo.imports[name].file;
+    for (const name in widgetInfo.imports) {
+        if (widgetInfo.imports[name].file) {
+            imports[name] = widgetInfo.imports[name].file;
+        }
     }
 
     const importMapPath = mkdirif(settings[`output-dir`], CONST.FILENAME.IMPORT_FILE);
     FS.writeFileSync(importMapPath, JSON.stringify({imports : imports}, null, 2));    
 }
 
-export default doimport;
+export default importmap;

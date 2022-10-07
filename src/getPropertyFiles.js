@@ -1,8 +1,9 @@
 import FS from "fs";
 import Path from "path";
 import settings from "./settings.js";
+import CONST from "./constants.js";
 
-function getPropertyFiles (filename = settings[`widget-rc`]) {
+function getPropertyFiles (filename = CONST.WIDGET_PROPERTY_FILE) {
     return checkDirectory(settings[`node-modules`], [], filename);
 }
 

@@ -1,20 +1,24 @@
 import Path from "path";
 import FS from "fs";
-import Logger from "@thaerious/logger";
-import CONSTANTS from "../constants.js";
-import settings from "../settings.js";
+import log from "../setupLogger.js";
+import CONST from "../constants.js";
 import { mkdirif, seekfiles, fsjson } from "@thaerious/utility";
-import loadRecords from "../loadRecords.js";
+import discover from "./discover.js";
 
 /**
  * Prebuild the output tree and default files.
- * Uses widget.config files so isn't dependent on 'discover'.
  */
-function tree(records, commands, args) {
+function tree(records, commands, args) {    
+    if (Object.keys(records).length === 0) {
+        discover(records);
+    }
     
-    for (const record of loadRecords(settings['client-src'])){
-        if (record.type == "view"){
-            const templatesFilename = Path.join(record.dir.dest, CONSTANTS.FILENAME.TEMPLATES);
+    for (const field in records) {
+        const record = records[field];
+
+        if (record.type == "view") {
+            log.verbose(`    \\__ ${record.dir.sub}`);
+            const templatesFilename = Path.join(record.dir.dest, CONST.FILENAME.TEMPLATES);
             mkdirif(templatesFilename);
             const fd = FS.openSync(templatesFilename, 'a');
             FS.closeSync(fd);

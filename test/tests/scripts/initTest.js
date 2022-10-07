@@ -1,7 +1,6 @@
 import child_process from "child_process";
 import FS from "fs";
 import CONST from "../../../src/constants.js";
-import { reloadSettings } from "../../../src/settings.js"
 import ParseArgs from "@thaerious/parseargs";
 import assert from "assert";
 import {fsjson} from "@thaerious/utility"
@@ -61,7 +60,7 @@ async function init_all(){
     }
     await npm_init();
     await npm_i_widget();
-    reloadSettings();
+    // reloadSettings();
 }
 
 /**

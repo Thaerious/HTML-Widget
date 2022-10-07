@@ -4,7 +4,7 @@ import http from "http";
 import FS from "fs";
 import Path from "path";
 import { WidgetMiddleware } from "./WidgetMiddleware.js";
-import CONSTANTS from "../constants.js";
+import CONST from "../constants.js";
 import log, {logger, args} from "../setupLogger.js";
 
 if (args.flags["env"]){
@@ -16,11 +16,6 @@ class Server {
         log.verbose("Server Initialize");
         const wmw = new WidgetMiddleware();
         this.app = Express();
-
-        this.app.use(`*`, (req, res, next) => {
-            log.server(`${req.method} ${req.originalUrl}`);
-            next();
-        });
 
         this.app.set(`views`, `www/linked`);
         this.app.set(`view engine`, `ejs`);
@@ -60,11 +55,12 @@ class Server {
         process.exit();
     }
 
-    async loadRoutes(path = CONSTANTS.LOCATIONS.ROUTES_DIR){
+    async loadRoutes(path = CONST.LOCATIONS.ROUTES_DIR){
         if (!FS.existsSync(path)) return;
         
-        const contents = FS.readdirSync(path);
-        for (const entry of contents){            
+        const contents = FS.readdirSync(path).sort();
+
+        for (const entry of contents) {
             const fullpath = Path.join(process.cwd(), path, entry);
             const { default: route } = await import(fullpath);
             this.app.use(route);
