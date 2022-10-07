@@ -1,4 +1,3 @@
-import FS from "fs";
 import Path from "path";
 import settings from "../settings.js";
 import enumeratePackages from "../enumeratePackages.js";

@@ -4,12 +4,17 @@ import FS from "fs";
 import { mkdirif } from "@thaerious/utility";
 import settings from "../settings.js";
 import logger from "../setupLogger.js";
+import discover from "./discover.js";
 
 /**
  * Compile sass files into css files and place then into
  * the component and view output directories.
  */
-function style (records, commands, args) {
+function style(records, commands, args) {
+    if (Object.keys(records).length === 0) {
+        discover(records);
+    }
+
     for (const name in records) {
         const record = records[name];
         logger.verbose(`  \\_ ${record.package}:${name}`);
