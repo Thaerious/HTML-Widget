@@ -8,6 +8,7 @@ const CONST = {
     SERVER_SRC_FILE: `src/server/Server.js`,
     SERVER_DEST_FILE: `Server.js`,
     MODULE_NAME: Path.join(`@html-widget`, `core`),
+    DEFAULT_ROUTES: Path.join(`src`, `server`, `routes`),
     FILENAME: {
         IMPORT_FILE: `import_map.ejs`,
         BODY_FILE: `body.ejs`,
@@ -36,7 +37,7 @@ CONST.LOCATIONS = {
     LINK_DIR: Path.join(`www`, `linked/`),
     OUTPUT: Path.join(`www`, `compiled/`),
     CLIENT_SRC: `client-src/`,
-    SERVER: `server-src/`,
+    SERVER_SRC: `server-src/`,
     TEMPLATES: Path.join(CONST.NODE_MODULES_PATH, CONST.MODULE_NAME, `templates`)
 };
 

@@ -29,7 +29,11 @@ const parseArgsOptions = {
             long: `path`,
             short: `p`,
             type: `string`
-        }
+        },
+        {
+            long: `port`,
+            type: `number`
+        }        
     ]
 };
 

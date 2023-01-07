@@ -2,13 +2,17 @@ import Path from "path";
 import settings from "../settings.js";
 import enumeratePackages from "../enumeratePackages.js";
 import CONST from "../constants.js";
-import {fsjson} from "@thaerious/utility";
+import { fsjson } from "@thaerious/utility";
 import log from "../setupLogger.js";
 import { EmptyCommandStackError } from "../cli.js";
 
 function reference(records, commands, args) {
     try {
-        createReference(commands.nextCommand(), args.flags[`path`]);
+        if (args.flags[`delete`]) {
+            deleteReference(commands.nextCommand());
+        } else {
+            createReference(commands.nextCommand(), args.flags[`file`], args.flags[`path`]);
+        }
     } catch (error) {
         if (error instanceof EmptyCommandStackError) {
             helpReference();
@@ -18,6 +22,14 @@ function reference(records, commands, args) {
     }
 }
 
+function deleteReference(pkgName) {
+    const widgetInfoPath = Path.join(settings['client-src'], CONST.WIDGET_INFO_FILE);
+    let widgetInfo = fsjson.load(widgetInfoPath);
+    if (!widgetInfo.imports) widgetInfo.imports = {};
+    if (widgetInfo.imports[pkgName]) delete widgetInfo.imports[pkgName];
+    fsjson.save(widgetInfoPath, widgetInfo);
+}
+
 /**
  * Add a field to the imports in the root widget.info file.
  * These fields are used during the link phase to create filesystem dir
@@ -25,38 +37,56 @@ function reference(records, commands, args) {
  * If the path is omitted a search will take place looking for the package in
  * the node_modules directory.  When found, the most appropriate field will
  * be used for the path (see getTargetField below).
- * @param {*} packageName 
- * @param {*} packagePath 
+ * @param {*} pkgName 
+ * @param {*} pkgPath 
  * @returns 
  */
-function createReference(packageName, packagePath) {
+function createReference(pkgName, pkgFile, pkgPath) {
+    log.verbose(`\\_ {name: '${pkgName}', file: '${pkgFile}', path: '${pkgPath}'}`);
+
+    // Load the root widget.info file
     const widgetInfoPath = Path.join(settings['client-src'], CONST.WIDGET_INFO_FILE);
     let widgetInfo = fsjson.load(widgetInfoPath);
     if (!widgetInfo.imports) widgetInfo.imports = {};
-    const packageMap = enumeratePackages();
+    if (!widgetInfo.imports[pkgName]) widgetInfo.imports[pkgName] = {};
 
-    if (packagePath){
-        widgetInfo.imports[packageName] = {
-            path : packagePath
+    // Load the import for package name (pkgName).
+    const pkgInfo = widgetInfo.imports[pkgName];
+
+    // If the file and path have been omitted, extract them from
+    // node_modules/pkgName/package.json
+    if (!pkgFile && !pkgPath) {
+        const packageMap = enumeratePackages();
+        const fullpath = Path.join(packageMap.get(pkgName), settings[`package-json`]);
+        const packageJSON = fsjson.load(fullpath);
+        pkgInfo.file = findPackageJSON(pkgName);
+        pkgInfo.path = Path.join("/", packageJSON.name);
+    }
+    else {
+        if (pkgFile) {
+            if (pkgFile.charAt(0) !== '/') pkgFile = '/' + pkgFile;
+            pkgInfo.file = pkgFile;
         }
-    } else {
-        const fullpath = Path.join(packageMap.get(packageName), settings[`package-json`]);
-        const packageJSON = fsjson.load(fullpath);        
-        const field = getTargetField(packageJSON);
-
-        if (!field){
-            widgetInfo.imports[packageName] = {
-                path : Path.join("/", packageJSON.name),
-            }  
-        } else {
-            widgetInfo.imports[packageName] = {
-                path : Path.join("/", packageJSON.name),
-                file : widgetInfo.imports[packageName] = Path.join("/", packageJSON.name, field.value)
-            }              
+        if (pkgPath) {
+            if (pkgPath.charAt(0) !== '/') pkgPath = '/' + pkgPath;
+            pkgInfo.path = pkgPath;
         }
     }
-
+    
     fsjson.save(widgetInfoPath, widgetInfo);
+}
+
+/**
+ * Find the pacakge.json file for the given package name.
+ * @param {*} pkgName 
+ * @returns 
+ */
+function findPackageJSON(pkgName) {
+    const packageMap = enumeratePackages();
+    const fullpath = Path.join(packageMap.get(pkgName), settings[`package-json`]);
+    const packageJSON = fsjson.load(fullpath);
+    const field = getTargetField(packageJSON);
+    return Path.join("/", packageJSON.name, field.value);
 }
 
 /**
@@ -72,13 +102,13 @@ function createReference(packageName, packagePath) {
  * 
  * Returns undefined if no field is found
  */
-function getTargetField(obj){
+function getTargetField(obj) {
     const keys = ["browser", "module", "main"];
-    for (const key of keys){
-        if (typeof obj[key] == `string`){
+    for (const key of keys) {
+        if (typeof obj[key] == `string`) {
             return {
-                key : key,
-                value : obj[key]
+                key: key,
+                value: obj[key]
             }
         }
     }
@@ -109,4 +139,4 @@ function helpReference() {
     log.standard("\tspecified there will treated as a widget client source directory.");
 }
 
-export {reference as default, createReference, helpReference};
+export { reference as default, createReference, helpReference };

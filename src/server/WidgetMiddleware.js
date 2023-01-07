@@ -13,6 +13,7 @@ const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 class WidgetMiddleware {
     constructor() {
         this._records = {};
+        this._data = {};
     }
 
     get records() {
@@ -66,8 +67,8 @@ class WidgetMiddleware {
         return true;
     }
 
-    async middleware(req, res, next) {
-        await this.render(req.originalUrl, {}, res, next);
+    async middleware(req, res, next, data = {}) {
+        await this.render(req.originalUrl, data, res, next);
     }
 
     cleanName(string){

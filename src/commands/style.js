@@ -19,7 +19,7 @@ function style(records, commands, args) {
         const record = records[name];
         logger.verbose(`  \\_ ${record.package}:${name}`);
         try {
-            renderSCSS(record, settings);
+            renderSCSS(record);
         } catch (err) {
             logger.standard(`Error in #sass`);
             logger.standard(err);
@@ -28,7 +28,7 @@ function style(records, commands, args) {
     }
 }
 
-function renderSCSS (record, settings) {
+function renderSCSS (record) {
     if (!record?.style?.src || !record?.style?.dest) {
         logger["veryverbose"](`    \\_ skip`);
         return;
@@ -38,7 +38,15 @@ function renderSCSS (record, settings) {
 
     const src = Path.join(record.dir.src, record.style.src);
     const outpath = Path.join(record.dir.dest, record.style.dest);
-    const result = sass.compile(src);
+    
+    const sassOptions = {
+        loadPaths: [
+            Path.resolve(process.cwd()),
+            Path.resolve(settings["link-dir"])
+        ]
+    };
+    
+    const result = sass.compile(src, sassOptions);
 
     if (result) {
         mkdirif(outpath);

@@ -21,7 +21,7 @@ async function link (records, commands, args) {
 }
 
 function linkClientSrc (path, settings) {
-    logger.channel(`veryverbose`).log(`  \\__ link client source (${path})`);
+    logger.channel(`veryverbose`).log(`# link client source (${path})`);
     const widgetInfoFiles = seekfiles(path, file => file.base === CONST.WIDGET_INFO_FILE);
 
     for (const file of widgetInfoFiles) {
@@ -51,7 +51,7 @@ function linkClientSrc (path, settings) {
  * @param {*} packageJSON 
  */
 function linkPackages(){
-    logger.channel(`veryverbose`).log(`  \\__ link packages`);
+    logger.channel(`veryverbose`).log(`# link packages`);
     const rootWidgetInfoPath = Path.join(settings['client-src'], CONST.WIDGET_INFO_FILE);
     let rootWidgetInfo = fsjson.load(rootWidgetInfoPath);
     if (!rootWidgetInfo.imports) return;
@@ -60,7 +60,7 @@ function linkPackages(){
         const pkgPath = rootWidgetInfo.imports[name].path;
         const fullpath = Path.join(CONST.NODE_MODULES_PATH, pkgPath, settings[`package-json`]);
         const pkgJSON = fsjson.load(fullpath);
-
+        
         if (pkgJSON.widget) {
             const widgetPath = Path.join(CONST.NODE_MODULES_PATH, pkgPath, pkgJSON.widget);
             linkClientSrc(widgetPath, settings);
@@ -71,15 +71,15 @@ function linkPackages(){
 }
 
 function linkPackage (pkgJSON) {
-    logger.channel(`veryverbose`).log(`    \\__ link ${pkgJSON.name}`);
+    logger.channel(`verbose`).log(` \\__ link ${pkgJSON.name}`);
     const from = Path.join(CONST.NODE_MODULES_PATH, pkgJSON.name);
     const to = Path.join(settings[`link-dir`], pkgJSON.name);
 
     if (!FS.existsSync(Path.parse(to).dir)) FS.mkdirSync(Path.parse(to).dir, { recursive: true });
     if (FS.existsSync(to)) FS.rmSync(to, { recursive: true });
 
-    logger.channel(`verbose`).log(`  \\__ from ${from}`);
-    logger.channel(`verbose`).log(`  \\__ to ${to}`);
+    logger.channel(`veryverbose`).log(`    \\__ from ${from}`);
+    logger.channel(`veryverbose`).log(`    \\__ to ${to}`);
 
     FS.symlinkSync(Path.resolve(from), to);
 }

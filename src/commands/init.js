@@ -1,4 +1,5 @@
 import Path from "path";
+import FS from "fs";
 import CONST from "../constants.js";
 import { fsjson, mkdirif } from "@thaerious/utility"
 import Logger from "@thaerious/logger";
@@ -6,7 +7,7 @@ import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "../parseArgsOptions.js";
 import { createNamespace } from "./namespace.js";
 import { createReference } from "./reference.js";
-import {reloadSettings} from "../settings.js";
+import settings, { reloadSettings } from "../settings.js";
 const logger = Logger.getLogger();
 
 /**
@@ -18,11 +19,12 @@ const logger = Logger.getLogger();
 function init(records, commands, args) {
     args = args || new ParseArgs().loadOptions(parseArgsOptions).run();
     addWidgetRC(args);
-    const settings = reloadSettings();
+    reloadSettings();
 
     createNamespace(args.flags.package || settings.package);
     mkdirif(CONST.LOCATIONS.STATIC_DIR);
     createReference(CONST.MODULE_NAME);
+    defaultRoutes();
 }
 
 /**
@@ -39,7 +41,8 @@ function addWidgetRC(args) {
             "output-dir": CONST.LOCATIONS.OUTPUT,
             "link-dir": CONST.LOCATIONS.LINK_DIR,
             "client-src": CONST.LOCATIONS.CLIENT_SRC,
-            "server-dir": CONST.LOCATIONS.SERVER,
+            "server-src": CONST.LOCATIONS.SERVER_SRC,
+            "routes-dir": CONST.LOCATIONS.ROUTES_DIR,
             "node-modules": Path.join(CONST.NODE_MODULES_PATH),
             "package-json": Path.join(CONST.NODE_PACKAGE_FILE),
         },
@@ -48,6 +51,28 @@ function addWidgetRC(args) {
 
     logger.channel(`verbose`).log(`  \\__ + ${CONST.WIDGET_PROPERTY_FILE}`);
     fsjson.save(CONST.WIDGET_PROPERTY_FILE, widgetrc);
+}
+
+function defaultRoutes() {
+    logger.channel(`verbose`).log(`  \\__ setting up default routes`);
+    const fromDir = Path.join(settings["node-modules"], CONST.MODULE_NAME, CONST.DEFAULT_ROUTES);
+    const toDir = mkdirif(settings["routes-dir"] + "/");
+    const contents = FS.readdirSync(fromDir).sort();
+   
+    for (const entry of contents) {        
+        const from = Path.join(fromDir, entry);
+        const to = Path.join(toDir, entry);
+        
+        if (FS.existsSync(to)) {
+            logger.channel(`veryverbose`).log(`  \\__ skipping: ${to}`);
+            continue;  
+        } 
+
+        logger.channel(`veryverbose`).log(`  \\__ file: ${from}`);
+        logger.channel(`verbose`).log(`  \\__ link: ${to}`);
+
+        FS.cpSync(from, to);
+    }        
 }
 
 export { init as default, addWidgetRC as addwidgetrc };

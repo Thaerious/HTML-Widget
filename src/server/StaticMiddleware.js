@@ -25,6 +25,7 @@ class StaticMiddleware {
      * @param {function} next Next callback called by express.
      */
     async render(view, dataIn, res, next) {
+        console.log("render " + view);
         view = this.cleanName(view);
         this._records = {};
         discover(this._records);
@@ -38,8 +39,6 @@ class StaticMiddleware {
 
         const record = this.records[view];
         if (record.type === CONST.TYPE.VIEW) {
-            await build(this._records, null, args);
-
             const path = Path.join(record.dir.sub, record.view);
             const libFile = Path.join(settings[`output-dir`], CONST.FILENAME.IMPORT_FILE);
             const templateFile = Path.join(settings[`output-dir`], record.dir.sub, CONST.FILENAME.TEMPLATES);

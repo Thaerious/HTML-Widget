@@ -3,7 +3,6 @@ import Express from "express";
 import http from "http";
 import FS from "fs";
 import Path from "path";
-import { WidgetMiddleware } from "./WidgetMiddleware.js";
 import CONST from "../constants.js";
 import log, {logger, args} from "../setupLogger.js";
 
@@ -13,32 +12,18 @@ if (args.flags["env"]){
 
 class Server {
     async init () {
-        log.verbose("Server Initialize");
-        const wmw = new WidgetMiddleware();
+        log.verbose("Initialize Server");        
         this.app = Express();
 
         this.app.set(`views`, `www/linked`);
         this.app.set(`view engine`, `ejs`);
-        this.app.use((req, res, next) => wmw.middleware(req, res, next));
 
         await this.loadRoutes();
-
-        this.app.use(Express.static(`www/static`));
-        this.app.use(Express.static(`www/compiled`));
-        this.app.use(Express.static(`www/linked`));
-
-        this.app.use(`*`, (req, res) => {
-            log.server(`404 ${req.originalUrl}`);
-            res.statusMessage = `404 Page Not Found: ${req.originalUrl}`;
-            res.status(404);
-            res.send(`404: page not found`);
-            res.end();
-        });
-
         return this;
     }
 
-    start (port = 8000, ip = `0.0.0.0`) {
+    start(port = 8000, ip = `0.0.0.0`) {
+        port = parseInt(port);
         this.server = http.createServer(this.app);
         this.server.listen(port, ip, () => {
             log.server(`Listening on port ${port}`);

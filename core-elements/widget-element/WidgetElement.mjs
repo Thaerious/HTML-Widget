@@ -4,6 +4,15 @@
  * Calling methods on the widget will treat shadow contents as regular contents.
  */
 class WidgetElement extends HTMLElement {
+
+    /**
+     * Use 'templateId' to populate this element.
+     * Settings:
+     *  - shadowroot (default true) : if true attach as a shadow element
+     * @param {*} templateId 
+     * @param {*} settings 
+     * @returns 
+     */
     constructor(templateId, settings) {
         super();
         if (!templateId) return;
@@ -18,8 +27,7 @@ class WidgetElement extends HTMLElement {
      */
     async connectedCallback() {
         this.detectDOM();
-        if (typeof this.ready === "function") window.addEventListener("load", async ()=>await this.ready(), {once : true});
-        if (!this.classList.contains("hidden")) this.classList.add("visible");
+        if (typeof this.ready === "function") window.addEventListener("load", async () => await this.ready(), { once: true });
     }
 
     /**
@@ -33,8 +41,8 @@ class WidgetElement extends HTMLElement {
             innerTarget = this.querySelector(innerTarget);
         }
 
-        if (!selector){
-            for (const node of this.childNodes){
+        if (!selector) {
+            for (const node of this.childNodes) {
                 this.removeChild(node);
                 innerTarget.append(node);
             }
@@ -81,21 +89,7 @@ class WidgetElement extends HTMLElement {
     async shadowTemplate(templateId) {
         if (this.shadowRoot !== null) return;
         let template = document.getElementById(templateId);
-
-        if (!template) {
-            throw new Error(
-                "Template '" +
-                    templateId +
-                    "' not found\n" +
-                    "Has the .ejs directive been added to the source file?\n" +
-                    "<%- include('../partials/widget-templates'); %>"
-            );
-        }
-
-        if (template.tagName.toUpperCase() !== "TEMPLATE") {
-            throw new Error("Element with id '" + templateId + "' is not a template.");
-        }
-
+        this.checkTemplate(template);
         const content = template.content.cloneNode(true);
         this.attachShadow({ mode: "open" }).appendChild(content);
     }
@@ -105,22 +99,45 @@ class WidgetElement extends HTMLElement {
      */
     async copyTemplate(templateId) {
         let template = document.getElementById(templateId);
+        this.checkTemplate(template);
+        const content = template.content.cloneNode(true);
+        const children = Array.from(content.childNodes);
 
+        children.forEach(ele => {
+            if (ele.tagName) {
+                switch (ele.tagName.toLowerCase()) {
+                    case "default-attributes":
+                        this.copyAttributes(ele);
+                        break;
+                    default:
+                        this.appendChild(ele);
+                        break;
+                }
+            }
+        });
+    }
+
+    copyAttributes(from) {
+        for (const attr of from.attributes) {
+            if (this.getAttribute(attr.nodeName)) continue;
+            this.setAttribute(attr.nodeName, attr.nodeValue);
+        }
+    }
+
+    checkTemplate(template) {
         if (!template) {
             throw new Error(
                 "Template '" +
-                    templateId +
-                    "' not found\n" +
-                    "Has the .ejs directive been added to the source file?\n" +
-                    "<%- include('../partials/widget-templates'); %>"
+                templateId +
+                "' not found\n" +
+                "Has the .ejs directive been added to the source file?\n" +
+                "<%- include('../partials/widget-templates'); %>"
             );
         }
 
         if (template.tagName.toUpperCase() !== "TEMPLATE") {
             throw new Error("Element with id '" + templateId + "' is not a template.");
         }
-
-        this.append(template.content.cloneNode(true));
     }
 
     get visible() {
@@ -260,7 +277,7 @@ class WidgetElement extends HTMLElement {
     }
 }
 
-function convertDelimited (string, delimiter = `-`) {
+function convertDelimited(string, delimiter = `-`) {
     string = string.trim();
     string = string.charAt(0).toLocaleLowerCase() + string.substr(1); // leading lower case
     string = string.replace(/[_ -]+/g, delimiter); // replace common delimeters with declared delimiter
@@ -275,7 +292,7 @@ function convertDelimited (string, delimiter = `-`) {
     return string;
 }
 
-function convertToCamel (string) {
+function convertToCamel(string) {
     string = convertDelimited(string, `-`);
     string = string.replace(/(-[a-z])+/g, v => v.toUpperCase()); // replace dash with nothing, letter preceeding to uppercase
     string = string.replace(/-+/g, ``); // remove dashes
