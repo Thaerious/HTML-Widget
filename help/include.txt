@@ -1,8 +1,0 @@
-COMMAND
-    include - Sub-command used by build to create the templates.mjs file
-    for each component.
-
-SYNOPSIS
-    npx widget include
-    
-DESCRIPTION

@@ -1,10 +1,8 @@
+import discover from "../discover.js";
+import seekFiles from "@thaerious/utility/src/seekfiles.js";
+import { compileSASS } from "../server/middleware/style.js";
+import CONST from "../const.js";
 import Path from "path";
-import sass from "sass";
-import FS from "fs";
-import { mkdirif } from "@thaerious/utility";
-import settings from "../settings.js";
-import logger from "../setupLogger.js";
-import discover from "./discover.js";
 
 /**
  * Compile sass files into css files and place then into
@@ -17,42 +15,19 @@ function style(records, commands, args) {
 
     for (const name in records) {
         const record = records[name];
-        logger.verbose(`  \\_ ${record.package}:${name}`);
-        try {
-            renderSCSS(record);
-        } catch (err) {
-            logger.standard(`Error in #sass`);
-            logger.standard(err);
-            logger.standard(JSON.stringify(record, null, 2));
-        }
-    }
-}
-
-function renderSCSS (record) {
-    if (!record?.style?.src || !record?.style?.dest) {
-        logger["veryverbose"](`    \\_ skip`);
-        return;
-    }
-
-    logger["veryverbose"](`    \\_ ${record.package}:${record.fullName}`);
-
-    const src = Path.join(record.dir.src, record.style.src);
-    const outpath = Path.join(record.dir.dest, record.style.dest);
-    
-    const sassOptions = {
-        loadPaths: [
-            Path.resolve(process.cwd()),
-            Path.resolve(settings["link-dir"])
-        ]
-    };
-    
-    const result = sass.compile(src, sassOptions);
-
-    if (result) {
-        mkdirif(outpath);
-        FS.writeFileSync(outpath, result.css);
-        logger.verbose(`      \\_ ${src}`);
-        logger.verbose(`      \\_ ${outpath}`);
+        const src = Path.join(
+            record.type == "view" ? CONST.DIR.VIEWS : CONST.DIR.COMPONENTS,
+            record.name,
+            record.name + CONST.EXT.SCSS
+        );
+        const dest = Path.join(
+            CONST.DIR.COMPILED,
+            record.name,
+            record.name + CONST.EXT.CSS
+        );
+        console.log(src);
+        console.log(dest);
+        compileSASS(src, dest); 
     }
 }
 

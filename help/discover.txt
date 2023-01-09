@@ -1,9 +1,0 @@
-COMMAND
-    discover - Sub-command used by build to look up info files.
-
-SYNOPSIS
-    npx widget discover
-
-DESCRIPTION
-    Recrusivly search all source directories for widget.info files and
-    collect them into a dictionary.

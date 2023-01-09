@@ -1,7 +1,0 @@
-COMMAND
-    show-settings - Debug command to view settings as the tool seems them.
-
-SYNOPSIS
-    npx show-settings
-    
-DESCRIPTION

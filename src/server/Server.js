@@ -3,30 +3,38 @@ import Express from "express";
 import http from "http";
 import FS from "fs";
 import Path from "path";
-import CONST from "../constants.js";
-import log, {logger, args} from "../setupLogger.js";
+import CONST from "../const.js";
+import logger from "./setupLogger.js";
+import ejs from "ejs";
 
-if (args.flags["env"]){
-    dotenv.config();
-}
+dotenv.config();
 
 class Server {
-    async init () {
-        log.verbose("Initialize Server");        
+    async init(path = CONST.DIR.ROUTES) {
+        logger.verbose("Initialize Server");
         this.app = Express();
 
-        this.app.set(`views`, `www/linked`);
+        this.app.set(`views`, `www/views`);
         this.app.set(`view engine`, `ejs`);
 
-        await this.loadRoutes();
+        // The engine is using a callback method for async rendering
+        this.app.engine('ejs', async (path, data, cb) => {
+            try {
+                let html = await ejs.renderFile(path, data, { async: true });
+                cb(null, html);
+            } catch (e) {
+                cb(e, '');
+            }
+        });
+
+        await this.loadRoutes(path);
         return this;
     }
 
-    start(port = 8000, ip = `0.0.0.0`) {
-        port = parseInt(port);
+    start(port = process.env.PORT, ip = `0.0.0.0`) {
         this.server = http.createServer(this.app);
         this.server.listen(port, ip, () => {
-            log.server(`Listening on port ${port}`);
+            logger.standard(`Listening on port ${port}`);
         });
 
         process.on(`SIGINT`, () => this.stop(this.server));
@@ -34,22 +42,27 @@ class Server {
         return this;
     }
 
-    stop () {
-        log.server(`Stopping server`);
+    stop() {
+        logger.standard(`Stopping server`);
         this.server.close();
         process.exit();
     }
 
-    async loadRoutes(path = CONST.LOCATIONS.ROUTES_DIR){
+    async loadRoutes(path = CONST.PATH.ROUTES) {
+        logger.verbose(`routes path ${path} ${FS.existsSync(path)}`);
         if (!FS.existsSync(path)) return;
-        
+
         const contents = FS.readdirSync(path).sort();
 
         for (const entry of contents) {
             const fullpath = Path.join(process.cwd(), path, entry);
             const { default: route } = await import(fullpath);
-            this.app.use(route);
-        }        
+            try {
+                this.app.use(route);
+            } catch (ex) {
+                throw `route ${fullpath} did not load`;
+            }
+        }
     }
 }
 

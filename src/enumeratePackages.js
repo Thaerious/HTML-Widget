@@ -5,7 +5,7 @@ import settings from "./settings.js";
 import {fsjson} from "@thaerious/utility";
 
 /**
- * Recrusivly check each subdirectory until a pacakge.json file is found.
+ * Recrusivly check each subdirectory until a package.json file is found.
  * When found add the package name and path to the returned map. 
  * */
 function enumeratePackages(root = ".") {

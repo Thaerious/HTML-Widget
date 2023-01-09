@@ -1,8 +1,0 @@
-COMMAND
-    link-packages - Sub-command used by build to populate the www/linked directory
-    with links to the source packages.
-
-SYNOPSIS
-    npx widget link-packages
-
-DESCRIPTION

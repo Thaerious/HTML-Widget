@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="/${style}">
-    <script type="importmap">
-        <%- include(widget.lib_file) %>
-    </script>
-</head>
-<body>
-    <script type="module" src="/${script}"></script>
-    <%- include(widget.template_file) %>
-    <%- include('./body.ejs'); %>
-</body>
-</html>
+<html lang="en" dir="ltr">
+    <head>
+        <link rel="stylesheet" href="/${camel}/${camel}.css">
+        <script type="importmap">{
+            "imports" : {}
+        }</script>
+    </head>
 
+    <body>
+        <script type="module" src="/${camel}/${pascal}.mjs"></script>
+        <%- buildTemplates -%>
+    </body>
+</html>

@@ -2,6 +2,7 @@
 import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "./parseArgsOptions.js";
 import logger from "./setupLogger.js";
+import help from "./commands/help.js";
 
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
 if (args.flags.cwd) process.chdir(args.flags.cwd);
@@ -64,20 +65,26 @@ async function cli (commandStack) {
     const records = {};
     commands = new Commands(commandStack);
 
-    while (commandStack.length > 0) {
+    // advance command stack to first command
+    while (!started) {
         const module = `./commands/${commands.nextCommand().replaceAll(`-`, `_`)}.js`;
         logger.debug(` -- ${module}`);
 
         if (module.endsWith(`widget.js`) || module.endsWith(`cli.js`)) {
             logger.debug(` -- started`);
             started = true;
-            continue;
         }
+    }
 
-        if (!started) {
-            continue;
-        }
+    // if no commands given, print help
+    if (commandStack.length == 0) {
+        help(records, commands, args);
+    }
 
+    // attempt to import each command as a module from /commands
+    while (commandStack.length > 0) {
+        const module = `./commands/${commands.nextCommand().replaceAll(`-`, `_`)}.js`;
+        
         const { default: command } = await import(module);
         logger.verbose(`# ${commands.prev}`);
         rvalue = await command(records, commands, args);
