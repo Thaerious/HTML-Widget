@@ -46,6 +46,9 @@ const CONST = {
             ],
             sourceMap: true
         }
+    },
+    VAR: {
+        ROOT: ""
     }
 }
 

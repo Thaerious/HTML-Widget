@@ -3,9 +3,16 @@ import ParseArgs from "@thaerious/parseargs";
 import parseArgsOptions from "./parseArgsOptions.js";
 import logger from "./setupLogger.js";
 import help from "./commands/help.js";
+import CONST from "./const.js";
+import Path from "path";
 
 const args = new ParseArgs().loadOptions(parseArgsOptions).run();
-if (args.flags.cwd) process.chdir(args.flags.cwd);
+if (args.flags.cwd) {
+    process.chdir(args.flags.cwd);
+}
+
+const modulePath = Path.parse(import.meta.url)
+CONST.VAR.ROOT = Path.resolve(Path.join(modulePath.dir.substring("file://".length), ".."));
 
 class EmptyCommandStackError extends Error{
     constructor() {
@@ -66,11 +73,11 @@ async function cli (commandStack) {
     commands = new Commands(commandStack);
 
     // advance command stack to first command
-    while (!started) {
-        const module = `./commands/${commands.nextCommand().replaceAll(`-`, `_`)}.js`;
-        logger.debug(` -- ${module}`);
+    while (!started && commands.hasNext()) {
+        const next = commands.nextCommand();
+        logger.debug(` -- ${next}`);
 
-        if (module.endsWith(`widget.js`) || module.endsWith(`cli.js`)) {
+        if (next.endsWith(`/.bin/widget`) || next.endsWith(`cli.js`)) {
             logger.debug(` -- started`);
             started = true;
         }

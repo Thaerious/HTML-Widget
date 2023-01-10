@@ -128,3 +128,12 @@ Widget View Record
   "package": "test_widget"
 }
 
+# Development
+
+## C8
+
+Make c8 globally executable.
+    npm i c8 -g
+    sudo ln -s /opt/node/19.3.0/lib/node_modules/c8/bin/c8.js /usr/local/bin/c8
+
+

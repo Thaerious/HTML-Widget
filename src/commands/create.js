@@ -29,25 +29,25 @@ function createView(name, args) {
 
     const mjsDest = mkdirif(CONST.DIR.VIEWS, names.camel, names.pascal + ".mjs");
     if (args.flags.replace || !FS.existsSync(mjsDest)) {        
-        const mjsTemplate = mkdirif(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, CONST.TEMPLATE.VIEW_MJS);
+        const mjsTemplate = mkdirif(CONST.VAR.ROOT, CONST.TEMPLATE.VIEW_MJS);
         FS.writeFileSync(mjsDest, loadTemplate(mjsTemplate, names));
     }
     
     const scssDest = mkdirif(CONST.DIR.VIEWS, names.camel, names.camel + ".scss");
     if (args.flags.replace || !FS.existsSync(scssDest)) {
-        const scssTemplate = mkdirif(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, CONST.TEMPLATE.VIEW_SCSS);
+        const scssTemplate = mkdirif(CONST.VAR.ROOT, CONST.TEMPLATE.VIEW_SCSS);
         FS.writeFileSync(scssDest, loadTemplate(scssTemplate, names));
     }
 
     const ejsDest = mkdirif(CONST.DIR.VIEWS, names.camel, names.camel + ".ejs");   
     if (args.flags.replace || !FS.existsSync(ejsDest)) {
-        const ejsTemplate = mkdirif(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, CONST.TEMPLATE.VIEW_EJS);
+        const ejsTemplate = mkdirif(CONST.VAR.ROOT, CONST.TEMPLATE.VIEW_EJS);
         FS.writeFileSync(ejsDest, loadTemplate(ejsTemplate, names));
     }
 
     const routeDest = mkdirif(CONST.DIR.ROUTES, "300." + names.camel + ".js");   
     if (args.flags.replace || !FS.existsSync(routeDest)) {
-        const routeTemplate = mkdirif(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, CONST.TEMPLATE.VIEW_ROUTE);
+        const routeTemplate = mkdirif(CONST.VAR.ROOT, CONST.TEMPLATE.VIEW_ROUTE);
         FS.writeFileSync(routeDest, loadTemplate(routeTemplate, names));
     }    
 }
@@ -66,19 +66,19 @@ function createComponent(name, args) {
 
     const mjsDest = mkdirif(CONST.DIR.COMPONENTS, names.camel, names.pascal + ".mjs");
     if (args.flags.replace || !FS.existsSync(mjsDest)) {        
-        const mjsTemplate = mkdirif(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, CONST.TEMPLATE.COMP_MJS);
+        const mjsTemplate = mkdirif(CONST.VAR.ROOT, CONST.TEMPLATE.COMP_MJS);
         FS.writeFileSync(mjsDest, loadTemplate(mjsTemplate, names));
     }
     
     const scssDest = mkdirif(CONST.DIR.COMPONENTS, names.camel, names.camel + ".scss");
     if (args.flags.replace || !FS.existsSync(scssDest)) {
-        const scssTemplate = mkdirif(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, CONST.TEMPLATE.COMP_SCSS);
+        const scssTemplate = mkdirif(CONST.VAR.ROOT, CONST.TEMPLATE.COMP_SCSS);
         FS.writeFileSync(scssDest, loadTemplate(scssTemplate, names));
     }
 
     const ejsDest = mkdirif(CONST.DIR.COMPONENTS, names.camel, names.camel + ".ejs");   
     if (args.flags.replace || !FS.existsSync(ejsDest)) {
-        const ejsTemplate = mkdirif(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, CONST.TEMPLATE.COMP_EJS);
+        const ejsTemplate = mkdirif(CONST.VAR.ROOT, CONST.TEMPLATE.COMP_EJS);
         FS.writeFileSync(ejsDest, loadTemplate(ejsTemplate, names));
     }
 }

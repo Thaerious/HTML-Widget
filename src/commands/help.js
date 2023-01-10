@@ -7,7 +7,9 @@ const logger = Logger.getLogger();
 
 function help (records, commands, args) {
     const helpContext = commands.hasNext() ? commands.nextCommand() : `index`;
-    const path = Path.join(CONST.NODE.MODULES_PATH, CONST.APP.MODULE_NAME, `help/${helpContext}.txt`);
+
+    const modulePath = Path.parse(import.meta.url)
+    const path = Path.join(CONST.VAR.ROOT, "help", `${helpContext}.txt`);
 
     if (!FS.existsSync(path)) {
         logger.channel(`standard`).log(`Help for command '${helpContext}' not found.`);

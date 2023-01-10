@@ -2,7 +2,7 @@
     "name": "@html-widget/core",
     "version": "0.2.4",
     "browser": "core-elements/lib.mjs",
-    "main": "src/packageExports.js",
+    "main": "src/lib.js",
     "bin": {
         "widget": "src/cli.js"
     },
