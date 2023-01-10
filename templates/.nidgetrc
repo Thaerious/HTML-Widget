@@ -1,7 +1,0 @@
-{
-  "output-dir": "output",
-  "package-dir": "dist",
-  "widget-src": "./src/",
-  "view-src": "./src/",
-  "src": "./src/"
-}
